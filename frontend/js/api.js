@@ -1,7 +1,7 @@
 const API = {
-  baseURL: (window.location.port === '5500' || window.location.port === '3000')
+  baseURL: (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost')
     ? 'http://127.0.0.1:8000/api/'
-    : `${window.location.origin}/api/`,
+    : 'https://<tudjango>.onrender.com/api/',
 
   async getToken() { return localStorage.getItem('access_token'); },
 

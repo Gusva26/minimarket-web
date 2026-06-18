@@ -81,6 +81,10 @@ else:
         }
     }
 
+    ssl_ca = config('DB_SSL_CA', default='')
+    if ssl_ca:
+        DATABASES['default']['OPTIONS']['ssl'] = {'ca': ssl_ca}
+
 
 AUTH_USER_MODEL = 'usuarios.Usuario'
 PASSWORD_RESET_TIMEOUT = 300
@@ -184,6 +188,7 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:5500',
     'http://127.0.0.1:8000',
     'http://localhost:8000',
+    config('FRONTEND_URL', default=''),
 ]
 CORS_ALLOW_CREDENTIALS = True
 
