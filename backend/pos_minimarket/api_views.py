@@ -15,7 +15,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from inventario.models import Producto, UnidadProducto, Kardex
-from inventario.utils import get_mercado_cache_version
+from inventario.utils import get_mercado_cache_version, mercado_filter
 from ventas.models import Venta, Caja
 from usuarios.models import Usuario
 
@@ -25,14 +25,15 @@ class DashboardView(APIView):
 
     def get(self, request):
         mercado = request.user.mercado
-        version = get_mercado_cache_version(mercado.id)
-        cache_key = f"dashboard_mercado_{mercado.id}_v{version}"
+        mfiltro = {} if not mercado else {'mercado': mercado}
+
+        version = get_mercado_cache_version(mercado.id if mercado else None)
+        cache_key = f"dashboard_mercado_{mercado.id if mercado else 'all'}_v{version}"
         
         cached_data = cache.get(cache_key)
         if cached_data:
-            # We must check if caja status changed, as it's user-specific and dynamic
             caja_abierta = Caja.objects.filter(
-                usuario=request.user, mercado=mercado, estado='ABIERTA'
+                usuario=request.user, **mfiltro, estado='ABIERTA'
             ).first()
             cached_data['caja_abierta_id'] = caja_abierta.id if caja_abierta else None
             return Response(cached_data)
@@ -42,12 +43,11 @@ class DashboardView(APIView):
         hoy = timezone.now().date()
 
         productos_bajo_stock = list(Producto.objects.filter(
-            mercado=mercado, stock__lt=F('stock_minimo')
+            **mfiltro, stock__lt=F('stock_minimo')
         ).values('id', 'nombre', 'categoria__nombre', 'stock', 'stock_minimo', 'unidad_medida'))
 
-        # Aggregated expiration data
         proximos_vencer_qs = UnidadProducto.objects.filter(
-            mercado=mercado, estado='disponible', cantidad__gt=0,
+            **mfiltro, estado='disponible', cantidad__gt=0,
             fecha_vencimiento__lte=hoy + timezone.timedelta(days=30)
         ).values(
             'producto__nombre', 'fecha_vencimiento'
@@ -67,11 +67,11 @@ class DashboardView(APIView):
             })
 
         ventas_hoy = Venta.objects.filter(
-            mercado=mercado, fecha_hora__date=hoy, estado='COMPLETADA'
+            **mfiltro, fecha_hora__date=hoy, estado='COMPLETADA'
         ).aggregate(total=Sum('total'))['total'] or 0
 
         caja_abierta = Caja.objects.filter(
-            usuario=request.user, mercado=mercado, estado='ABIERTA'
+            usuario=request.user, **mfiltro, estado='ABIERTA'
         ).first()
 
         response_data = {
@@ -79,12 +79,11 @@ class DashboardView(APIView):
             'proximos_vencer': proximos_vencer,
             'ventas_hoy': float(ventas_hoy),
             'caja_abierta_id': caja_abierta.id if caja_abierta else None,
-            'mercado_nombre': mercado.nombre if mercado else None,
+            'mercado_nombre': mercado.nombre if mercado else 'Todas las sedes',
         }
         
-        # Store in cache but without caja_abierta_id as it varies by user/session state
         cache_data_to_store = response_data.copy()
-        cache.set(cache_key, cache_data_to_store, 300) # 5 min
+        cache.set(cache_key, cache_data_to_store, 300)
         
         return Response(response_data)
 

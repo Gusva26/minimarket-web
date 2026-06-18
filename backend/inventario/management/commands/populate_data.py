@@ -30,7 +30,7 @@ USUARIOS = [
         "first_name": "Admin",
         "last_name": "Principal",
         "rol": "ADMIN",
-        "mercado_nombre": None,
+        "mercado_nombre": "Minimarket Centro",
         "is_staff": True,
         "is_superuser": True,
     },
@@ -147,28 +147,43 @@ class Command(BaseCommand):
 
     def _populate_usuarios(self):
         mercados = {m.nombre: m for m in Mercado.objects.all()}
-        created = 0
+        created = updated = 0
         for data in USUARIOS:
             mercado = mercados.get(data["mercado_nombre"]) if data["mercado_nombre"] else None
+            defaults = {
+                "password": make_password(data["password"]),
+                "email": data["email"],
+                "first_name": data["first_name"],
+                "last_name": data["last_name"],
+                "rol": data["rol"],
+                "mercado": mercado,
+                "is_staff": data["is_staff"],
+                "is_superuser": data["is_superuser"],
+            }
             usuario, was_created = Usuario.objects.get_or_create(
                 username=data["username"],
-                defaults={
-                    "password": make_password(data["password"]),
-                    "email": data["email"],
-                    "first_name": data["first_name"],
-                    "last_name": data["last_name"],
-                    "rol": data["rol"],
-                    "mercado": mercado,
-                    "is_staff": data["is_staff"],
-                    "is_superuser": data["is_superuser"],
-                },
+                defaults=defaults,
             )
             if was_created:
                 created += 1
                 self.stdout.write(f"  [CREADO] Usuario: {data['username']}")
             else:
-                self.stdout.write(f"  [EXISTE] Usuario: {data['username']}")
-        self.stdout.write(self.style.SUCCESS(f"Usuarios: {created} creado(s)"))
+                changed = False
+                for field, value in defaults.items():
+                    if field == "password":
+                        if not usuario.check_password(data["password"]):
+                            usuario.set_password(data["password"])
+                            changed = True
+                    elif getattr(usuario, field) != value:
+                        setattr(usuario, field, value)
+                        changed = True
+                if changed:
+                    usuario.save()
+                    updated += 1
+                    self.stdout.write(f"  [ACTUALIZADO] Usuario: {data['username']}")
+                else:
+                    self.stdout.write(f"  [EXISTE] Usuario: {data['username']}")
+        self.stdout.write(self.style.SUCCESS(f"Usuarios: {created} creado(s), {updated} actualizado(s)"))
 
     def _populate_proveedores(self):
         created = 0

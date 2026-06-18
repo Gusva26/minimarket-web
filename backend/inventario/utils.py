@@ -6,7 +6,17 @@ from .models import UnidadProducto, Kardex
 
 def get_mercado_cache_version(mercado_id):
     """Obtiene la versión actual de la caché para un mercado."""
+    if not mercado_id:
+        return 1
     return cache.get_or_set(f"version_mercado_{mercado_id}", 1)
+
+
+def mercado_filter(request):
+    """Retorna filtro de mercado según el usuario. Si es superuser sin mercado, retorna vacío."""
+    mercado = request.user.mercado
+    if mercado:
+        return {'mercado': mercado}
+    return {}
 
 
 def invalidate_mercado_cache(mercado_id):
