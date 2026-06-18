@@ -280,8 +280,24 @@ const ProductosPage = {
     }
     const btnExportar = document.getElementById('btnExportarProductos');
     if (btnExportar) {
-      btnExportar.addEventListener('click', () => {
-        window.open(API.baseURL + 'productos/exportar/', '_blank');
+      btnExportar.addEventListener('click', async () => {
+        try {
+          const response = await fetch(API.baseURL + 'productos/exportar/', {
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('access_token') }
+          });
+          if (!response.ok) throw new Error('Error al exportar');
+          const blob = await response.blob();
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `productos_${new Date().toISOString().split('T')[0]}.xlsx`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        } catch (e) {
+          Utils.showToast('Error al exportar: ' + e.message, 'error');
+        }
       });
     }
     const btnImportarEnviar = document.getElementById('btnImportarEnviar');
