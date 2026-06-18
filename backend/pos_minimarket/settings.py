@@ -81,9 +81,8 @@ else:
         }
     }
 
-    ssl_ca = config('DB_SSL_CA', default='')
-    if ssl_ca:
-        DATABASES['default']['OPTIONS']['ssl'] = {'ca': ssl_ca}
+    if config('DB_USE_SSL', default=False, cast=bool):
+        DATABASES['default']['OPTIONS']['ssl'] = {}
 
 
 AUTH_USER_MODEL = 'usuarios.Usuario'
