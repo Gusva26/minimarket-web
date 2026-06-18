@@ -234,20 +234,27 @@ const ComprasPage = {
     Object.values(this.tomSelects).forEach(ts => ts.destroy());
     this.tomSelects = {};
 
-    // Initialize Provider TomSelect with Remote Search
-    this.tomSelects['proveedor'] = new TomSelect('#compra_proveedor', {
+    // Initialize Provider TomSelect with all options preloaded
+    const proveedorSelect = new TomSelect('#compra_proveedor', {
       valueField: 'id',
       labelField: 'nombre',
       searchField: 'nombre',
-      load: async (query, callback) => {
-        try {
-          const data = await API.get(`proveedores/?search=${encodeURIComponent(query)}`);
-          callback(data.results || data);
-        } catch (e) { callback(); }
-      },
       placeholder: 'Buscar proveedor...',
       create: false
     });
+    this.tomSelects['proveedor'] = proveedorSelect;
+
+    // Load all suppliers into the select
+    (async () => {
+      try {
+        const data = await API.get('proveedores/?page_size=500');
+        const items = data.results || data || [];
+        proveedorSelect.clearOptions();
+        proveedorSelect.addOptions(items);
+      } catch (e) {
+        console.error('Error cargando proveedores', e);
+      }
+    })();
 
     this.agregarFilaProducto();
     Utils.showModal('compraModal');
@@ -291,24 +298,17 @@ const ComprasPage = {
     const index = Date.now();
     container.insertAdjacentHTML('beforeend', this.filaProductoHTML(index));
     
-    // Initialize Product TomSelect with Remote Search
+    // Initialize Product TomSelect with all options preloaded
     const ts = new TomSelect(`#prod_select_${index}`, {
       valueField: 'id',
       labelField: 'nombre',
       searchField: 'nombre',
-      load: async (query, callback) => {
-        try {
-          const data = await API.get(`productos/?search=${encodeURIComponent(query)}`);
-          callback(data.results || data);
-        } catch (e) { callback(); }
-      },
       placeholder: 'Buscar producto...',
       create: false,
       onChange: async (val) => {
         if (!val) return;
         const item = document.querySelector(`.compra-item[data-index="${index}"]`);
         const precioInput = item.querySelector('.precio-input');
-        // Fetch full product details to get current cost
         try {
           const p = await API.get(`productos/${val}/detalle/`);
           if (precioInput) precioInput.value = p.costo || 0;
@@ -318,6 +318,19 @@ const ComprasPage = {
     });
 
     this.tomSelects[`prod_${index}`] = ts;
+
+    // Load all products into the select
+    (async () => {
+      try {
+        const data = await API.get('productos/?page_size=500');
+        const items = data.results || data || [];
+        ts.clearOptions();
+        ts.addOptions(items);
+      } catch (e) {
+        console.error('Error cargando productos', e);
+      }
+    })();
+
     this.bindFilaEventos(index);
     this.calcularTotal();
   },
