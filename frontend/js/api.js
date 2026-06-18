@@ -1,7 +1,7 @@
 const API = {
   baseURL: (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost')
     ? 'http://127.0.0.1:8000/api/'
-    : 'https://<tudjango>.onrender.com/api/',
+    : 'https://minimarket-backend-t8ai.onrender.com/api/',
 
   async getToken() { return localStorage.getItem('access_token'); },
 
