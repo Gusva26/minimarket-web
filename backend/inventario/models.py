@@ -5,7 +5,7 @@ from django.db import models
 from django.utils import timezone
 from django.core.files.base import ContentFile
 from io import BytesIO
-from rembg import remove
+
 
 logger = logging.getLogger(__name__)
 
@@ -68,9 +68,12 @@ class Producto(models.Model):
                 if img.width > 500 or img.height > 500:
                     img.thumbnail(max_size, Image.LANCZOS)
                 
-                # Remove background with rembg
+                # Remove background with rembg (optional)
                 try:
+                    from rembg import remove
                     img = remove(img)
+                except ImportError:
+                    pass
                 except Exception as e:
                     logger.warning(f"rembg falló, usando imagen original: {e}")
                 

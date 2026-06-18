@@ -16,5 +16,4 @@ djangorestframework==3.15.2
 djangorestframework-simplejwt==5.3.1
 django-cors-headers==4.3.1
 django-filter==24.2
-rembg==2.0.69
-onnxruntime==1.23.2
+
