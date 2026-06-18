@@ -1,0 +1,57 @@
+/* ============================================
+   TOAST.CSS — Toast Notifications
+   ============================================ */
+
+.toast-container {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 380px;
+}
+
+.toast-custom {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  animation: toastIn 0.3s ease;
+  overflow: hidden;
+  position: relative;
+}
+.toast-custom.toast-out { animation: toastOut 0.3s ease forwards; }
+
+.toast-custom .toast-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+.toast-custom .toast-body { flex: 1; font-size: 0.88rem; }
+.toast-custom .toast-close {
+  background: none;
+  border: none;
+  color: inherit;
+  opacity: 0.6;
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 2px;
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+.toast-custom .toast-close:hover { opacity: 1; }
+
+.toast-custom .toast-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: currentColor;
+  opacity: 0.3;
+  animation: toastProgress 3s linear;
+}
+
+.toast-success { background: var(--success); color: white; }
+.toast-error { background: var(--danger); color: white; }
+.toast-warning { background: var(--warning); color: white; }
+.toast-info { background: var(--accent); color: white; }

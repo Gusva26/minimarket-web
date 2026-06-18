@@ -1,0 +1,174 @@
+/* ============================================
+   DASHBOARD.CSS — Estilos del Dashboard
+   ============================================ */
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.dashboard-section {
+  margin-bottom: 1.5rem;
+}
+
+.dashboard-section-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dashboard-section-title i {
+  color: var(--accent);
+}
+
+/* KPI Cards */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.kpi-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  box-shadow: var(--shadow);
+  transition: all var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.kpi-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-3px);
+}
+
+.kpi-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+}
+
+.kpi-card.kpi-sales::after { background: var(--accent); }
+.kpi-card.kpi-stock::after { background: var(--warning); }
+.kpi-card.kpi-expiry::after { background: var(--danger); }
+.kpi-card.kpi-market::after { background: var(--success); }
+
+.kpi-card .kpi-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.kpi-card .kpi-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  flex-shrink: 0;
+}
+
+.kpi-sales .kpi-icon { background: var(--accent-light); color: var(--accent); }
+.kpi-stock .kpi-icon { background: var(--warning-light); color: var(--warning); }
+.kpi-expiry .kpi-icon { background: var(--danger-light); color: var(--danger); }
+.kpi-market .kpi-icon { background: var(--success-light); color: var(--success); }
+
+.kpi-card .kpi-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.kpi-card .kpi-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.kpi-card .kpi-sub {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* Two-column layout */
+.dashboard-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 992px) {
+  .dashboard-two-col { grid-template-columns: 1fr; }
+}
+
+/* Alert table inside card */
+.alert-table {
+  width: 100%;
+  font-size: 0.88rem;
+}
+
+.alert-table td {
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.alert-table tr:last-child td { border-bottom: none; }
+
+.alert-table .product-name { font-weight: 600; color: var(--text); }
+.alert-table .product-category { font-size: 0.75rem; color: var(--text-muted); }
+
+.alert-table .stock-value {
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.alert-table .stock-value.danger { color: var(--danger); }
+.alert-table .stock-value.warning { color: var(--warning); }
+.alert-table .stock-value.success { color: var(--success); }
+
+/* Quick actions grid */
+.quick-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+}
+
+/* Empty state for dashboard alerts */
+.dashboard-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.dashboard-empty i { font-size: 2.5rem; opacity: 0.15; margin-bottom: 0.75rem; }
+.dashboard-empty p { font-size: 0.85rem; margin: 0; }
+
+/* Responsive */
+@media (max-width: 576px) {
+  .kpi-grid { grid-template-columns: 1fr; }
+  .quick-grid { grid-template-columns: repeat(2, 1fr); }
+}

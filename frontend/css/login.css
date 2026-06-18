@@ -1,0 +1,181 @@
+/* ============================================
+   LOGIN.CSS — Estilos de Inicio de Sesión
+   ============================================ */
+
+.login-wrapper {
+  min-height: 100vh;
+  min-height: 100dvh;
+  width: 100%;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+}
+
+/* Login card */
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem 2rem;
+  box-shadow: var(--shadow-lg);
+}
+
+.login-brand {
+  text-align: center;
+  margin-bottom: 1.75rem;
+}
+
+.login-brand .brand-circle {
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, var(--accent), var(--primary-light));
+  border-radius: var(--radius);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.75rem;
+  color: white;
+  font-size: 1.35rem;
+}
+
+.login-brand h2 {
+  color: var(--text);
+  font-weight: 700;
+  font-size: 1.25rem;
+  margin: 0;
+}
+
+.login-brand p {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  margin-top: 4px;
+}
+
+/* Floating group (icon + label) */
+.login-card .floating-group {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.login-card .floating-group .form-control {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text);
+  padding-left: 38px;
+  height: 44px;
+}
+
+.login-card .floating-group .form-control:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(14,165,233,0.12);
+}
+
+.login-card .floating-group .form-control::placeholder {
+  color: transparent;
+}
+
+.login-card .floating-group label {
+  position: absolute;
+  left: 38px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  pointer-events: none;
+  transition: all var(--transition);
+  background: var(--surface);
+  padding: 0 4px;
+}
+
+.login-card .floating-group .form-control:focus ~ label,
+.login-card .floating-group .form-control:not(:placeholder-shown) ~ label {
+  top: 0;
+  transform: translateY(-50%);
+  font-size: 0.72rem;
+  color: var(--accent);
+}
+
+.login-card .input-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Login button */
+.login-btn {
+  width: 100%;
+  padding: 0.7rem;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--font);
+}
+
+.login-btn:hover:not(:disabled) {
+  background: var(--primary-light);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.login-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.login-btn .spinner {
+  width: 18px;
+  height: 18px;
+  border: 2.5px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+/* Error */
+.login-error {
+  background: var(--danger-light);
+  border: 1px solid var(--danger);
+  color: var(--danger);
+  padding: 0.6rem 0.85rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  margin-bottom: 1rem;
+  display: none;
+  animation: shake 0.4s ease;
+}
+
+.login-error.show {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.login-error i {
+  flex-shrink: 0;
+}
+
+/* Footer */
+.login-footer {
+  text-align: center;
+  margin-top: 1.25rem;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}

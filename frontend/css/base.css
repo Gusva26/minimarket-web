@@ -1,0 +1,37 @@
+/* ============================================
+   BASE.CSS — Reset, Body, Links, Typography
+   ============================================ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 15px; scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a { color: var(--accent); text-decoration: none; transition: var(--transition); }
+a:hover { color: var(--primary-light); }
+
+img { max-width: 100%; height: auto; }
+
+::selection { background: var(--accent); color: white; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
+
+/* ---------- Print ---------- */
+@media print {
+  .no-print, .sidebar, .sidebar-overlay, .toast-container, nav { display: none !important; }
+  .main-content { margin-left: 0 !important; padding: 0 !important; }
+  .print-ticket { display: block !important; }
+  body { background: white !important; }
+  .card { box-shadow: none !important; border: 1px solid #ddd !important; }
+}

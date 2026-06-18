@@ -1,0 +1,324 @@
+/* ============================================
+   COMPONENTS.CSS — Cards, KPI, Badges, Skeleton,
+   Spinner, Pagination, Quick Actions, Empty State,
+   Page Header, Search/Filters, Charts
+   ============================================ */
+
+/* ---------- Cards ---------- */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  transition: box-shadow var(--transition), transform var(--transition);
+}
+.card:hover { box-shadow: var(--shadow-md); }
+.card-header {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+.card-header h5, .card-header h6 { margin: 0; font-size: 0.95rem; }
+.card-body { padding: 1.25rem; }
+.card-elevated { box-shadow: var(--shadow-lg); }
+.card-elevated:hover { box-shadow: var(--shadow-xl); transform: translateY(-2px); }
+.card-accent { border-top: 3px solid var(--accent); }
+.card-success { border-top: 3px solid var(--success); }
+.card-warning { border-top: 3px solid var(--warning); }
+.card-danger { border-top: 3px solid var(--danger); }
+.card-flush { border: none; box-shadow: none; background: transparent; }
+.card-flush:hover { box-shadow: none; transform: none; }
+
+/* ---------- KPI Cards ---------- */
+.kpi-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  box-shadow: var(--shadow);
+  transition: all var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+.kpi-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-3px); }
+.kpi-card .kpi-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  margin-bottom: 0.75rem;
+}
+.kpi-card .kpi-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.03em; }
+.kpi-card .kpi-value { font-size: 1.75rem; font-weight: 700; color: var(--text); line-height: 1.2; margin: 4px 0; }
+.kpi-card .kpi-change { font-size: 0.75rem; font-weight: 600; }
+.kpi-primary .kpi-icon { background: var(--primary-lighter); color: var(--primary); }
+.kpi-accent .kpi-icon { background: var(--accent-light); color: var(--accent); }
+.kpi-success .kpi-icon { background: var(--success-light); color: var(--success); }
+.kpi-warning .kpi-icon { background: var(--warning-light); color: var(--warning); }
+.kpi-danger .kpi-icon { background: var(--danger-light); color: var(--danger); }
+.kpi-info .kpi-icon { background: var(--info-light); color: var(--info); }
+
+/* ---------- Badges ---------- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0.25em 0.7em;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 50px;
+  line-height: 1.4;
+  white-space: nowrap;
+  background: var(--border);
+  color: var(--text-secondary);
+}
+.badge-primary { background: var(--primary-lighter); color: var(--primary); }
+.badge-accent { background: var(--surface-hover); color: var(--text-secondary); }
+.badge-success { background: var(--success-light); color: var(--success); }
+.badge-warning { background: var(--warning-light); color: var(--warning); }
+.badge-danger { background: var(--danger-light); color: var(--danger); }
+.badge-info { background: var(--info-light); color: var(--info); }
+.badge-yape { background: #742581; color: #fff; }
+.badge-plin { background: #00a3d2; color: #fff; }
+
+.badge-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  padding: 0;
+  display: inline-block;
+}
+.badge-dot-success { background: var(--success); }
+.badge-dot-warning { background: var(--warning); }
+.badge-dot-danger { background: var(--danger); }
+.badge-dot-info { background: var(--info); }
+
+/* ---------- Skeleton ---------- */
+.skeleton {
+  background: linear-gradient(90deg, var(--border-light) 25%, var(--border) 50%, var(--border-light) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-sm);
+}
+.skeleton-text { height: 14px; margin-bottom: 8px; width: 80%; }
+.skeleton-text.short { width: 40%; }
+.skeleton-title { height: 20px; margin-bottom: 12px; width: 60%; }
+.skeleton-avatar { width: 40px; height: 40px; border-radius: 50%; }
+.skeleton-card { height: 100px; border-radius: var(--radius); }
+.skeleton-table-row { height: 48px; margin-bottom: 4px; border-radius: var(--radius-sm); }
+
+/* ---------- Spinner ---------- */
+.spinner-modern {
+  width: 24px;
+  height: 24px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+.spinner-modern-sm { width: 16px; height: 16px; border-width: 2px; }
+.spinner-modern-lg { width: 40px; height: 40px; border-width: 4px; }
+
+.loading-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 16px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+/* ---------- Pagination ---------- */
+.pagination-modern {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 1rem 0;
+}
+.pagination-modern .page-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  height: 34px;
+  padding: 0 8px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.pagination-modern .page-btn:hover:not(:disabled):not(.active) {
+  background: var(--surface-hover);
+  border-color: var(--text-muted);
+}
+.pagination-modern .page-btn.active { background: var(--primary); border-color: var(--primary); color: white; }
+.pagination-modern .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.pagination-modern .page-info { font-size: 0.8rem; color: var(--text-muted); padding: 0 8px; }
+
+/* ---------- Quick Actions ---------- */
+.quick-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 1.25rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  text-decoration: none;
+  color: var(--text);
+  transition: all var(--transition);
+  box-shadow: var(--shadow);
+}
+.quick-action:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--accent);
+  color: var(--text);
+}
+.quick-action .qa-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+}
+.quick-action .qa-label { font-weight: 600; font-size: 0.85rem; text-align: center; }
+
+/* ---------- Empty State ---------- */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  color: var(--text-muted);
+}
+.empty-state .empty-icon { font-size: 3rem; opacity: 0.2; margin-bottom: 1rem; }
+.empty-state .empty-title { font-weight: 600; font-size: 1rem; margin-bottom: 4px; color: var(--text-secondary); }
+.empty-state .empty-desc { font-size: 0.85rem; }
+
+/* ---------- Page Header ---------- */
+.page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 1.5rem;
+}
+.page-header h3 {
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+}
+.page-header .page-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+/* ---------- Search Bar ---------- */
+.search-bar {
+  position: relative;
+  max-width: 320px;
+}
+.search-bar .search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  pointer-events: none;
+}
+.search-bar .form-control { padding-left: 36px; }
+
+/* ---------- Search Box ---------- */
+.search-box {
+  position: relative;
+  margin-top: 0.5rem;
+}
+.search-box i {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  pointer-events: none;
+  z-index: 1;
+}
+.search-box input {
+  width: 100%;
+  padding: 0.6rem 0.85rem 0.6rem 2.4rem;
+  font-size: 0.88rem;
+  font-family: var(--font);
+  color: var(--text);
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 50px;
+  transition: all var(--transition);
+  outline: none;
+  line-height: 1.5;
+}
+.search-box input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(14,165,233,0.12);
+}
+.search-box input::placeholder {
+  color: var(--text-muted);
+}
+
+/* ---------- Filters Bar ---------- */
+.filters-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 1rem 1.25rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  align-items: flex-end;
+}
+.filters-bar .filter-group { display: flex; flex-direction: column; gap: 4px; }
+.filters-bar .filter-group label { font-size: 0.7rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.03em; }
+
+/* ---------- Charts ---------- */
+.chart-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+.chart-col .card { border: none; box-shadow: none; background: transparent; }
+.chart-col .card canvas { width: 100%; height: 350px; }
+.chart-col .card-body { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.75rem; }
+
+.charts-bottom {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+/* ---------- Page Transitions ---------- */
+.page-enter { animation: pageIn 0.35s ease both; }
+.page-leave { animation: pageOut 0.2s ease both; }
