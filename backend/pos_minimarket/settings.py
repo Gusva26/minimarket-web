@@ -81,6 +81,8 @@ else:
         }
     }
 
+    DATABASES['default']['CONN_MAX_AGE'] = 60
+
     if config('DB_USE_SSL', default=False, cast=bool):
         DATABASES['default']['OPTIONS']['ssl'] = {}
 
