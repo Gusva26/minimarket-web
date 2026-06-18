@@ -234,17 +234,24 @@ const ComprasPage = {
     Object.values(this.tomSelects).forEach(ts => ts.destroy());
     this.tomSelects = {};
 
-    // Initialize Provider TomSelect with all options preloaded
+    // Initialize Provider TomSelect
     const proveedorSelect = new TomSelect('#compra_proveedor', {
       valueField: 'id',
       labelField: 'nombre',
       searchField: 'nombre',
       placeholder: 'Buscar proveedor...',
-      create: false
+      create: false,
+      load: async (query, callback) => {
+        if (!query || query.length < 2) return callback();
+        try {
+          const data = await API.get(`proveedores/?search=${encodeURIComponent(query)}`);
+          callback(data.results || data);
+        } catch (e) { callback(); }
+      }
     });
     this.tomSelects['proveedor'] = proveedorSelect;
 
-    // Load all suppliers into the select
+    // Load all suppliers initially
     (async () => {
       try {
         const data = await API.get('proveedores/?page_size=500');
@@ -298,13 +305,20 @@ const ComprasPage = {
     const index = Date.now();
     container.insertAdjacentHTML('beforeend', this.filaProductoHTML(index));
     
-    // Initialize Product TomSelect with all options preloaded
+    // Initialize Product TomSelect
     const ts = new TomSelect(`#prod_select_${index}`, {
       valueField: 'id',
       labelField: 'nombre',
       searchField: 'nombre',
       placeholder: 'Buscar producto...',
       create: false,
+      load: async (query, callback) => {
+        if (!query || query.length < 2) return callback();
+        try {
+          const data = await API.get(`productos/?search=${encodeURIComponent(query)}`);
+          callback(data.results || data);
+        } catch (e) { callback(); }
+      },
       onChange: async (val) => {
         if (!val) return;
         const item = document.querySelector(`.compra-item[data-index="${index}"]`);
@@ -319,7 +333,7 @@ const ComprasPage = {
 
     this.tomSelects[`prod_${index}`] = ts;
 
-    // Load all products into the select
+    // Load all products initially
     (async () => {
       try {
         const data = await API.get('productos/?page_size=500');
