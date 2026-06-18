@@ -6,7 +6,7 @@ openpyxl==3.1.5
 asgiref==3.11.1
 sqlparse==0.5.5
 tzdata==2026.2
-numpy==2.2.6
+numpy==2.3.3
 python-dateutil==2.9.0.post0
 six==1.17.0
 et-xmlfile==2.0.0
