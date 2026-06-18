@@ -38,13 +38,20 @@ const App = {
     this.initSidebar();
     this.initTheme();
     this.initLogout();
+    this.keepAlive();
     window.addEventListener('hashchange', () => this.handleRoute());
-    // Only call handleRoute if there is no hash yet, otherwise hashchange will fire it
     if (!window.location.hash) {
       window.location.hash = '#/dashboard';
     } else {
       this.handleRoute();
     }
+  },
+
+  keepAlive() {
+    fetch(API.baseURL.replace(/\/$/, '') + '/auth/login/');
+    setInterval(() => {
+      fetch(API.baseURL.replace(/\/$/, '') + '/auth/login/');
+    }, 240000);
   },
 
   initSidebar() {
