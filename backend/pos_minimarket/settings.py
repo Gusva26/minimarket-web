@@ -1,5 +1,4 @@
 import os
-import socket
 import sys
 from pathlib import Path
 from decouple import config, Csv
@@ -74,25 +73,6 @@ elif db_engine == 'sqlite':
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
-elif db_engine == 'postgres':
-    db_host = config('DB_HOST', default='localhost')
-    try:
-        db_host = socket.gethostbyname(db_host)
-    except:
-        pass
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': config('DB_NAME', default='postgres'),
-            'USER': config('DB_USER', default='postgres'),
-            'PASSWORD': config('DB_PASSWORD', default=''),
-            'HOST': db_host,
-            'PORT': config('DB_PORT', default='5432'),
-            'OPTIONS': {
-                'sslmode': 'require',
-            }
         }
     }
 else:
