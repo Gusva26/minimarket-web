@@ -59,7 +59,16 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'pos_minimarket.wsgi.application'
 
+db_engine = config('DB_ENGINE', default='sqlite')
+
 if 'test' in sys.argv:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+elif db_engine == 'sqlite':
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -80,8 +89,6 @@ else:
             }
         }
     }
-
-    DATABASES['default']['CONN_MAX_AGE'] = 300
 
     if config('DB_USE_SSL', default=False, cast=bool):
         DATABASES['default']['OPTIONS']['ssl'] = {}
