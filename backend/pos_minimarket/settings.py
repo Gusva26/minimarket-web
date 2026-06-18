@@ -187,8 +187,10 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:5500',
     'http://127.0.0.1:8000',
     'http://localhost:8000',
-    config('FRONTEND_URL', default=''),
 ]
+frontend_url = config('FRONTEND_URL', default='')
+if frontend_url:
+    CORS_ALLOWED_ORIGINS.append(frontend_url)
 CORS_ALLOW_CREDENTIALS = True
 
 LOGGING = {
