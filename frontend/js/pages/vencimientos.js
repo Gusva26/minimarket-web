@@ -71,11 +71,14 @@ const VencimientosPage = {
 
   cargarFiltros: async function () {
     try {
+      const sel = document.getElementById('filterVencimientoCategoria');
+      if (!sel) return;
       const cats = await API.get('categorias/');
       const options = [{value: '', text: 'Todas las Categorías'}].concat(
         (cats.results || cats).map(c => ({value: c.id, text: c.nombre}))
       );
 
+      if (!document.getElementById('filterVencimientoCategoria')) return;
       this.tomSelects['categoria'] = new TomSelect('#filterVencimientoCategoria', {
         options: options,
         create: false,

@@ -110,8 +110,9 @@ const KardexPage = {
   cargarProductos: async function () {
     try {
       const data = await API.get('productos/?page_size=1000');
-      this._productos = data.results || data || [];
       const datalist = document.getElementById('productoList');
+      if (!datalist) return;
+      this._productos = data.results || data || [];
       datalist.innerHTML = '';
       this._productos.forEach(p => {
         datalist.innerHTML += `<option value="${p.nombre}">`;
