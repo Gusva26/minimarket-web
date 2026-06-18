@@ -75,6 +75,20 @@ elif db_engine == 'sqlite':
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
+elif db_engine == 'postgres':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': config('DB_NAME', default='postgres'),
+            'USER': config('DB_USER', default='postgres'),
+            'PASSWORD': config('DB_PASSWORD', default=''),
+            'HOST': config('DB_HOST', default='localhost'),
+            'PORT': config('DB_PORT', default='5432'),
+            'OPTIONS': {
+                'sslmode': 'require',
+            }
+        }
+    }
 else:
     DATABASES = {
         'default': {
