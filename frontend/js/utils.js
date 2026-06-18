@@ -1,4 +1,9 @@
 const Utils = {
+  /**
+   * Obtiene un elemento del DOM y retorna null si no existe (en lugar de lanzar error).
+   * Usar para evitar errores cuando se navega entre páginas antes de que terminen de cargar.
+   */
+  el(id) { return document.getElementById(id); },
   formatMoney(n) { return 'S/ ' + parseFloat(n || 0).toFixed(2); },
   formatDate(d) { return new Date(d).toLocaleDateString('es-PE', {year:'numeric',month:'2-digit',day:'2-digit'}); },
   formatDateTime(d) { return new Date(d).toLocaleString('es-PE'); },

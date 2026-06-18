@@ -1,5 +1,6 @@
 const App = {
   currentPage: null,
+  _pageToken: 0,
 
   routes: {
     'login': { page: 'login', title: 'Iniciar Sesión', auth: false },
@@ -198,8 +199,14 @@ const App = {
     } catch(e) { /* ignore */ }
   },
 
+  isPageActive() {
+    return this._pageToken;
+  },
+
   async handleRoute() {
     this.savePageState();
+    this._pageToken = Date.now() + Math.random();
+    const pageToken = this._pageToken;
 
     let hash = window.location.hash.replace('#/', '') || 'dashboard';
     let params = {};
@@ -233,9 +240,9 @@ const App = {
 
     const container = document.getElementById('app-content');
 
-    if (!route.auth) {
-      container.innerHTML = '<div class="loading-page"><div class="spinner-modern spinner-modern-lg"></div></div>';
-    } else {
+    container.innerHTML = '<div class="loading-page"><div class="spinner-modern spinner-modern-lg"></div></div>';
+
+    if (route.auth) {
       this.ensureSectionOpen(hash);
       this.navbar.render();
       this.navbar.highlight(hash);
@@ -264,6 +271,7 @@ const App = {
           } else {
             await pageMap[hash].render(container);
           }
+          if (this._pageToken !== pageToken) return;
           container.classList.add('page-enter');
           this.restorePageState(hash);
         } else {
@@ -271,6 +279,7 @@ const App = {
         }
       }
     } catch(e) {
+      if (this._pageToken !== pageToken) return;
       container.innerHTML = `<div class="alert alert-danger m-4"><i class="fas fa-exclamation-circle me-2"></i>${e.message}</div>`;
       console.error(e);
     }
