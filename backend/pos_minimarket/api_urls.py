@@ -5,7 +5,8 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from usuarios.api import UsuarioViewSet, CambiarPasswordView, ToggleActivoUsuarioView
 from inventario.api import (
     ProductoViewSet, CategoriaViewSet, KardexListView,
-    ImportarProductosView, ValoracionInventarioView,
+    ImportarProductosView, ExportarProductosExcelView,
+    ValoracionInventarioView,
     ReporteVencimientosView, TransferenciaViewSet, MercadoViewSet
 )
 from ventas.api import CajaViewSet, ClienteViewSet, VentaViewSet, ObtenerSiguienteNumeroView
@@ -45,6 +46,7 @@ urlpatterns = [
 
     # Inventario extras
     path('productos/importar/', ImportarProductosView.as_view(), name='importar_productos'),
+    path('productos/exportar/', ExportarProductosExcelView.as_view(), name='exportar_productos'),
     path('kardex/', KardexListView.as_view(), name='kardex_list'),
     path('inventario/valoracion/', ValoracionInventarioView.as_view(), name='valoracion_inventario'),
     path('inventario/vencimientos/', ReporteVencimientosView.as_view(), name='reporte_vencimientos'),

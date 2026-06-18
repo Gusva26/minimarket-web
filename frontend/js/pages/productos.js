@@ -13,6 +13,7 @@ const ProductosPage = {
         <div class="page-actions">
           ${isAdmin ? '<button class="btn btn-primary btn-sm btn-pill" id="btnNuevoProducto"><i class="fas fa-plus"></i>Nuevo</button>' : ''}
           ${isAdmin ? '<button class="btn btn-ghost btn-sm" id="btnImportarProductos"><i class="fas fa-file-import"></i>Importar</button>' : ''}
+          ${isAdmin ? '<button class="btn btn-success btn-sm" id="btnExportarProductos"><i class="fas fa-file-excel"></i>Exportar Excel</button>' : ''}
           ${isAdmin ? '<button class="btn btn-accent btn-sm" id="btnKardex"><i class="fas fa-book"></i>Kardex</button>' : ''}
         </div>
       </div>
@@ -275,6 +276,12 @@ const ProductosPage = {
     if (btnImportar) {
       btnImportar.addEventListener('click', () => {
         Utils.showModal('modalImportar');
+      });
+    }
+    const btnExportar = document.getElementById('btnExportarProductos');
+    if (btnExportar) {
+      btnExportar.addEventListener('click', () => {
+        window.open(API.baseURL + 'productos/exportar/', '_blank');
       });
     }
     const btnImportarEnviar = document.getElementById('btnImportarEnviar');

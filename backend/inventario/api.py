@@ -15,6 +15,7 @@ from rest_framework.filters import SearchFilter
 from usuarios.api import IsAdminOrSuperUser, IsAdminOrReadOnly
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.http import HttpResponse
 
 logger = logging.getLogger(__name__)
 
@@ -827,3 +828,36 @@ class MercadoViewSet(viewsets.ReadOnlyModelViewSet):
         if self.request.query_params.get('all') != 'true':
             qs = qs.exclude(pk=usuario.mercado_id)
         return qs
+
+
+class ExportarProductosExcelView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        mercado = request.user.mercado
+        productos = Producto.objects.filter(
+            mercado=mercado
+        ).select_related('categoria').order_by('nombre')
+
+        data = []
+        for p in productos:
+            data.append({
+                'Nombre': p.nombre,
+                'Codigo Barras': p.codigo_barras or '',
+                'Categoria': p.categoria.nombre if p.categoria else '',
+                'Unidad Medida': p.get_unidad_medida_display() if hasattr(p, 'get_unidad_medida_display') else p.unidad_medida,
+                'Stock': float(p.stock),
+                'Stock Minimo': float(p.stock_minimo),
+                'Precio': float(p.precio),
+                'Costo': float(p.costo),
+            })
+
+        df = pd.DataFrame(data)
+        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        hoy = timezone.localtime(timezone.now()).strftime('%Y-%m-%d')
+        response['Content-Disposition'] = f'attachment; filename="productos_{hoy}.xlsx"'
+
+        with pd.ExcelWriter(response, engine='openpyxl') as writer:
+            df.to_excel(writer, index=False, sheet_name='Productos')
+
+        return response
