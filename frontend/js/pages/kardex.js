@@ -200,18 +200,19 @@ const KardexPage = {
 
     tbody.innerHTML = movimientos.map(m => {
       const saldoCls = m.saldo_nuevo > m.saldo_anterior ? 'kpi-success' : m.saldo_nuevo < m.saldo_anterior ? 'kpi-danger' : '';
+      const userDisplayName = m.usuario?.get_full_name || m.usuario?.username || 'N/A';
       return `<tr>
         <td data-label="Fecha"><small style="color:var(--text-muted)">${Utils.formatDateTime(m.fecha)}</small></td>
         <td data-label="Producto">
-          <div style="font-weight:600">${m.producto?.nombre || '---'}</div>
+          <div style="font-weight:600">${Utils.escapeHtml(m.producto?.nombre || '---')}</div>
           <small style="color:var(--text-muted)">ID: #${m.producto?.id || ''}</small>
         </td>
-        <td data-label="Tipo">${tipoBadge[m.tipo_movimiento] || `<span class="badge">${m.tipo_movimiento}</span>`}</td>
+        <td data-label="Tipo">${tipoBadge[m.tipo_movimiento] || `<span class="badge">${Utils.escapeHtml(m.tipo_movimiento)}</span>`}</td>
         <td data-label="Cantidad" class="text-end fw-bold">${m.cantidad}</td>
         <td data-label="Saldo Anterior" class="text-end" style="color:var(--text-muted)">${m.saldo_anterior}</td>
         <td data-label="Saldo Nuevo" class="text-end fw-bold" style="color:${saldoCls === 'kpi-success' ? 'var(--success)' : saldoCls === 'kpi-danger' ? 'var(--danger)' : 'var(--text)'}">${m.saldo_nuevo}</td>
-        <td data-label="Usuario"><small>${m.usuario?.get_full_name || m.usuario?.username || 'N/A'}</small></td>
-        <td data-label="Referencia" class="text-end"><small style="color:var(--text-muted)">${m.referencia_tipo || ''} ${m.referencia_id ? '#' + m.referencia_id : ''}</small></td>
+        <td data-label="Usuario"><small>${Utils.escapeHtml(userDisplayName)}</small></td>
+        <td data-label="Referencia" class="text-end"><small style="color:var(--text-muted)">${Utils.escapeHtml(m.referencia_tipo || '')} ${m.referencia_id ? '#' + m.referencia_id : ''}</small></td>
       </tr>`;
     }).join('');
   },

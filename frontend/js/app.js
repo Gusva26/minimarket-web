@@ -8,6 +8,7 @@ const App = {
     'reset-password': { page: 'reset-password', title: 'Nueva Contraseña', auth: false },
     'dashboard': { page: 'dashboard', title: 'Dashboard', auth: true },
     'usuarios': { page: 'usuarios', title: 'Usuarios', auth: true, admin: true },
+    'configuracion': { page: 'configuracion', title: 'Configuración', auth: true, admin: true },
     'productos': { page: 'productos', title: 'Productos', auth: true },
     'categorias': { page: 'categorias', title: 'Categorías', auth: true },
     'kardex': { page: 'kardex', title: 'Kardex', auth: true, admin: true },
@@ -29,7 +30,7 @@ const App = {
   groupMap: {
     'gestion': ['productos','categorias','kardex','transferencias','vencimientos','valoracion'],
     'ventas': ['ventas','ventas-historial','ventas-detalle','cajas'],
-    'admin': ['compras','proveedores','reportes','usuarios'],
+    'admin': ['compras','proveedores','reportes','usuarios','configuracion'],
   },
 
   async init() {
@@ -48,9 +49,9 @@ const App = {
   },
 
   keepAlive() {
-    fetch(API.baseURL.replace(/\/$/, '') + '/auth/login/');
+    fetch(API.baseURL + 'ping/');
     setInterval(() => {
-      fetch(API.baseURL.replace(/\/$/, '') + '/auth/login/');
+      fetch(API.baseURL + 'ping/');
     }, 240000);
   },
 
@@ -263,7 +264,7 @@ const App = {
       } else {
         const pageMap = {
           login: LoginPage, 'password-reset': PasswordResetPage, 'reset-password': ResetPasswordPage,
-          dashboard: DashboardPage, usuarios: UsuariosPage,
+          dashboard: DashboardPage, usuarios: UsuariosPage, configuracion: ConfiguracionPage,
           productos: ProductosPage, categorias: CategoriasPage, kardex: KardexPage,
           transferencias: TransferenciasPage, vencimientos: VencimientosPage,
           valoracion: ValoracionPage, ventas: VentasPage, 'ventas-historial': HistorialPage,

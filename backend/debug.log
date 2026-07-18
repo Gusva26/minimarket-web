@@ -1,0 +1,284 @@
+WARNING 2026-06-20 05:15:10,725 log 15476 24696 Forbidden: /api/kardex/
+WARNING 2026-06-20 05:15:11,330 log 15476 24696 Forbidden: /api/inventario/valoracion/
+WARNING 2026-06-20 05:15:11,331 log 15476 24696 Forbidden: /api/productos/importar/
+WARNING 2026-06-20 05:15:11,935 log 15476 24696 Forbidden: /api/productos/
+WARNING 2026-06-20 05:15:11,936 log 15476 24696 Forbidden: /api/productos/1/ajustar/
+WARNING 2026-06-20 05:15:14,969 log 15476 24696 Unauthorized: /api/auth/login/
+WARNING 2026-06-20 05:15:15,577 log 15476 24696 Forbidden: /api/usuarios/1/toggle-activo/
+WARNING 2026-06-20 05:15:16,180 log 15476 24696 Unauthorized: /api/usuarios/
+WARNING 2026-06-20 05:15:16,181 log 15476 24696 Forbidden: /api/usuarios/
+WARNING 2026-06-20 05:15:20,252 log 15476 24696 Bad Request: /api/ventas/
+WARNING 2026-06-20 05:15:59,253 log 13132 14400 Forbidden: /api/kardex/
+WARNING 2026-06-20 05:15:59,850 log 13132 14400 Forbidden: /api/inventario/valoracion/
+WARNING 2026-06-20 05:15:59,851 log 13132 14400 Forbidden: /api/productos/importar/
+WARNING 2026-06-20 05:16:00,457 log 13132 14400 Forbidden: /api/productos/
+WARNING 2026-06-20 05:16:00,458 log 13132 14400 Forbidden: /api/productos/1/ajustar/
+WARNING 2026-06-20 05:16:03,528 log 13132 14400 Unauthorized: /api/auth/login/
+WARNING 2026-06-20 05:16:04,134 log 13132 14400 Forbidden: /api/usuarios/1/toggle-activo/
+WARNING 2026-06-20 05:16:04,755 log 13132 14400 Unauthorized: /api/usuarios/
+WARNING 2026-06-20 05:16:04,756 log 13132 14400 Forbidden: /api/usuarios/
+WARNING 2026-06-20 05:16:08,857 log 13132 14400 Bad Request: /api/ventas/
+WARNING 2026-06-20 12:24:21,630 log 6828 5312 Unauthorized: /api/auth/login/
+WARNING 2026-06-20 12:24:21,631 basehttp 6828 5312 "POST /api/auth/login/ HTTP/1.1" 401 71
+WARNING 2026-06-20 12:24:24,722 log 6828 5312 Unauthorized: /api/auth/login/
+WARNING 2026-06-20 12:24:24,722 basehttp 6828 5312 "POST /api/auth/login/ HTTP/1.1" 401 71
+WARNING 2026-06-20 12:24:32,562 log 6828 5312 Unauthorized: /api/auth/login/
+WARNING 2026-06-20 12:24:32,562 basehttp 6828 5312 "POST /api/auth/login/ HTTP/1.1" 401 71
+WARNING 2026-06-20 12:24:37,360 log 6828 5312 Unauthorized: /api/auth/login/
+WARNING 2026-06-20 12:24:37,361 basehttp 6828 5312 "POST /api/auth/login/ HTTP/1.1" 401 71
+WARNING 2026-06-20 12:24:38,404 log 6828 5312 Unauthorized: /api/auth/login/
+WARNING 2026-06-20 12:24:38,405 basehttp 6828 5312 "POST /api/auth/login/ HTTP/1.1" 401 71
+WARNING 2026-06-20 12:24:43,363 log 6828 5312 Unauthorized: /api/auth/login/
+WARNING 2026-06-20 12:24:43,364 basehttp 6828 5312 "POST /api/auth/login/ HTTP/1.1" 401 71
+WARNING 2026-06-20 12:24:51,493 log 6828 5312 Unauthorized: /api/auth/login/
+WARNING 2026-06-20 12:24:51,494 basehttp 6828 5312 "POST /api/auth/login/ HTTP/1.1" 401 71
+WARNING 2026-06-20 12:25:01,336 log 6828 5312 Unauthorized: /api/auth/login/
+WARNING 2026-06-20 12:25:01,336 basehttp 6828 5312 "POST /api/auth/login/ HTTP/1.1" 401 71
+WARNING 2026-06-20 12:25:09,283 log 6828 5312 Unauthorized: /api/auth/login/
+WARNING 2026-06-20 12:25:09,283 basehttp 6828 5312 "POST /api/auth/login/ HTTP/1.1" 401 71
+WARNING 2026-06-20 12:25:41,369 log 6828 5312 Unauthorized: /api/auth/login/
+WARNING 2026-06-20 12:25:41,370 basehttp 6828 5312 "POST /api/auth/login/ HTTP/1.1" 401 71
+WARNING 2026-06-20 12:25:43,083 log 6828 5312 Unauthorized: /api/auth/login/
+WARNING 2026-06-20 12:25:43,083 basehttp 6828 5312 "POST /api/auth/login/ HTTP/1.1" 401 71
+WARNING 2026-06-20 12:25:44,064 log 6828 5312 Unauthorized: /api/auth/login/
+WARNING 2026-06-20 12:25:44,065 basehttp 6828 5312 "POST /api/auth/login/ HTTP/1.1" 401 71
+WARNING 2026-06-20 12:25:44,757 log 6828 5312 Unauthorized: /api/auth/login/
+WARNING 2026-06-20 12:25:44,757 basehttp 6828 5312 "POST /api/auth/login/ HTTP/1.1" 401 71
+WARNING 2026-06-20 12:25:49,612 log 6828 5312 Unauthorized: /api/auth/login/
+WARNING 2026-06-20 12:25:49,612 basehttp 6828 5312 "POST /api/auth/login/ HTTP/1.1" 401 71
+WARNING 2026-06-20 12:25:53,690 log 6828 5312 Unauthorized: /api/auth/login/
+WARNING 2026-06-20 12:25:53,691 basehttp 6828 5312 "POST /api/auth/login/ HTTP/1.1" 401 71
+WARNING 2026-06-20 12:25:54,931 log 6828 5312 Unauthorized: /api/auth/login/
+WARNING 2026-06-20 12:25:54,932 basehttp 6828 5312 "POST /api/auth/login/ HTTP/1.1" 401 71
+WARNING 2026-06-20 12:25:56,284 log 6828 5312 Unauthorized: /api/auth/me/
+WARNING 2026-06-20 12:25:56,285 basehttp 6828 5312 "GET /api/auth/me/ HTTP/1.1" 401 65
+WARNING 2026-06-20 12:25:56,288 log 6828 5312 Bad Request: /api/auth/refresh/
+WARNING 2026-06-20 12:25:56,288 basehttp 6828 5312 "POST /api/auth/refresh/ HTTP/1.1" 400 44
+WARNING 2026-06-20 12:26:03,371 log 6828 5312 Unauthorized: /api/auth/me/
+WARNING 2026-06-20 12:26:03,372 basehttp 6828 5312 "GET /api/auth/me/ HTTP/1.1" 401 65
+WARNING 2026-06-20 12:26:03,375 log 6828 5312 Bad Request: /api/auth/refresh/
+WARNING 2026-06-20 12:26:03,376 basehttp 6828 5312 "POST /api/auth/refresh/ HTTP/1.1" 400 44
+WARNING 2026-06-20 12:26:50,232 log 25052 18384 Forbidden: /api/kardex/
+WARNING 2026-06-20 12:26:51,023 log 25052 18384 Forbidden: /api/inventario/valoracion/
+WARNING 2026-06-20 12:26:51,024 log 25052 18384 Forbidden: /api/productos/importar/
+WARNING 2026-06-20 12:26:51,772 log 25052 18384 Forbidden: /api/productos/
+WARNING 2026-06-20 12:26:51,773 log 25052 18384 Forbidden: /api/productos/1/ajustar/
+WARNING 2026-06-20 12:26:55,523 log 25052 18384 Unauthorized: /api/auth/login/
+WARNING 2026-06-20 12:26:56,418 log 25052 18384 Forbidden: /api/usuarios/1/toggle-activo/
+WARNING 2026-06-20 12:26:57,210 log 25052 18384 Unauthorized: /api/usuarios/
+WARNING 2026-06-20 12:26:57,212 log 25052 18384 Forbidden: /api/usuarios/
+WARNING 2026-06-20 12:27:02,308 log 25052 18384 Bad Request: /api/ventas/
+WARNING 2026-06-20 12:27:54,417 log 21988 17908 Unauthorized: /api/auth/login/
+WARNING 2026-06-20 12:27:54,418 basehttp 21988 17908 "POST /api/auth/login/ HTTP/1.1" 401 71
+WARNING 2026-06-20 12:27:58,208 log 21988 17908 Unauthorized: /api/auth/login/
+WARNING 2026-06-20 12:27:58,209 basehttp 21988 17908 "POST /api/auth/login/ HTTP/1.1" 401 71
+WARNING 2026-06-20 12:28:00,222 log 21988 17908 Unauthorized: /api/auth/login/
+WARNING 2026-06-20 12:28:00,222 basehttp 21988 17908 "POST /api/auth/login/ HTTP/1.1" 401 71
+WARNING 2026-06-20 12:28:07,748 log 21988 17908 Unauthorized: /api/auth/me/
+WARNING 2026-06-20 12:28:07,748 basehttp 21988 17908 "GET /api/auth/me/ HTTP/1.1" 401 65
+WARNING 2026-06-20 12:28:07,758 log 21988 17908 Unauthorized: /api/auth/refresh/
+WARNING 2026-06-20 12:28:07,759 basehttp 21988 17908 "POST /api/auth/refresh/ HTTP/1.1" 401 44
+WARNING 2026-06-20 12:28:47,630 log 21988 17908 Unauthorized: /api/auth/login/
+WARNING 2026-06-20 12:28:47,631 basehttp 21988 17908 "POST /api/auth/login/ HTTP/1.1" 401 71
+WARNING 2026-06-20 12:28:51,324 log 21988 17908 Unauthorized: /api/auth/me/
+WARNING 2026-06-20 12:28:51,325 basehttp 21988 17908 "GET /api/auth/me/ HTTP/1.1" 401 65
+WARNING 2026-06-20 12:28:51,329 log 21988 17908 Unauthorized: /api/auth/refresh/
+WARNING 2026-06-20 12:28:51,330 basehttp 21988 17908 "POST /api/auth/refresh/ HTTP/1.1" 401 44
+WARNING 2026-06-20 12:29:55,636 log 28396 12844 Forbidden: /api/kardex/
+WARNING 2026-06-20 12:29:56,393 log 28396 12844 Forbidden: /api/inventario/valoracion/
+WARNING 2026-06-20 12:29:56,395 log 28396 12844 Forbidden: /api/productos/importar/
+WARNING 2026-06-20 12:29:57,174 log 28396 12844 Forbidden: /api/productos/
+WARNING 2026-06-20 12:29:57,175 log 28396 12844 Forbidden: /api/productos/1/ajustar/
+WARNING 2026-06-20 12:30:00,977 log 28396 12844 Unauthorized: /api/auth/login/
+WARNING 2026-06-20 12:30:01,872 log 28396 12844 Forbidden: /api/usuarios/1/toggle-activo/
+WARNING 2026-06-20 12:30:02,757 log 28396 12844 Unauthorized: /api/usuarios/
+WARNING 2026-06-20 12:30:02,758 log 28396 12844 Forbidden: /api/usuarios/
+WARNING 2026-06-20 12:30:08,647 log 28396 12844 Bad Request: /api/ventas/
+WARNING 2026-06-20 12:30:42,209 log 27920 24376 Unauthorized: /api/auth/login/
+WARNING 2026-06-20 12:30:42,210 basehttp 27920 24376 "POST /api/auth/login/ HTTP/1.1" 401 71
+WARNING 2026-06-20 12:30:49,774 log 27920 24376 Unauthorized: /api/auth/me/
+WARNING 2026-06-20 12:30:49,775 basehttp 27920 24376 "GET /api/auth/me/ HTTP/1.1" 401 65
+WARNING 2026-06-20 12:30:49,779 log 27920 24376 Unauthorized: /api/auth/refresh/
+WARNING 2026-06-20 12:30:49,780 basehttp 27920 24376 "POST /api/auth/refresh/ HTTP/1.1" 401 44
+WARNING 2026-06-20 12:31:28,087 log 4324 27836 Not Found: /media/productos/Aceite_SxYC2rM.png
+WARNING 2026-06-20 12:31:28,088 log 4324 24048 Not Found: /media/productos/agua-cielo-1L.png
+WARNING 2026-06-20 12:31:28,089 basehttp 4324 24048 "GET /media/productos/agua-cielo-1L.png HTTP/1.1" 404 2639
+WARNING 2026-06-20 12:31:28,089 basehttp 4324 27836 "GET /media/productos/Aceite_SxYC2rM.png HTTP/1.1" 404 2643
+WARNING 2026-06-20 12:31:28,260 log 4324 25860 Not Found: /media/productos/Arroz_9GQbrr3.png
+WARNING 2026-06-20 12:31:28,261 log 4324 11908 Not Found: /media/productos/agua-san-luis-625ml.png
+WARNING 2026-06-20 12:31:28,262 basehttp 4324 25860 "GET /media/productos/Arroz_9GQbrr3.png HTTP/1.1" 404 2639
+WARNING 2026-06-20 12:31:28,263 basehttp 4324 11908 "GET /media/productos/agua-san-luis-625ml.png HTTP/1.1" 404 2663
+WARNING 2026-06-20 12:31:28,264 log 4324 12320 Not Found: /media/productos/arroz-extra-costeño5kg.png
+WARNING 2026-06-20 12:31:28,266 basehttp 4324 12320 "GET /media/productos/arroz-extra-coste%C3%B1o5kg.png HTTP/1.1" 404 2683
+WARNING 2026-06-20 12:31:34,348 log 4324 24504 Not Found: /media/productos/agua-cielo-1L.png
+WARNING 2026-06-20 12:31:34,349 log 4324 19892 Not Found: /media/productos/Aceite_SxYC2rM.png
+WARNING 2026-06-20 12:31:34,350 basehttp 4324 24504 "GET /media/productos/agua-cielo-1L.png HTTP/1.1" 404 2639
+WARNING 2026-06-20 12:31:34,350 basehttp 4324 19892 "GET /media/productos/Aceite_SxYC2rM.png HTTP/1.1" 404 2643
+WARNING 2026-06-20 12:31:34,687 log 4324 28196 Not Found: /media/productos/Arroz_9GQbrr3.png
+WARNING 2026-06-20 12:31:34,688 log 4324 28140 Not Found: /media/productos/agua-san-luis-625ml.png
+WARNING 2026-06-20 12:31:34,690 basehttp 4324 28196 "GET /media/productos/Arroz_9GQbrr3.png HTTP/1.1" 404 2639
+WARNING 2026-06-20 12:31:34,689 log 4324 20772 Not Found: /media/productos/arroz-extra-costeño5kg.png
+WARNING 2026-06-20 12:31:34,690 basehttp 4324 28140 "GET /media/productos/agua-san-luis-625ml.png HTTP/1.1" 404 2663
+WARNING 2026-06-20 12:31:34,691 basehttp 4324 20772 "GET /media/productos/arroz-extra-coste%C3%B1o5kg.png HTTP/1.1" 404 2683
+WARNING 2026-06-20 12:31:34,725 log 4324 25516 Not Found: /media/productos/Aceite_SxYC2rM.png
+WARNING 2026-06-20 12:31:34,726 basehttp 4324 25516 "GET /media/productos/Aceite_SxYC2rM.png HTTP/1.1" 404 2643
+WARNING 2026-06-20 12:31:35,002 log 4324 24832 Not Found: /media/productos/agua-cielo-1L.png
+WARNING 2026-06-20 12:31:35,003 basehttp 4324 24832 "GET /media/productos/agua-cielo-1L.png HTTP/1.1" 404 2639
+WARNING 2026-06-20 12:31:35,017 log 4324 21688 Not Found: /media/productos/arroz-extra-costeño5kg.png
+WARNING 2026-06-20 12:31:35,018 log 4324 23256 Not Found: /media/productos/Arroz_9GQbrr3.png
+WARNING 2026-06-20 12:31:35,019 log 4324 23200 Not Found: /media/productos/agua-san-luis-625ml.png
+WARNING 2026-06-20 12:31:35,020 basehttp 4324 21688 "GET /media/productos/arroz-extra-coste%C3%B1o5kg.png HTTP/1.1" 404 2683
+WARNING 2026-06-20 12:31:35,020 basehttp 4324 23256 "GET /media/productos/Arroz_9GQbrr3.png HTTP/1.1" 404 2639
+WARNING 2026-06-20 12:31:35,021 basehttp 4324 23200 "GET /media/productos/agua-san-luis-625ml.png HTTP/1.1" 404 2663
+WARNING 2026-06-20 12:35:53,448 log 23076 26008 Not Found: /media/productos/Aceite_SxYC2rM.png
+WARNING 2026-06-20 12:35:53,451 basehttp 23076 26008 "GET /media/productos/Aceite_SxYC2rM.png HTTP/1.1" 404 2643
+WARNING 2026-06-20 12:35:53,452 log 23076 10304 Not Found: /media/productos/agua-cielo-1L.png
+WARNING 2026-06-20 12:35:53,453 basehttp 23076 10304 "GET /media/productos/agua-cielo-1L.png HTTP/1.1" 404 2639
+WARNING 2026-06-20 12:36:08,404 log 23076 26208 Not Found: /media/productos/Aceite_SxYC2rM.png
+WARNING 2026-06-20 12:36:08,405 basehttp 23076 26208 "GET /media/productos/Aceite_SxYC2rM.png HTTP/1.1" 404 2643
+WARNING 2026-06-20 12:36:08,710 log 23076 23748 Not Found: /media/productos/agua-cielo-1L.png
+WARNING 2026-06-20 12:36:08,711 basehttp 23076 23748 "GET /media/productos/agua-cielo-1L.png HTTP/1.1" 404 2639
+WARNING 2026-06-20 12:36:11,756 log 24008 28016 Forbidden: /api/kardex/
+WARNING 2026-06-20 12:36:12,465 log 24008 28016 Forbidden: /api/inventario/valoracion/
+WARNING 2026-06-20 12:36:12,467 log 24008 28016 Forbidden: /api/productos/importar/
+WARNING 2026-06-20 12:36:12,803 log 23076 23168 Not Found: /media/productos/agua-cielo-1L.png
+WARNING 2026-06-20 12:36:12,804 log 23076 22700 Not Found: /media/productos/Aceite_SxYC2rM.png
+WARNING 2026-06-20 12:36:12,805 basehttp 23076 23168 "GET /media/productos/agua-cielo-1L.png HTTP/1.1" 404 2639
+WARNING 2026-06-20 12:36:12,805 basehttp 23076 22700 "GET /media/productos/Aceite_SxYC2rM.png HTTP/1.1" 404 2643
+WARNING 2026-06-20 12:36:13,139 log 23076 27772 Not Found: /media/productos/Arroz_9GQbrr3.png
+WARNING 2026-06-20 12:36:13,140 log 23076 27724 Not Found: /media/productos/agua-san-luis-625ml.png
+WARNING 2026-06-20 12:36:13,142 basehttp 23076 27772 "GET /media/productos/Arroz_9GQbrr3.png HTTP/1.1" 404 2639
+WARNING 2026-06-20 12:36:13,142 log 23076 27708 Not Found: /media/productos/arroz-extra-costeño5kg.png
+WARNING 2026-06-20 12:36:13,143 basehttp 23076 27724 "GET /media/productos/agua-san-luis-625ml.png HTTP/1.1" 404 2663
+WARNING 2026-06-20 12:36:13,144 basehttp 23076 27708 "GET /media/productos/arroz-extra-coste%C3%B1o5kg.png HTTP/1.1" 404 2683
+WARNING 2026-06-20 12:36:13,203 log 23076 27732 Not Found: /media/productos/Aceite_SxYC2rM.png
+WARNING 2026-06-20 12:36:13,203 basehttp 23076 27732 "GET /media/productos/Aceite_SxYC2rM.png HTTP/1.1" 404 2643
+WARNING 2026-06-20 12:36:13,272 log 24008 28016 Forbidden: /api/productos/
+WARNING 2026-06-20 12:36:13,274 log 24008 28016 Forbidden: /api/productos/1/ajustar/
+WARNING 2026-06-20 12:36:13,459 log 23076 27716 Not Found: /media/productos/agua-cielo-1L.png
+WARNING 2026-06-20 12:36:13,460 basehttp 23076 27716 "GET /media/productos/agua-cielo-1L.png HTTP/1.1" 404 2639
+WARNING 2026-06-20 12:36:13,476 log 23076 27712 Not Found: /media/productos/Arroz_9GQbrr3.png
+WARNING 2026-06-20 12:36:13,477 log 23076 27720 Not Found: /media/productos/agua-san-luis-625ml.png
+WARNING 2026-06-20 12:36:13,478 log 23076 27704 Not Found: /media/productos/arroz-extra-costeño5kg.png
+WARNING 2026-06-20 12:36:13,479 basehttp 23076 27720 "GET /media/productos/agua-san-luis-625ml.png HTTP/1.1" 404 2663
+WARNING 2026-06-20 12:36:13,479 basehttp 23076 27712 "GET /media/productos/Arroz_9GQbrr3.png HTTP/1.1" 404 2639
+WARNING 2026-06-20 12:36:13,479 basehttp 23076 27704 "GET /media/productos/arroz-extra-coste%C3%B1o5kg.png HTTP/1.1" 404 2683
+WARNING 2026-06-20 12:36:17,353 log 24008 28016 Unauthorized: /api/auth/login/
+WARNING 2026-06-20 12:36:18,097 log 24008 28016 Forbidden: /api/usuarios/1/toggle-activo/
+WARNING 2026-06-20 12:36:19,043 log 24008 28016 Unauthorized: /api/usuarios/
+WARNING 2026-06-20 12:36:19,044 log 24008 28016 Forbidden: /api/usuarios/
+WARNING 2026-06-20 12:36:24,036 log 24008 28016 Bad Request: /api/ventas/
+WARNING 2026-06-20 12:37:48,067 log 23076 27692 Not Found: /media/productos/Aceite_SxYC2rM.png
+WARNING 2026-06-20 12:37:48,068 basehttp 23076 27692 "GET /media/productos/Aceite_SxYC2rM.png HTTP/1.1" 404 2643
+WARNING 2026-06-20 12:37:48,373 log 23076 27696 Not Found: /media/productos/agua-cielo-1L.png
+WARNING 2026-06-20 12:37:48,374 basehttp 23076 27696 "GET /media/productos/agua-cielo-1L.png HTTP/1.1" 404 2639
+WARNING 2026-06-20 12:38:28,534 log 23076 21668 Not Found: /media/productos/agua-cielo-1L.png
+WARNING 2026-06-20 12:38:28,535 log 23076 21616 Not Found: /media/productos/Aceite_SxYC2rM.png
+WARNING 2026-06-20 12:38:28,536 basehttp 23076 21668 "GET /media/productos/agua-cielo-1L.png HTTP/1.1" 404 2639
+WARNING 2026-06-20 12:38:28,536 basehttp 23076 21616 "GET /media/productos/Aceite_SxYC2rM.png HTTP/1.1" 404 2643
+WARNING 2026-06-20 12:38:46,587 log 23076 6884 Not Found: /api/mercados/1/
+WARNING 2026-06-20 12:38:46,587 basehttp 23076 6884 "PATCH /api/mercados/1/ HTTP/1.1" 404 48
+WARNING 2026-06-20 12:38:51,813 log 23076 6884 Not Found: /api/mercados/1/
+WARNING 2026-06-20 12:38:51,814 basehttp 23076 6884 "PATCH /api/mercados/1/ HTTP/1.1" 404 48
+WARNING 2026-06-20 12:41:09,877 log 27064 23792 Forbidden: /api/kardex/
+WARNING 2026-06-20 12:41:10,648 log 27064 23792 Forbidden: /api/inventario/valoracion/
+WARNING 2026-06-20 12:41:10,649 log 27064 23792 Forbidden: /api/productos/importar/
+WARNING 2026-06-20 12:41:11,307 log 27064 23792 Forbidden: /api/productos/
+WARNING 2026-06-20 12:41:11,308 log 27064 23792 Forbidden: /api/productos/1/ajustar/
+WARNING 2026-06-20 12:41:15,342 log 27064 23792 Unauthorized: /api/auth/login/
+WARNING 2026-06-20 12:41:16,116 log 27064 23792 Forbidden: /api/usuarios/1/toggle-activo/
+WARNING 2026-06-20 12:41:17,018 log 27064 23792 Unauthorized: /api/usuarios/
+WARNING 2026-06-20 12:41:17,020 log 27064 23792 Forbidden: /api/usuarios/
+WARNING 2026-06-20 12:41:23,599 log 27064 23792 Bad Request: /api/ventas/
+WARNING 2026-06-20 12:42:17,722 log 11036 20272 Not Found: /media/productos/agua-cielo-1L.png
+WARNING 2026-06-20 12:42:17,723 log 11036 12900 Not Found: /media/productos/Aceite_SxYC2rM.png
+WARNING 2026-06-20 12:42:17,724 basehttp 11036 20272 "GET /media/productos/agua-cielo-1L.png HTTP/1.1" 404 2639
+WARNING 2026-06-20 12:42:17,724 basehttp 11036 12900 "GET /media/productos/Aceite_SxYC2rM.png HTTP/1.1" 404 2643
+WARNING 2026-06-20 12:42:18,047 log 11036 12680 Not Found: /media/productos/Arroz_9GQbrr3.png
+WARNING 2026-06-20 12:42:18,048 log 11036 17516 Not Found: /media/productos/agua-san-luis-625ml.png
+WARNING 2026-06-20 12:42:18,049 basehttp 11036 12680 "GET /media/productos/Arroz_9GQbrr3.png HTTP/1.1" 404 2639
+WARNING 2026-06-20 12:42:18,051 log 11036 22988 Not Found: /media/productos/arroz-extra-costeño5kg.png
+WARNING 2026-06-20 12:42:18,052 basehttp 11036 17516 "GET /media/productos/agua-san-luis-625ml.png HTTP/1.1" 404 2663
+WARNING 2026-06-20 12:42:18,052 basehttp 11036 22988 "GET /media/productos/arroz-extra-coste%C3%B1o5kg.png HTTP/1.1" 404 2683
+WARNING 2026-06-20 12:42:18,088 log 11036 20164 Not Found: /media/productos/Aceite_SxYC2rM.png
+WARNING 2026-06-20 12:42:18,088 basehttp 11036 20164 "GET /media/productos/Aceite_SxYC2rM.png HTTP/1.1" 404 2643
+WARNING 2026-06-20 12:42:18,386 log 11036 20316 Not Found: /media/productos/Arroz_9GQbrr3.png
+WARNING 2026-06-20 12:42:18,387 log 11036 25016 Not Found: /media/productos/agua-san-luis-625ml.png
+WARNING 2026-06-20 12:42:18,388 log 11036 24988 Not Found: /media/productos/agua-cielo-1L.png
+WARNING 2026-06-20 12:42:18,389 basehttp 11036 20316 "GET /media/productos/Arroz_9GQbrr3.png HTTP/1.1" 404 2639
+WARNING 2026-06-20 12:42:18,388 log 11036 27416 Not Found: /media/productos/arroz-extra-costeño5kg.png
+WARNING 2026-06-20 12:42:18,390 basehttp 11036 24988 "GET /media/productos/agua-cielo-1L.png HTTP/1.1" 404 2639
+WARNING 2026-06-20 12:42:18,390 basehttp 11036 25016 "GET /media/productos/agua-san-luis-625ml.png HTTP/1.1" 404 2663
+WARNING 2026-06-20 12:42:18,391 basehttp 11036 27416 "GET /media/productos/arroz-extra-coste%C3%B1o5kg.png HTTP/1.1" 404 2683
+WARNING 2026-06-20 13:05:02,995 log 12092 19096 Not Found: /media/productos/agua-cielo-1L.png
+WARNING 2026-06-20 13:05:02,996 log 12092 4136 Not Found: /media/productos/Aceite_SxYC2rM.png
+WARNING 2026-06-20 13:05:02,997 basehttp 12092 19096 "GET /media/productos/agua-cielo-1L.png HTTP/1.1" 404 2639
+WARNING 2026-06-20 13:05:02,997 basehttp 12092 4136 "GET /media/productos/Aceite_SxYC2rM.png HTTP/1.1" 404 2643
+WARNING 2026-06-20 13:05:03,135 log 12092 17260 Not Found: /media/productos/agua-san-luis-625ml.png
+WARNING 2026-06-20 13:05:03,136 log 12092 16180 Not Found: /media/productos/Arroz_9GQbrr3.png
+WARNING 2026-06-20 13:05:03,137 log 12092 16236 Not Found: /media/productos/arroz-extra-costeño5kg.png
+WARNING 2026-06-20 13:05:03,138 basehttp 12092 17260 "GET /media/productos/agua-san-luis-625ml.png HTTP/1.1" 404 2663
+WARNING 2026-06-20 13:05:03,139 basehttp 12092 16180 "GET /media/productos/Arroz_9GQbrr3.png HTTP/1.1" 404 2639
+WARNING 2026-06-20 13:05:03,139 basehttp 12092 16236 "GET /media/productos/arroz-extra-coste%C3%B1o5kg.png HTTP/1.1" 404 2683
+WARNING 2026-06-20 13:05:15,682 log 12092 16132 Not Found: /media/productos/Aceite_SxYC2rM.png
+WARNING 2026-06-20 13:05:15,683 log 12092 1960 Not Found: /media/productos/agua-cielo-1L.png
+WARNING 2026-06-20 13:05:15,684 basehttp 12092 16132 "GET /media/productos/Aceite_SxYC2rM.png HTTP/1.1" 404 2643
+WARNING 2026-06-20 13:05:15,684 basehttp 12092 1960 "GET /media/productos/agua-cielo-1L.png HTTP/1.1" 404 2639
+WARNING 2026-06-20 13:05:18,552 log 12092 13840 Not Found: /media/productos/Aceite_SxYC2rM.png
+WARNING 2026-06-20 13:05:18,552 log 12092 19260 Not Found: /media/productos/agua-cielo-1L.png
+WARNING 2026-06-20 13:05:18,553 basehttp 12092 13840 "GET /media/productos/Aceite_SxYC2rM.png HTTP/1.1" 404 2643
+WARNING 2026-06-20 13:05:18,554 basehttp 12092 19260 "GET /media/productos/agua-cielo-1L.png HTTP/1.1" 404 2639
+WARNING 2026-06-20 13:05:18,877 log 12092 13600 Not Found: /media/productos/Arroz_9GQbrr3.png
+WARNING 2026-06-20 13:05:18,881 basehttp 12092 13600 "GET /media/productos/Arroz_9GQbrr3.png HTTP/1.1" 404 2639
+WARNING 2026-06-20 13:05:18,882 log 12092 14636 Not Found: /media/productos/agua-san-luis-625ml.png
+WARNING 2026-06-20 13:05:18,884 log 12092 13580 Not Found: /media/productos/arroz-extra-costeño5kg.png
+WARNING 2026-06-20 13:05:18,885 basehttp 12092 14636 "GET /media/productos/agua-san-luis-625ml.png HTTP/1.1" 404 2663
+WARNING 2026-06-20 13:05:18,887 basehttp 12092 13580 "GET /media/productos/arroz-extra-coste%C3%B1o5kg.png HTTP/1.1" 404 2683
+WARNING 2026-06-20 13:05:18,921 log 12092 4180 Not Found: /media/productos/Aceite_SxYC2rM.png
+WARNING 2026-06-20 13:05:18,922 basehttp 12092 4180 "GET /media/productos/Aceite_SxYC2rM.png HTTP/1.1" 404 2643
+WARNING 2026-06-20 13:05:19,196 log 12092 10012 Not Found: /media/productos/agua-cielo-1L.png
+WARNING 2026-06-20 13:05:19,196 basehttp 12092 10012 "GET /media/productos/agua-cielo-1L.png HTTP/1.1" 404 2639
+WARNING 2026-06-20 13:05:19,210 log 12092 10100 Not Found: /media/productos/Arroz_9GQbrr3.png
+WARNING 2026-06-20 13:05:19,211 log 12092 14412 Not Found: /media/productos/agua-san-luis-625ml.png
+WARNING 2026-06-20 13:05:19,212 log 12092 9724 Not Found: /media/productos/arroz-extra-costeño5kg.png
+WARNING 2026-06-20 13:05:19,212 basehttp 12092 10100 "GET /media/productos/Arroz_9GQbrr3.png HTTP/1.1" 404 2639
+WARNING 2026-06-20 13:05:19,213 basehttp 12092 14412 "GET /media/productos/agua-san-luis-625ml.png HTTP/1.1" 404 2663
+WARNING 2026-06-20 13:05:19,214 basehttp 12092 9724 "GET /media/productos/arroz-extra-coste%C3%B1o5kg.png HTTP/1.1" 404 2683
+WARNING 2026-06-20 13:07:06,747 log 12092 10612 Not Found: /media/productos/Aceite_SxYC2rM.png
+WARNING 2026-06-20 13:07:06,748 basehttp 12092 10612 "GET /media/productos/Aceite_SxYC2rM.png HTTP/1.1" 404 2643
+WARNING 2026-06-20 13:07:07,087 log 12092 17752 Not Found: /media/productos/agua-san-luis-625ml.png
+WARNING 2026-06-20 13:07:07,088 log 12092 20212 Not Found: /media/productos/Arroz_9GQbrr3.png
+WARNING 2026-06-20 13:07:07,089 log 12092 11464 Not Found: /media/productos/agua-cielo-1L.png
+WARNING 2026-06-20 13:07:07,092 basehttp 12092 17752 "GET /media/productos/agua-san-luis-625ml.png HTTP/1.1" 404 2663
+WARNING 2026-06-20 13:07:07,092 basehttp 12092 20212 "GET /media/productos/Arroz_9GQbrr3.png HTTP/1.1" 404 2639
+WARNING 2026-06-20 13:07:07,090 log 12092 16172 Not Found: /media/productos/arroz-extra-costeño5kg.png
+WARNING 2026-06-20 13:07:07,093 basehttp 12092 11464 "GET /media/productos/agua-cielo-1L.png HTTP/1.1" 404 2639
+WARNING 2026-06-20 13:07:07,098 basehttp 12092 16172 "GET /media/productos/arroz-extra-coste%C3%B1o5kg.png HTTP/1.1" 404 2683
+WARNING 2026-06-20 13:07:07,139 log 12092 17132 Not Found: /media/productos/Aceite_SxYC2rM.png
+WARNING 2026-06-20 13:07:07,140 basehttp 12092 17132 "GET /media/productos/Aceite_SxYC2rM.png HTTP/1.1" 404 2643
+WARNING 2026-06-20 13:07:07,425 log 12092 16156 Not Found: /media/productos/Arroz_9GQbrr3.png
+WARNING 2026-06-20 13:07:07,427 log 12092 16176 Not Found: /media/productos/agua-san-luis-625ml.png
+WARNING 2026-06-20 13:07:07,428 log 12092 17368 Not Found: /media/productos/agua-cielo-1L.png
+WARNING 2026-06-20 13:07:07,429 basehttp 12092 16156 "GET /media/productos/Arroz_9GQbrr3.png HTTP/1.1" 404 2639
+WARNING 2026-06-20 13:07:07,430 basehttp 12092 17368 "GET /media/productos/agua-cielo-1L.png HTTP/1.1" 404 2639
+WARNING 2026-06-20 13:07:07,430 basehttp 12092 16176 "GET /media/productos/agua-san-luis-625ml.png HTTP/1.1" 404 2663
+WARNING 2026-06-20 13:07:07,428 log 12092 13592 Not Found: /media/productos/arroz-extra-costeño5kg.png
+WARNING 2026-06-20 13:07:07,431 basehttp 12092 13592 "GET /media/productos/arroz-extra-coste%C3%B1o5kg.png HTTP/1.1" 404 2683
+WARNING 2026-06-20 13:07:13,470 log 12092 19488 Not Found: /media/productos/Aceite_SxYC2rM.png
+WARNING 2026-06-20 13:07:13,471 basehttp 12092 19488 "GET /media/productos/Aceite_SxYC2rM.png HTTP/1.1" 404 2643
+WARNING 2026-07-18 09:08:22,843 log 3948 5768 Unauthorized: /api/auth/me/
+WARNING 2026-07-18 09:08:22,844 basehttp 3948 5768 "GET /api/auth/me/ HTTP/1.1" 401 65
+WARNING 2026-07-18 09:08:22,849 log 3948 5768 Unauthorized: /api/auth/refresh/
+WARNING 2026-07-18 09:08:22,849 basehttp 3948 5768 "POST /api/auth/refresh/ HTTP/1.1" 401 44
+WARNING 2026-07-18 09:08:28,470 log 3948 5768 Unauthorized: /api/auth/login/
+WARNING 2026-07-18 09:08:28,470 basehttp 3948 5768 "POST /api/auth/login/ HTTP/1.1" 401 71
+WARNING 2026-07-18 09:08:33,449 log 3948 5768 Unauthorized: /api/auth/login/
+WARNING 2026-07-18 09:08:33,450 basehttp 3948 5768 "POST /api/auth/login/ HTTP/1.1" 401 71
+WARNING 2026-07-18 09:08:39,744 log 3948 5768 Unauthorized: /api/auth/login/
+WARNING 2026-07-18 09:08:39,745 basehttp 3948 5768 "POST /api/auth/login/ HTTP/1.1" 401 71
+WARNING 2026-07-18 09:08:44,978 log 3948 5768 Unauthorized: /api/auth/login/
+WARNING 2026-07-18 09:08:44,978 basehttp 3948 5768 "POST /api/auth/login/ HTTP/1.1" 401 71
+WARNING 2026-07-18 09:08:48,279 log 3948 5768 Unauthorized: /api/auth/login/
+WARNING 2026-07-18 09:08:48,280 basehttp 3948 5768 "POST /api/auth/login/ HTTP/1.1" 401 71
+WARNING 2026-07-18 09:08:51,347 log 3948 5768 Unauthorized: /api/auth/login/
+WARNING 2026-07-18 09:08:51,348 basehttp 3948 5768 "POST /api/auth/login/ HTTP/1.1" 401 71

@@ -1,4 +1,14 @@
 const Utils = {
+  escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  },
+
   /**
    * Obtiene un elemento del DOM y retorna null si no existe (en lugar de lanzar error).
    * Usar para evitar errores cuando se navega entre páginas antes de que terminen de cargar.

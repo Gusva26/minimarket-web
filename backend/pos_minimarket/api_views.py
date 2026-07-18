@@ -194,3 +194,97 @@ class PasswordResetConfirmView(APIView):
         user.save()
 
         return Response({'mensaje': 'Contraseña actualizada exitosamente. Ya puedes iniciar sesión.'})
+
+
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
+
+class CookieTokenObtainPairView(TokenObtainPairView):
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        if response.status_code == 200:
+            access_token = response.data.get('access')
+            refresh_token = response.data.get('refresh')
+            
+            secure_cookie = not settings.DEBUG
+            
+            response.set_cookie(
+                key='access_token',
+                value=access_token,
+                httponly=True,
+                secure=secure_cookie,
+                samesite='Lax',
+                path='/',
+                max_age=3600 * 2,
+            )
+            response.set_cookie(
+                key='refresh_token',
+                value=refresh_token,
+                httponly=True,
+                secure=secure_cookie,
+                samesite='Lax',
+                path='/',
+                max_age=3600 * 24,
+            )
+            
+            del response.data['access']
+            if 'refresh' in response.data:
+                del response.data['refresh']
+            response.data['status'] = 'success'
+        return response
+
+
+class CookieTokenRefreshView(TokenRefreshView):
+    def post(self, request, *args, **kwargs):
+        refresh_token = request.COOKIES.get('refresh_token')
+        if not refresh_token:
+            return Response({'error': 'Refresh token missing in cookies'}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        serializer = self.get_serializer(data={'refresh': refresh_token})
+        try:
+            serializer.is_valid(raise_exception=True)
+        except TokenError as e:
+            raise InvalidToken(e.args[0])
+            
+        response = Response(serializer.validated_data, status=status.HTTP_200_OK)
+        
+        if response.status_code == 200:
+            access_token = response.data.get('access')
+            secure_cookie = not settings.DEBUG
+            
+            response.set_cookie(
+                key='access_token',
+                value=access_token,
+                httponly=True,
+                secure=secure_cookie,
+                samesite='Lax',
+                path='/',
+                max_age=3600 * 2,
+            )
+            new_refresh_token = response.data.get('refresh')
+            if new_refresh_token:
+                response.set_cookie(
+                    key='refresh_token',
+                    value=new_refresh_token,
+                    httponly=True,
+                    secure=secure_cookie,
+                    samesite='Lax',
+                    path='/',
+                    max_age=3600 * 24,
+                )
+                del response.data['refresh']
+                
+            del response.data['access']
+            response.data['status'] = 'success'
+            
+        return response
+
+
+class CookieLogoutView(APIView):
+    permission_classes = [AllowAny]
+    def post(self, request):
+        response = Response({'status': 'success', 'mensaje': 'Sesión cerrada exitosamente'})
+        response.delete_cookie('access_token', path='/')
+        response.delete_cookie('refresh_token', path='/')
+        return response
+

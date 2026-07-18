@@ -30,6 +30,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -91,7 +92,11 @@ else:
     }
 
     if config('DB_USE_SSL', default=False, cast=bool):
-        DATABASES['default']['OPTIONS']['ssl'] = {}
+        ssl_ca = config('DB_SSL_CA', default='')
+        if ssl_ca:
+            DATABASES['default']['OPTIONS']['ssl'] = {'ca': ssl_ca}
+        else:
+            DATABASES['default']['OPTIONS']['ssl'] = {}
 
 
 AUTH_USER_MODEL = 'usuarios.Usuario'
@@ -128,7 +133,7 @@ FRONTEND_URL = config('FRONTEND_URL', default='')
 # Django REST Framework
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'pos_minimarket.authentication.CookieJWTAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
@@ -205,19 +210,33 @@ CORS_ALLOW_CREDENTIALS = True
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+    },
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
         },
+        'file': {
+            'level': 'WARNING',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': BASE_DIR / 'debug.log',
+            'maxBytes': 5 * 1024 * 1024,  # 5MB cap
+            'backupCount': 5,
+            'formatter': 'verbose',
+        },
     },
     'root': {
-        'handlers': ['console'],
+        'handlers': ['console', 'file'],
         'level': 'WARNING',
     },
     'loggers': {
         'django.server': {
             'level': 'WARNING',
-            'handlers': ['console'],
+            'handlers': ['console', 'file'],
             'propagate': False,
         },
     },

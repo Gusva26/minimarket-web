@@ -121,6 +121,11 @@ const VentasPage = {
               <input type="text" class="form-control" id="cliente_direccion" placeholder="Ej: Av. Principal 123, Lima">
             </div>
           </div>
+          <h6 style="font-size:.75rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px">Descuento</h6>
+          <div class="form-group mb-3">
+            <label class="form-label">Descuento Global (S/)</label>
+            <input type="number" step="0.01" min="0" class="form-control" id="descuento_global" placeholder="0.00" value="0.00" autocomplete="off">
+          </div>
           <h6 style="font-size:.75rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px">Método de Pago</h6>
           <div class="row g-2 justify-content-center mb-3">
             <div class="col-4">
@@ -218,7 +223,7 @@ const VentasPage = {
       html += `
       <div class="d-flex align-items-center mb-2 p-2" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)">
         <div class="flex-grow-1 me-2" style="min-width:0">
-          <small class="fw-bold d-block text-truncate">${item.nombre}</small>
+          <small class="fw-bold d-block text-truncate">${Utils.escapeHtml(item.nombre)}</small>
           <small style="color:var(--text-muted)">${Utils.formatMoney(item.precio)}</small>
         </div>
         <div class="d-flex align-items-center" style="background:var(--surface-hover);border-radius:50px;padding:2px;border:1px solid var(--border)">
@@ -309,12 +314,12 @@ const VentasPage = {
 
       html += `
       <div class="col producto-item" data-categoria="${catId}">
-        <div class="card card-flush" style="cursor:pointer;height:100%;display:flex;flex-direction:column;overflow:hidden" onclick='VentasPage.agregarAlCarrito(${p.id}, ${JSON.stringify(p.nombre)}, ${p.precio}, ${JSON.stringify(p.imagen || '')})'>
+        <div class="card card-flush" style="cursor:pointer;height:100%;display:flex;flex-direction:column;overflow:hidden" onclick='VentasPage.agregarAlCarrito(${p.id}, ${Utils.escapeHtml(JSON.stringify(p.nombre))}, ${p.precio}, ${Utils.escapeHtml(JSON.stringify(p.imagen || ''))})'>
           <div style="height:120px;display:flex;align-items:center;justify-content:center;background:var(--surface-hover);padding:.5rem">
-            ${p.imagen ? `<img src="${p.imagen}" style="max-height:110px;max-width:100%;object-fit:contain" alt="${p.nombre}">` : '<div style="opacity:.15;color:var(--text-muted)"><i class="fas fa-box fa-3x"></i></div>'}
+            ${p.imagen ? `<img src="${p.imagen}" style="max-height:110px;max-width:100%;object-fit:contain" alt="${Utils.escapeHtml(p.nombre)}">` : '<div style="opacity:.15;color:var(--text-muted)"><i class="fas fa-box fa-3x"></i></div>'}
           </div>
           <div style="padding:.6rem;text-align:center;flex:1;display:flex;flex-direction:column;justify-content:space-between">
-            <div style="font-size:.8rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${p.nombre}">${p.nombre}</div>
+            <div style="font-size:.8rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${Utils.escapeHtml(p.nombre)}">${Utils.escapeHtml(p.nombre)}</div>
             <div class="mt-1">
               <div style="font-weight:700;color:var(--primary)">${Utils.formatMoney(p.precio)}</div>
               <span class="badge ${stockBadgeClass}" style="display:block;margin-top:4px;font-size:.65rem">Stock: ${p.stock}</span>
@@ -386,17 +391,73 @@ const VentasPage = {
       });
     }
 
+    const updateCheckout = () => {
+      const totalCarrito = Object.values(this.carrito).reduce((s, i) => s + i.precio * i.cantidad, 0);
+      const discountInput = document.getElementById('descuento_global');
+      let descuento = 0;
+      if (discountInput) {
+        descuento = parseFloat(discountInput.value) || 0;
+        if (descuento < 0) {
+          descuento = 0;
+          discountInput.value = '0.00';
+        }
+        if (descuento > totalCarrito) {
+          descuento = totalCarrito;
+          discountInput.value = totalCarrito.toFixed(2);
+        }
+      }
+      
+      const totalNeto = Math.max(0, totalCarrito - descuento);
+      
+      const modalTotal = document.getElementById('modalTotal');
+      if (modalTotal) modalTotal.textContent = Utils.formatMoney(totalNeto);
+      
+      const checkoutSubtotal = document.getElementById('checkoutSubtotal');
+      if (checkoutSubtotal) checkoutSubtotal.textContent = Utils.formatMoney(totalNeto / 1.18);
+      
+      const checkoutIgv = document.getElementById('checkoutIgv');
+      if (checkoutIgv) checkoutIgv.textContent = Utils.formatMoney(totalNeto - totalNeto / 1.18);
+      
+      const checkoutTotal = document.getElementById('checkoutTotal');
+      if (checkoutTotal) checkoutTotal.textContent = Utils.formatMoney(totalNeto);
+
+      const inputRecibido = document.getElementById('monto_recibido');
+      if (inputRecibido) {
+        const recibido = parseFloat(inputRecibido.value) || 0;
+        const vueltoDisplay = document.getElementById('vuelto_display_container');
+        if (vueltoDisplay) {
+          if (recibido === 0) {
+            vueltoDisplay.innerHTML = '';
+          } else {
+            const vuelto = recibido - totalNeto;
+            if (vuelto >= 0) {
+              vueltoDisplay.innerHTML = `
+                <div class="alert alert-success mt-2 d-flex justify-content-between align-items-center py-2 fade-in" style="border-radius:var(--radius);font-weight:600;margin-bottom:0">
+                  <span>Cambio a entregar:</span>
+                  <span style="font-size:1.25rem">${Utils.formatMoney(vuelto)}</span>
+                </div>`;
+            } else {
+              vueltoDisplay.innerHTML = `
+                <div class="alert alert-danger mt-2 d-flex justify-content-between align-items-center py-2 fade-in" style="border-radius:var(--radius);font-weight:600;margin-bottom:0">
+                  <span>Falta cubrir:</span>
+                  <span style="font-size:1.25rem">${Utils.formatMoney(Math.abs(vuelto))}</span>
+                </div>`;
+            }
+          }
+        }
+      }
+    };
+
     const btnPagar = document.getElementById('btnPagar');
     if (btnPagar) {
       btnPagar.addEventListener('click', () => {
-        const total = Object.values(this.carrito).reduce((s, i) => s + i.precio * i.cantidad, 0);
-        document.getElementById('modalTotal').textContent = Utils.formatMoney(total);
-        document.getElementById('checkoutSubtotal').textContent = Utils.formatMoney(total / 1.18);
-        document.getElementById('checkoutIgv').textContent = Utils.formatMoney(total - total / 1.18);
-        document.getElementById('checkoutTotal').textContent = Utils.formatMoney(total);
+        const discountInput = document.getElementById('descuento_global');
+        if (discountInput) discountInput.value = '0.00';
+        
+        updateCheckout();
 
         const inputRecibido = document.getElementById('monto_recibido');
-        inputRecibido.value = '';
+        if (inputRecibido) inputRecibido.value = '';
         const vueltoDisplay = document.getElementById('vuelto_display_container');
         if (vueltoDisplay) vueltoDisplay.innerHTML = '';
 
@@ -415,35 +476,14 @@ const VentasPage = {
       });
     }
 
-    // 2. Cálculo dinámico del Vuelto / Cambio a entregar
+    const discountInput = document.getElementById('descuento_global');
+    if (discountInput) {
+      discountInput.addEventListener('input', updateCheckout);
+    }
+
     const inputRecibido = document.getElementById('monto_recibido');
     if (inputRecibido) {
-      inputRecibido.addEventListener('input', () => {
-      const total = Object.values(this.carrito).reduce((s, i) => s + i.precio * i.cantidad, 0);
-      const recibido = parseFloat(inputRecibido.value) || 0;
-      const vueltoDisplay = document.getElementById('vuelto_display_container');
-      
-      if (!vueltoDisplay) return;
-      if (recibido === 0) {
-        vueltoDisplay.innerHTML = '';
-        return;
-      }
-      
-      const vuelto = recibido - total;
-      if (vuelto >= 0) {
-        vueltoDisplay.innerHTML = `
-          <div class="alert alert-success mt-2 d-flex justify-content-between align-items-center py-2 fade-in" style="border-radius:var(--radius);font-weight:600;margin-bottom:0">
-            <span>Cambio a entregar:</span>
-            <span style="font-size:1.25rem">${Utils.formatMoney(vuelto)}</span>
-          </div>`;
-      } else {
-        vueltoDisplay.innerHTML = `
-          <div class="alert alert-danger mt-2 d-flex justify-content-between align-items-center py-2 fade-in" style="border-radius:var(--radius);font-weight:600;margin-bottom:0">
-            <span>Falta cubrir:</span>
-            <span style="font-size:1.25rem">${Utils.formatMoney(Math.abs(vuelto))}</span>
-          </div>`;
-      }
-    });
+      inputRecibido.addEventListener('input', updateCheckout);
     }
 
     document.querySelectorAll('input[name="metodo_pago"]').forEach(r => {
@@ -609,13 +649,15 @@ const VentasPage = {
 
     const metodo_pago = document.querySelector('input[name="metodo_pago"]:checked').value;
     const tipo_comprobante = document.getElementById('tipo_comprobante').value;
-    const total = Object.values(this.carrito).reduce((s, i) => s + i.precio * i.cantidad, 0);
+    const total_carrito = Object.values(this.carrito).reduce((s, i) => s + i.precio * i.cantidad, 0);
+    const descuento = parseFloat(document.getElementById('descuento_global').value) || 0;
+    const total_neto = Math.max(0, total_carrito - descuento);
     let monto_recibido = 0, vuelto = 0, num_operacion = '';
 
     if (metodo_pago === 'Efectivo') {
       monto_recibido = parseFloat(document.getElementById('monto_recibido').value) || 0;
-      if (monto_recibido < total) { Utils.showToast('El monto recibido debe cubrir el total de la venta', 'warning'); return; }
-      vuelto = monto_recibido - total;
+      if (monto_recibido < total_neto) { Utils.showToast('El monto recibido debe cubrir el total de la venta', 'warning'); return; }
+      vuelto = monto_recibido - total_neto;
     } else {
       num_operacion = document.getElementById('num_operacion').value.trim();
       if (!num_operacion) { Utils.showToast('El número de operación es obligatorio para pagos digitales', 'warning'); return; }
@@ -638,7 +680,16 @@ const VentasPage = {
       cliente.direccion = document.getElementById('cliente_direccion').value.trim();
     }
 
-    const payload = { metodo_pago, tipo_comprobante, monto_recibido, vuelto, num_operacion, cliente, items };
+    const payload = {
+      metodo_pago,
+      tipo_comprobante,
+      monto_recibido,
+      vuelto,
+      num_operacion,
+      cliente_data: Object.keys(cliente).length ? cliente : null,
+      descuento,
+      items
+    };
 
     const loading = Utils.showLoading();
     try {

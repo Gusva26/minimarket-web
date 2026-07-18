@@ -188,9 +188,9 @@ const UsuariosPage = {
       const esMismo = currentUser && currentUser.id === u.id;
       html += `
       <tr>
-        <td data-label="Usuario" style="font-weight:500">${u.username}</td>
-        <td data-label="Nombre">${u.first_name || ''} ${u.last_name || ''}</td>
-        <td data-label="Email">${u.email || '-'}</td>
+        <td data-label="Usuario" style="font-weight:500">${Utils.escapeHtml(u.username)}</td>
+        <td data-label="Nombre">${Utils.escapeHtml(u.first_name || '')} ${Utils.escapeHtml(u.last_name || '')}</td>
+        <td data-label="Email">${Utils.escapeHtml(u.email || '-')}</td>
         <td data-label="Rol"><span class="badge ${u.rol === 'ADMIN' ? 'badge-warning' : 'badge-accent'}">${u.rol || 'VENDEDOR'}</span></td>
         <td data-label="Estado" class="text-center">${badge}</td>
         <td data-label="Acciones" class="text-center">
@@ -198,7 +198,7 @@ const UsuariosPage = {
             <button class="btn btn-sm btn-icon btn-ghost btn-editar-usuario" data-id="${u.id}" title="Editar" style="color:var(--accent)"><i class="fas fa-edit"></i></button>
             <button class="btn btn-sm btn-icon btn-ghost btn-cambiar-pw" data-id="${u.id}" title="Cambiar Contraseña" style="color:var(--warning)"><i class="fas fa-key"></i></button>
             <button class="btn btn-sm btn-icon btn-ghost btn-toggle-activo" data-id="${u.id}" data-activo="${u.is_active}" title="${u.is_active ? 'Desactivar' : 'Activar'}" style="color:${u.is_active ? 'var(--success)' : 'var(--text-muted)'}"><i class="fas ${u.is_active ? 'fa-toggle-on' : 'fa-toggle-off'}"></i></button>
-            ${!esMismo ? `<button class="btn btn-sm btn-icon btn-ghost btn-eliminar-usuario" data-id="${u.id}" data-name="${u.username}" title="Eliminar" style="color:var(--danger)"><i class="fas fa-trash"></i></button>` : ''}
+            ${!esMismo ? `<button class="btn btn-sm btn-icon btn-ghost btn-eliminar-usuario" data-id="${u.id}" data-name="${Utils.escapeHtml(u.username)}" title="Eliminar" style="color:var(--danger)"><i class="fas fa-trash"></i></button>` : ''}
           </div>
         </td>
       </tr>`;

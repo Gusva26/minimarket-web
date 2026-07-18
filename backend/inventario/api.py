@@ -98,7 +98,8 @@ class ProductoViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'])
     @transaction.atomic
     def ajustar(self, request, pk=None):
-        producto = self.get_object()
+        # Select for update to prevent concurrent lost updates
+        producto = Producto.objects.select_for_update().get(pk=pk, mercado=request.user.mercado)
         tipo = request.data.get('tipo')
         cantidad = Decimal(str(request.data.get('cantidad', 0)))
         motivo = request.data.get('motivo', '')
@@ -212,6 +213,17 @@ class ImportarProductosView(APIView):
                 costo = Decimal(str(row['costo']))
                 stock_minimo = Decimal(str(row.get('stock_minimo', 5.0)))
                 unidad_medida = str(row.get('unidad_medida', 'UND')).strip().upper()
+                um_mapping = {
+                    'UNIDAD': 'UND', 'UNIDADES': 'UND',
+                    'KILOGRAMO': 'KG', 'KILOGRAMOS': 'KG', 'KILO': 'KG', 'KILOS': 'KG',
+                    'LITRO': 'LT', 'LITROS': 'LT',
+                    'PAQUETE': 'PAQ', 'PAQUETES': 'PAQ',
+                    'CAJA': 'CAJ', 'CAJAS': 'CAJ',
+                    'BOLSA': 'BOL', 'BOLSAS': 'BOL',
+                }
+                unidad_medida = um_mapping.get(unidad_medida, unidad_medida)
+                if unidad_medida not in [u[0] for u in Producto.UNIDADES_MEDIDA]:
+                    unidad_medida = 'UND'
 
                 if prod_name_lower in existing_products:
                     p = existing_products[prod_name_lower]
@@ -295,7 +307,7 @@ class CategoriaViewSet(viewsets.ModelViewSet):
 
 
 class KardexListView(generics.ListAPIView):
-    permission_classes = [IsAuthenticated, IsAdminOrSuperUser]
+    permission_classes = [IsAuthenticated]
     serializer_class = KardexSerializer
 
     def get_queryset(self):
@@ -365,10 +377,11 @@ class ValoracionInventarioView(APIView):
 
     def get(self, request):
         mercado = request.user.mercado
+        mercado_id = mercado.id if mercado else None
         page_number = request.query_params.get('page', 1)
         page_size = int(request.query_params.get('page_size', 25))
-        version = get_mercado_cache_version(mercado.id)
-        cache_key = f"valoracion_mercado_{mercado.id}_v{version}_page{page_number}_ps{page_size}"
+        version = get_mercado_cache_version(mercado_id)
+        cache_key = f"valoracion_mercado_{mercado_id}_v{version}_page{page_number}_ps{page_size}"
         use_cache = page_size == 25
 
         if use_cache:
@@ -378,7 +391,11 @@ class ValoracionInventarioView(APIView):
 
         logger.info(f'GET {request.path} (DB QUERY)')
 
-        productos_qs = Producto.objects.filter(mercado=mercado, stock__gt=0).annotate(
+        productos_qs = Producto.objects.filter(stock__gt=0)
+        if mercado:
+            productos_qs = productos_qs.filter(mercado=mercado)
+        
+        productos_qs = productos_qs.annotate(
             valor_total=F('stock') * F('costo'),
         ).order_by('-valor_total')
 
@@ -397,9 +414,12 @@ class ValoracionInventarioView(APIView):
                 'categoria': {'nombre': p.categoria.nombre} if p.categoria else None,
             })
 
-        categorias_valor = Categoria.objects.filter(mercado=mercado).annotate(
+        categorias_valor = Categoria.objects.annotate(
             valor_categoria=Sum(F('producto__stock') * F('producto__costo')),
-        ).filter(valor_categoria__gt=0).order_by('-valor_categoria')
+        )
+        if mercado:
+            categorias_valor = categorias_valor.filter(mercado=mercado)
+        categorias_valor = categorias_valor.filter(valor_categoria__gt=0).order_by('-valor_categoria')
 
         cat_ids = [c.id for c in categorias_valor]
         items_counts = Producto.objects.filter(
@@ -445,10 +465,11 @@ class ReporteVencimientosView(APIView):
 
     def get(self, request):
         mercado = request.user.mercado
+        mercado_id = mercado.id if mercado else None
         page_number = request.query_params.get('page', 1)
-        version = get_mercado_cache_version(mercado.id)
+        version = get_mercado_cache_version(mercado_id)
         params_str = "_".join([f"{k}:{v}" for k, v in sorted(request.query_params.items())])
-        cache_key = f"vencimientos_mercado_{mercado.id}_v{version}_{params_str}"
+        cache_key = f"vencimientos_mercado_{mercado_id}_v{version}_{params_str}"
         
         page_size = int(request.query_params.get('page_size', 25))
         use_cache = page_size == 25
@@ -469,10 +490,11 @@ class ReporteVencimientosView(APIView):
 
         # Base queryset
         unidades_qs = UnidadProducto.objects.filter(
-            mercado=mercado,
             estado='disponible',
             cantidad__gt=0,
         )
+        if mercado:
+            unidades_qs = unidades_qs.filter(mercado=mercado)
 
         # Apply filters BEFORE aggregation to keep summary consistent if needed, 
         # but usually summary is for the WHOLE inventory. 
@@ -817,17 +839,59 @@ class TransferenciaViewSet(viewsets.GenericViewSet):
         return Response(TransferenciaSerializer(t).data, status=status.HTTP_200_OK)
 
 
-class MercadoViewSet(viewsets.ReadOnlyModelViewSet):
-    permission_classes = [IsAuthenticated]
+class MercadoViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated, IsAdminOrReadOnly]
     serializer_class = MercadoSerializer
     ordering = ['nombre']
 
     def get_queryset(self):
         usuario = self.request.user
+        if (usuario.rol == 'ADMIN' or usuario.is_superuser) and self.request.query_params.get('manage') == 'true':
+            return Mercado.objects.all()
+
         qs = Mercado.objects.filter(activo=True)
         if self.request.query_params.get('all') != 'true':
             qs = qs.exclude(pk=usuario.mercado_id)
         return qs
+
+    @action(detail=False, methods=['post'], url_path='update-global')
+    def update_global(self, request):
+        if not (request.user.rol == 'ADMIN' or request.user.is_superuser):
+            return Response({'error': 'No autorizado'}, status=status.HTTP_403_FORBIDDEN)
+            
+        nombre_negocio = request.data.get('nombre_negocio', '').strip()
+        ruc = request.data.get('ruc', '').strip()
+        telefono = request.data.get('telefono', '').strip()
+        
+        if not nombre_negocio or not ruc:
+            return Response({'error': 'Nombre de negocio y RUC son requeridos'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        with transaction.atomic():
+            for m in Mercado.objects.all():
+                full_name = m.nombre
+                branch_name = ""
+                if " - " in full_name:
+                    branch_name = full_name.split(" - ", 1)[1].strip()
+                elif full_name.startswith("Minimarket "):
+                    branch_name = full_name[11:].strip()
+                else:
+                    parts = full_name.split(" ", 1)
+                    if len(parts) > 1:
+                        branch_name = parts[1].strip()
+                    else:
+                        branch_name = ""
+                        
+                if branch_name:
+                    m.nombre = f"{nombre_negocio} - {branch_name}"
+                else:
+                    m.nombre = nombre_negocio
+                    
+                m.ruc = ruc
+                m.telefono = telefono
+                m.save()
+                
+        return Response({'status': 'ok'})
+
 
 
 class ExportarProductosExcelView(APIView):

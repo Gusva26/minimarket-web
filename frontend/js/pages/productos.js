@@ -103,12 +103,12 @@ const ProductosPage = {
                   <div class="form-group">
                     <label class="form-label">Unidad de Medida <span class="text-danger">*</span></label>
                     <select class="form-select" name="unidad_medida">
-                      <option value="UNIDAD">Unidad (UND) — productos contables</option>
-                      <option value="KILOGRAMO">Kilogramo (KG) — peso</option>
-                      <option value="LITRO">Litro (LT) — líquidos</option>
-                      <option value="CAJA">Caja (CAJ) — por empaque</option>
-                      <option value="BOLSA">Bolsa (BOL) — por empaque</option>
-                      <option value="PAQUETE">Paquete (PAQ) — por empaque</option>
+                      <option value="UND">Unidad (UND) — productos contables</option>
+                      <option value="KG">Kilogramo (KG) — peso</option>
+                      <option value="LT">Litro (LT) — líquidos</option>
+                      <option value="CAJ">Caja (CAJ) — por empaque</option>
+                      <option value="BOL">Bolsa (BOL) — por empaque</option>
+                      <option value="PAQ">Paquete (PAQ) — por empaque</option>
                     </select>
                   </div>
                 </div>
@@ -384,7 +384,7 @@ const ProductosPage = {
       return;
     }
 
-    const umLabels = { UNIDAD: 'Und', KILOGRAMO: 'Kg', LITRO: 'Lt', CAJA: 'Cja', BOLSA: 'Bsa', PAQUETE: 'Pqte' };
+    const umLabels = { UND: 'Und', KG: 'Kg', LT: 'Lt', CAJ: 'Cja', BOL: 'Bsa', PAQ: 'Pqte' };
 
     tbody.innerHTML = productos.map(p => {
       const stock = parseFloat(p.stock) || 0;
@@ -400,9 +400,9 @@ const ProductosPage = {
             ? `<img src="${imgUrl}" alt="" style="width:40px;height:40px;object-fit:cover;border-radius:8px;">`
             : '<div style="width:40px;height:40px;border-radius:8px;background:var(--surface-hover);display:flex;align-items:center;justify-content:center;color:var(--text-muted)"><i class="fas fa-box opacity-50"></i></div>'}
         </td>
-        <td data-label="Nombre"><div style="font-weight:600">${p.nombre}</div></td>
-        <td data-label="Código Barras" class="text-center"><small style="color:var(--text-muted)">${p.codigo_barras || '---'}</small></td>
-        <td data-label="Categoría" class="text-center"><span class="badge badge-accent">${p.categoria ? p.categoria.nombre : 'Sin categoría'}</span></td>
+        <td data-label="Nombre"><div style="font-weight:600">${Utils.escapeHtml(p.nombre)}</div></td>
+        <td data-label="Código Barras" class="text-center"><small style="color:var(--text-muted)">${Utils.escapeHtml(p.codigo_barras) || '---'}</small></td>
+        <td data-label="Categoría" class="text-center"><span class="badge badge-accent">${p.categoria ? Utils.escapeHtml(p.categoria.nombre) : 'Sin categoría'}</span></td>
         <td data-label="U.M." class="text-center">${umLabels[p.unidad_medida] || p.unidad_medida || 'Und'}</td>
         <td data-label="Stock" class="text-center"><span class="badge ${stockBadgeClass}">${p.stock}</span></td>
         <td data-label="Stock Mín" class="text-center"><small style="color:var(--text-muted)">${p.stock_minimo}</small></td>
@@ -411,9 +411,9 @@ const ProductosPage = {
         ${isAdmin ? `
         <td data-label="Acciones" class="text-center">
           <div style="display:flex;gap:4px;justify-content:center">
-            <button class="btn btn-sm btn-icon btn-ghost" data-action="ajustar" data-id="${p.id}" data-nombre="${p.nombre}" title="Ajustar Stock" style="color:var(--warning)"><i class="fas fa-tools"></i></button>
+            <button class="btn btn-sm btn-icon btn-ghost" data-action="ajustar" data-id="${p.id}" data-nombre="${Utils.escapeHtml(p.nombre)}" title="Ajustar Stock" style="color:var(--warning)"><i class="fas fa-tools"></i></button>
             <button class="btn btn-sm btn-icon btn-ghost" data-action="editar" data-id="${p.id}" title="Editar" style="color:var(--accent)"><i class="fas fa-edit"></i></button>
-            <button class="btn btn-sm btn-icon btn-ghost" data-action="eliminar" data-id="${p.id}" data-nombre="${p.nombre}" title="Eliminar" style="color:var(--danger)"><i class="fas fa-trash-alt"></i></button>
+            <button class="btn btn-sm btn-icon btn-ghost" data-action="eliminar" data-id="${p.id}" data-nombre="${Utils.escapeHtml(p.nombre)}" title="Eliminar" style="color:var(--danger)"><i class="fas fa-trash-alt"></i></button>
           </div>
         </td>` : ''}
       </tr>`;
@@ -441,7 +441,7 @@ const ProductosPage = {
       form.nombre.value = p.nombre || '';
       form.codigo_barras.value = p.codigo_barras || '';
       form.categoria.value = p.categoria ? p.categoria.id : '';
-      form.unidad_medida.value = p.unidad_medida || 'UNIDAD';
+      form.unidad_medida.value = p.unidad_medida || 'UND';
       form.precio.value = p.precio || '';
       form.costo.value = p.costo || '';
       form.stock_minimo.value = p.stock_minimo || 0;

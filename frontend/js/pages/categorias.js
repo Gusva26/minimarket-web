@@ -148,13 +148,13 @@ const CategoriasPage = {
 
     tbody.innerHTML = categorias.map(c => `
       <tr>
-        <td data-label="Nombre"><div style="font-weight:600">${c.nombre}</div></td>
+        <td data-label="Nombre"><div style="font-weight:600">${Utils.escapeHtml(c.nombre)}</div></td>
         <td data-label="Cant. Productos" class="text-center"><span class="badge badge-info">${c.cantidad_productos ?? 0} items</span></td>
         ${isAdmin ? `
         <td data-label="Acciones" class="text-center">
           <div style="display:flex;gap:4px;justify-content:center">
             <button class="btn btn-sm btn-icon btn-ghost" data-action="editar" data-id="${c.id}" title="Editar" style="color:var(--accent)"><i class="fas fa-edit"></i></button>
-            <button class="btn btn-sm btn-icon btn-ghost" data-action="eliminar" data-id="${c.id}" data-nombre="${c.nombre}" title="Eliminar" style="color:var(--danger)"><i class="fas fa-trash-alt"></i></button>
+            <button class="btn btn-sm btn-icon btn-ghost" data-action="eliminar" data-id="${c.id}" data-nombre="${Utils.escapeHtml(c.nombre)}" title="Eliminar" style="color:var(--danger)"><i class="fas fa-trash-alt"></i></button>
           </div>
         </td>` : ''}
       </tr>

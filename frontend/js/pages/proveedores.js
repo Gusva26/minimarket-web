@@ -148,15 +148,15 @@ const ProveedoresPage = {
     proveedores.forEach(p => {
       html += `
       <tr>
-        <td data-label="Nombre" style="font-weight:500">${p.nombre}</td>
-        <td data-label="RUC">${p.ruc || '-'}</td>
-        <td data-label="Teléfono">${p.telefono || '-'}</td>
-        <td data-label="Email">${p.email || '-'}</td>
-        <td data-label="Dirección">${p.direccion || '-'}</td>
+        <td data-label="Nombre" style="font-weight:500">${Utils.escapeHtml(p.nombre)}</td>
+        <td data-label="RUC">${Utils.escapeHtml(p.ruc || '-')}</td>
+        <td data-label="Teléfono">${Utils.escapeHtml(p.telefono || '-')}</td>
+        <td data-label="Email">${Utils.escapeHtml(p.email || '-')}</td>
+        <td data-label="Dirección">${Utils.escapeHtml(p.direccion || '-')}</td>
         <td data-label="Acciones" class="text-center">
           <div style="display:flex;gap:4px;justify-content:center">
             <button class="btn btn-sm btn-icon btn-ghost btn-editar-proveedor" data-id="${p.id}" title="Editar" style="color:var(--accent)"><i class="fas fa-edit"></i></button>
-            <button class="btn btn-sm btn-icon btn-ghost btn-eliminar-proveedor" data-id="${p.id}" data-name="${p.nombre}" title="Eliminar" style="color:var(--danger)"><i class="fas fa-trash"></i></button>
+            <button class="btn btn-sm btn-icon btn-ghost btn-eliminar-proveedor" data-id="${p.id}" data-name="${Utils.escapeHtml(p.nombre)}" title="Eliminar" style="color:var(--danger)"><i class="fas fa-trash"></i></button>
           </div>
         </td>
       </tr>`;

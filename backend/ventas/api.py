@@ -218,19 +218,51 @@ class VentaViewSet(viewsets.ModelViewSet):
 
         tipo_comprobante = data['tipo_comprobante']
         items_data = data['items']
-        total = sum(Decimal(item['precio_unitario']) * Decimal(item['cantidad']) for item in items_data)
-        subtotal = total / Decimal('1.18')
-        igv = total - subtotal
-        monto_recibido = Decimal(data.get('monto_recibido', 0))
-        vuelto = max(Decimal('0.00'), monto_recibido - total)
 
         try:
             with transaction.atomic():
+                validated_items = []
+                total_catalogo = Decimal('0.00')
+                for item in items_data:
+                    producto = Producto.objects.select_for_update().get(
+                        pk=item['producto_id'], mercado=request.user.mercado
+                    )
+                    cantidad = Decimal(item['cantidad'])
+                    if producto.stock < cantidad:
+                        raise ValueError(f"Stock insuficiente para {producto.nombre}")
+                    
+                    precio = producto.precio
+                    item_descuento = Decimal(item.get('descuento', '0.00'))
+                    item_subtotal = (precio * cantidad) - item_descuento
+                    if item_subtotal < 0:
+                        raise ValueError(f"El descuento para {producto.nombre} no puede ser mayor que su subtotal")
+                    
+                    total_catalogo += precio * cantidad
+                    validated_items.append({
+                        'producto': producto,
+                        'cantidad': cantidad,
+                        'precio': precio,
+                        'descuento': item_descuento,
+                        'subtotal': item_subtotal,
+                    })
+
+                descuento_global = Decimal(data.get('descuento', '0.00'))
+                descuento_total = sum(item['descuento'] for item in validated_items) + descuento_global
+                total_neto = total_catalogo - descuento_total
+                if total_neto < 0:
+                    raise ValueError("El descuento total no puede ser mayor que el total de la venta")
+
+                subtotal = total_neto / Decimal('1.18')
+                igv = total_neto - subtotal
+                monto_recibido = Decimal(data.get('monto_recibido', 0))
+                vuelto = max(Decimal('0.00'), monto_recibido - total_neto)
+
                 serie, numero = obtener_siguiente_numero(request.user.mercado, tipo_comprobante)
                 venta = Venta.objects.create(
                     usuario=request.user,
                     cliente=cliente,
-                    total=total,
+                    total=total_neto,
+                    descuento=descuento_total,
                     subtotal=subtotal,
                     igv=igv,
                     metodo_pago=data['metodo_pago'],
@@ -245,25 +277,22 @@ class VentaViewSet(viewsets.ModelViewSet):
                 )
 
                 costo_total = Decimal('0.00')
-                for item in items_data:
-                    producto = Producto.objects.select_for_update().get(
-                        pk=item['producto_id'], mercado=request.user.mercado
-                    )
-                    cantidad = Decimal(item['cantidad'])
-                    precio = Decimal(item['precio_unitario'])
+                for v_item in validated_items:
+                    producto = v_item['producto']
+                    cantidad = v_item['cantidad']
+                    precio = v_item['precio']
 
-                    if producto.stock < cantidad:
-                        raise ValueError(f"Stock insuficiente para {producto.nombre}")
-
-                    # Create VentaDetalle first
                     costo_unitario = producto.costo or Decimal('0.00')
+                    saldo_anterior = producto.stock
+
                     detalle = VentaDetalle.objects.create(
                         venta=venta,
                         producto=producto,
                         cantidad=cantidad,
                         precio_unitario=precio,
                         costo_unitario=costo_unitario,
-                        subtotal=precio * cantidad,
+                        descuento=v_item['descuento'],
+                        subtotal=v_item['subtotal'],
                     )
 
                     # FEFO deduction with per-unit traceability
@@ -276,17 +305,26 @@ class VentaViewSet(viewsets.ModelViewSet):
                     producto.stock -= cantidad
                     producto.save()
 
+                    crear_kardex(
+                        producto=producto, mercado=request.user.mercado,
+                        tipo_movimiento='SALIDA', cantidad=cantidad,
+                        saldo_anterior=saldo_anterior, saldo_nuevo=producto.stock,
+                        ref_tipo='Venta', ref_id=venta.id,
+                        ref_detalle=f'Venta #{venta.id}',
+                        usuario=request.user,
+                    )
+
                     costo_total += costo_unitario * cantidad
 
                 venta.costo_total = costo_total
                 venta.save()
 
                 if data['metodo_pago'] == 'Efectivo':
-                    caja.monto_esperado_efectivo += total
+                    caja.monto_esperado_efectivo += total_neto
                 elif data['metodo_pago'] == 'Yape':
-                    caja.monto_esperado_yape += total
+                    caja.monto_esperado_yape += total_neto
                 elif data['metodo_pago'] == 'Plin':
-                    caja.monto_esperado_plin += total
+                    caja.monto_esperado_plin += total_neto
                 caja.save()
 
         except ValueError as e:

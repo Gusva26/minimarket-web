@@ -64,9 +64,9 @@ class InventarioModelsTestCase(APITestCase):
             mercado=self.mercado
         )
 
-        # La imagen debió convertirse a JPEG y redimensionarse a 500x500 px
+        # La imagen debió convertirse a PNG y redimensionarse a 500x500 px
         producto.refresh_from_db()
-        self.assertTrue(producto.imagen.name.endswith('.jpg'))
+        self.assertTrue(producto.imagen.name.endswith('.png'))
         img = Image.open(producto.imagen.path)
         self.assertEqual(img.size, (500, 500))
 

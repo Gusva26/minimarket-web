@@ -1,40 +1,37 @@
 const API = {
   baseURL: (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost')
-    ? 'http://127.0.0.1:8000/api/'
+    ? `http://${window.location.hostname}:8000/api/`
     : 'https://minimarket-backend-t8ai.onrender.com/api/',
 
-  async getToken() { return localStorage.getItem('access_token'); },
+  async getToken() { return null; },
 
   async request(method, endpoint, data = null, isFormData = false, rawResponse = false) {
-    const token = localStorage.getItem('access_token');
     const config = {
       method,
-      headers: { ...(!isFormData && data ? {'Content-Type': 'application/json'} : {}), ...(token ? {'Authorization': `Bearer ${token}`} : {}) },
+      headers: !isFormData && data ? {'Content-Type': 'application/json'} : {},
       body: isFormData ? data : (data ? JSON.stringify(data) : undefined),
+      credentials: 'include'
     };
 
     let response = await fetch(this.baseURL + endpoint, config);
 
-    if (response.status === 401 && token) {
-      const refresh = localStorage.getItem('refresh_token');
-      if (refresh) {
+    if (response.status === 401 && !endpoint.includes('auth/login') && !endpoint.includes('auth/refresh')) {
+      try {
         const refreshRes = await fetch(this.baseURL + 'auth/refresh/', {
           method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({refresh})
+          credentials: 'include',
         });
         if (refreshRes.ok) {
-          const {access} = await refreshRes.json();
-          localStorage.setItem('access_token', access);
-          config.headers['Authorization'] = `Bearer ${access}`;
           response = await fetch(this.baseURL + endpoint, config);
         } else {
-          localStorage.clear();
+          localStorage.removeItem('logged_in');
+          localStorage.removeItem('user');
           window.location.hash = '#/login';
           throw new Error('Sesión expirada');
         }
-      } else {
-        localStorage.clear();
+      } catch (err) {
+        localStorage.removeItem('logged_in');
+        localStorage.removeItem('user');
         window.location.hash = '#/login';
         throw new Error('Sesión expirada');
       }
@@ -45,7 +42,18 @@ const API = {
     const contentType = response.headers.get('content-type');
     if (contentType && contentType.includes('application/json')) {
       const json = await response.json();
-      if (!response.ok) throw new Error(json.detail || JSON.stringify(json));
+      if (!response.ok) {
+        if (json.detail) throw new Error(json.detail);
+        if (json.error) throw new Error(json.error);
+        if (typeof json === 'object') {
+          const msgs = Object.entries(json).map(([k, v]) => {
+            const val = Array.isArray(v) ? v.join(', ') : v;
+            return `${k}: ${val}`;
+          });
+          throw new Error(msgs.join(' | '));
+        }
+        throw new Error(JSON.stringify(json));
+      }
       return json;
     }
     if (!response.ok) throw new Error(`HTTP ${response.status}`);

@@ -169,18 +169,22 @@ const HistorialPage = {
         ? '<span class="badge badge-yape">Yape</span>'
         : '<span class="badge badge-plin">Plin</span>';
 
-      const clienteText = v.cliente ? `${v.cliente.nombre}<br><small style="color:var(--text-muted)">${v.cliente.num_documento || ''}</small>` : '<span style="color:var(--text-muted);font-style:italic">Cliente Genérico</span>';
+      const clienteText = v.cliente 
+        ? `${Utils.escapeHtml(v.cliente.nombre)}<br><small style="color:var(--text-muted)">${Utils.escapeHtml(v.cliente.num_documento || '')}</small>` 
+        : '<span style="color:var(--text-muted);font-style:italic">Cliente Genérico</span>';
 
       const hoy = new Date().toISOString().split('T')[0];
       const fechaVenta = new Date(v.fecha_hora).toISOString().split('T')[0];
       const puedeAnular = v.estado === 'COMPLETADA' && fechaVenta === hoy;
 
+      const comprobanteNumStr = `${v.serie || ''}-${String(v.numero || '').padStart(6, '0')}`;
+
       html += `
       <tr${v.estado === 'ANULADA' ? ' style="opacity:.6"' : ''}>
         <td data-label="Comprobante">
-          <div style="font-weight:600">${v.tipo_comprobante}</div>
-          <small style="color:var(--accent);font-weight:500">${v.serie || ''}-${String(v.numero || '').padStart(6, '0')}</small>
-          ${v.num_operacion ? `<br><span class="badge" style="font-size:.65rem;background:var(--surface-hover);color:var(--text)">OP: ${v.num_operacion}</span>` : ''}
+          <div style="font-weight:600">${Utils.escapeHtml(v.tipo_comprobante)}</div>
+          <small style="color:var(--accent);font-weight:500">${Utils.escapeHtml(comprobanteNumStr)}</small>
+          ${v.num_operacion ? `<br><span class="badge" style="font-size:.65rem;background:var(--surface-hover);color:var(--text)">OP: ${Utils.escapeHtml(v.num_operacion)}</span>` : ''}
         </td>
         <td data-label="Fecha" style="font-size:.85rem">
           ${Utils.formatDate(v.fecha_hora)}<br>
@@ -193,7 +197,7 @@ const HistorialPage = {
         <td data-label="Acciones" class="text-center">
           <div style="display:flex;gap:4px;justify-content:center">
             <button class="btn btn-sm btn-icon btn-ghost btn-ver-venta" data-id="${v.id}" title="Ver Detalle" style="color:var(--accent)"><i class="fas fa-eye"></i></button>
-            ${puedeAnular ? `<button class="btn btn-sm btn-icon btn-ghost btn-anular-venta" data-id="${v.id}" data-numero="${v.serie || ''}-${String(v.numero || '').padStart(6, '0')}" title="Anular Venta" style="color:var(--danger)"><i class="fas fa-ban"></i></button>` : ''}
+            ${puedeAnular ? `<button class="btn btn-sm btn-icon btn-ghost btn-anular-venta" data-id="${v.id}" data-numero="${Utils.escapeHtml(comprobanteNumStr)}" title="Anular Venta" style="color:var(--danger)"><i class="fas fa-ban"></i></button>` : ''}
           </div>
         </td>
       </tr>`;

@@ -135,7 +135,7 @@ const CajasPage = {
       const puedeCerrar = c.estado === 'ABIERTA' && c.usuario && c.usuario.id === user.id;
       html += `
       <tr>
-        <td data-label="Usuario" style="font-weight:500">${c.usuario ? (c.usuario.first_name || c.usuario.username) : '-'}</td>
+        <td data-label="Usuario" style="font-weight:500">${Utils.escapeHtml(c.usuario ? (c.usuario.first_name || c.usuario.username) : '-')}</td>
         <td data-label="Apertura">${Utils.formatDateTime(c.fecha_apertura)}</td>
         <td data-label="Cierre">${c.fecha_cierre ? Utils.formatDateTime(c.fecha_cierre) : '-'}</td>
         <td data-label="Monto Inicial">${Utils.formatMoney(c.monto_inicial)}</td>
@@ -189,9 +189,9 @@ const CajasPage = {
         <div style="display:flex;justify-content:space-between;font-weight:700;border-top:1px solid var(--border);padding-top:8px;margin-top:4px"><span>Total Esperado:</span><span>${Utils.formatMoney(esperados.total_general || 0)}</span></div>
       `;
       document.getElementById('cierreEsperados').innerHTML = html;
-      document.getElementById('cierre_efectivo_real').value = esperados.total_efectivo || 0;
-      document.getElementById('cierre_yape_real').value = esperados.total_yape || 0;
-      document.getElementById('cierre_plin_real').value = esperados.total_plin || 0;
+      document.getElementById('cierre_efectivo_real').value = '';
+      document.getElementById('cierre_yape_real').value = '';
+      document.getElementById('cierre_plin_real').value = '';
       document.getElementById('cierre_observaciones').value = '';
 
       Utils.showModal('cierreModal');
@@ -258,7 +258,7 @@ const CajasPage = {
 
     return `
     <div style="text-align:left">
-      <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-weight:600">Usuario:</span><span>${caja.usuario ? (caja.usuario.first_name || caja.usuario.username) : '-'}</span></div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-weight:600">Usuario:</span><span>${Utils.escapeHtml(caja.usuario ? (caja.usuario.first_name || caja.usuario.username) : '-')}</span></div>
       <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-weight:600">Apertura:</span><span>${Utils.formatDateTime(caja.fecha_apertura)}</span></div>
       <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-weight:600">Cierre:</span><span>${caja.fecha_cierre ? Utils.formatDateTime(caja.fecha_cierre) : '-'}</span></div>
       <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-weight:600">Monto Inicial:</span><span>${Utils.formatMoney(caja.monto_inicial)}</span></div>
@@ -273,7 +273,7 @@ const CajasPage = {
       <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span>Plin Esperado:</span><span>${Utils.formatMoney(esperados.total_plin || 0)}</span></div>
       <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span>Plin Real:</span><span>${Utils.formatMoney(reales.plin_real || 0)}</span></div>
       <div style="display:flex;justify-content:space-between;margin-bottom:4px;color:${diffClass(difPlin)}"><span>Diferencia:</span><span>${Utils.formatMoney(difPlin)}</span></div>
-      ${caja.observaciones ? `<hr><div style="font-weight:600">Observaciones:</div><p>${caja.observaciones}</p>` : ''}
+      ${caja.observaciones ? `<hr><div style="font-weight:600">Observaciones:</div><p>${Utils.escapeHtml(caja.observaciones)}</p>` : ''}
       <hr>
       <button class="btn btn-primary w-100" onclick="window.print()"><i class="fas fa-print me-2"></i>Imprimir</button>
     </div>`;

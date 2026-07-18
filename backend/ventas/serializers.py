@@ -72,7 +72,7 @@ class VentaDetalleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = VentaDetalle
-        fields = ['id', 'venta', 'producto', 'cantidad', 'precio_unitario', 'costo_unitario', 'subtotal', 'unidades']
+        fields = ['id', 'venta', 'producto', 'cantidad', 'precio_unitario', 'costo_unitario', 'subtotal', 'descuento', 'unidades']
 
 
 class VentaSerializer(serializers.ModelSerializer):
@@ -84,7 +84,7 @@ class VentaSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Venta
-        fields = ['id', 'usuario', 'cliente', 'fecha_hora', 'tipo_comprobante', 'serie', 'numero', 'subtotal', 'igv', 'total', 'costo_total', 'utilidad', 'metodo_pago', 'monto_recibido', 'vuelto', 'num_operacion', 'estado', 'mercado', 'caja', 'detalles']
+        fields = ['id', 'usuario', 'cliente', 'fecha_hora', 'tipo_comprobante', 'serie', 'numero', 'subtotal', 'igv', 'total', 'descuento', 'costo_total', 'utilidad', 'metodo_pago', 'monto_recibido', 'vuelto', 'num_operacion', 'estado', 'mercado', 'caja', 'detalles']
 
     def get_utilidad(self, obj):
         return obj.utilidad
@@ -94,6 +94,7 @@ class ItemVentaSerializer(serializers.Serializer):
     producto_id = serializers.IntegerField()
     cantidad = serializers.DecimalField(max_digits=10, decimal_places=2)
     precio_unitario = serializers.DecimalField(max_digits=10, decimal_places=2)
+    descuento = serializers.DecimalField(max_digits=10, decimal_places=2, required=False, default='0.00')
 
 
 class ClienteDataSerializer(serializers.Serializer):
@@ -109,4 +110,5 @@ class VentaCreateSerializer(serializers.Serializer):
     vuelto = serializers.DecimalField(max_digits=10, decimal_places=2, required=False, default='0.00')
     num_operacion = serializers.CharField(required=False, allow_blank=True, default='')
     cliente_data = ClienteDataSerializer(required=False, allow_null=True)
+    descuento = serializers.DecimalField(max_digits=10, decimal_places=2, required=False, default='0.00')
     items = ItemVentaSerializer(many=True)

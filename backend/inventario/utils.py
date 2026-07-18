@@ -1,6 +1,7 @@
 from decimal import Decimal
 from django.db import transaction
 from django.core.cache import cache
+from django.utils import timezone
 from .models import UnidadProducto, Kardex
 
 
@@ -63,6 +64,7 @@ def descontar_stock_fefo(producto, cantidad, mercado, venta_detalle=None):
         mercado=mercado,
         estado='disponible',
         cantidad__gt=0,
+        fecha_vencimiento__gte=timezone.now().date()
     ).order_by('fecha_vencimiento', 'id')
 
     for u in unidades:

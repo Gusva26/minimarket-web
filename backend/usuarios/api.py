@@ -38,7 +38,7 @@ class UsuarioViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     ordering = ['username']
 
-    admin_only_actions = ['list', 'retrieve', 'create',
+    admin_only_actions = ['list', 'retrieve', 'create', 'update',
                           'partial_update', 'destroy']
 
     def get_permissions(self):

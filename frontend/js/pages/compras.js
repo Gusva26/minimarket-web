@@ -211,7 +211,7 @@ const ComprasPage = {
       html += `
       <tr>
         <td data-label="#" style="font-weight:500">${c.id}</td>
-        <td data-label="Proveedor">${c.proveedor ? (c.proveedor.nombre || c.proveedor) : '-'}</td>
+        <td data-label="Proveedor">${Utils.escapeHtml(c.proveedor ? (c.proveedor.nombre || c.proveedor) : '-')}</td>
         <td data-label="Fecha">${Utils.formatDate(c.fecha)}</td>
         <td data-label="Total" class="text-end fw-bold">${Utils.formatMoney(c.total)}</td>
         <td data-label="Acción" class="text-center">
@@ -474,7 +474,7 @@ const ComprasPage = {
       const detalles = compra.detalles || [];
       let html = `
       <div class="mb-3">
-        <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-weight:600">Proveedor:</span><span>${compra.proveedor ? (compra.proveedor.nombre || compra.proveedor) : '-'}</span></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-weight:600">Proveedor:</span><span>${Utils.escapeHtml(compra.proveedor ? (compra.proveedor.nombre || compra.proveedor) : '-')}</span></div>
         <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-weight:600">Fecha:</span><span>${Utils.formatDate(compra.fecha)}</span></div>
         <div style="display:flex;justify-content:space-between;font-weight:700;font-size:1.2rem;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)"><span>Total:</span><span>${Utils.formatMoney(compra.total)}</span></div>
       </div>
@@ -485,7 +485,7 @@ const ComprasPage = {
           <tbody>`;
       detalles.forEach(d => {
         html += `<tr>
-          <td data-label="Producto">${d.producto ? d.producto.nombre : d.producto_nombre || ''}</td>
+          <td data-label="Producto">${Utils.escapeHtml(d.producto ? d.producto.nombre : d.producto_nombre || '')}</td>
           <td data-label="Cantidad" class="text-end">${d.cantidad}</td>
           <td data-label="P. Costo" class="text-end">${Utils.formatMoney(d.precio_costo_unitario)}</td>
           <td data-label="Vencimiento" class="text-end">${d.fecha_vencimiento ? Utils.formatDate(d.fecha_vencimiento) : '-'}</td>

@@ -55,8 +55,9 @@ class UsuarioAuthAPITestCase(APITestCase):
         }
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn('access', response.data)
-        self.assertIn('refresh', response.data)
+        self.assertIn('access_token', response.cookies)
+        self.assertIn('refresh_token', response.cookies)
+        self.assertEqual(response.data.get('status'), 'success')
 
     def test_login_incorrecto(self):
         url = reverse('token_obtain_pair')
@@ -107,3 +108,14 @@ class UsuarioAuthAPITestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.admin.refresh_from_db()
         self.assertTrue(self.admin.is_active)
+
+
+class PingAPITestCase(APITestCase):
+    def test_ping_endpoint(self):
+        url = reverse('ping')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json(), {'status': 'ok'})
+
+
+

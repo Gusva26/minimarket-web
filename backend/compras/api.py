@@ -115,7 +115,7 @@ class CompraViewSet(viewsets.ModelViewSet):
                     
                     cantidad = det['cantidad']
                     um = producto.unidad_medida
-                    if um in ('UND', 'PAQ'):
+                    if um in ('UND', 'PAQ', 'CAJ', 'BOL'):
                         # For whole units, create one record per unit
                         for _ in range(int(cantidad)):
                             UnidadProducto.objects.create(

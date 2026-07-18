@@ -79,6 +79,7 @@ class Venta(models.Model):
     subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     igv = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     total = models.DecimalField(max_digits=10, decimal_places=2)
+    descuento = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     costo_total = models.DecimalField(max_digits=10, decimal_places=2, default=0.00) # Para calcular utilidad
     
     # Detalle de Pago
@@ -108,6 +109,7 @@ class VentaDetalle(models.Model):
     precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)
     costo_unitario = models.DecimalField(max_digits=10, decimal_places=2, default=0.00) # Costo al momento de la venta
     subtotal = models.DecimalField(max_digits=10, decimal_places=2)
+    descuento = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
 
     def __str__(self):
         return f"{self.cantidad} x {self.producto.nombre if self.producto else 'Producto Eliminado'}"

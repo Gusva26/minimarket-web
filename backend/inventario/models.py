@@ -36,6 +36,8 @@ class Producto(models.Model):
         ('KG', 'Kilogramo'),
         ('LT', 'Litro'),
         ('PAQ', 'Paquete'),
+        ('CAJ', 'Caja'),
+        ('BOL', 'Bolsa'),
     )
 
     nombre = models.CharField(max_length=200)
