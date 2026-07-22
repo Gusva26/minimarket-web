@@ -282,3 +282,17 @@ WARNING 2026-07-18 09:08:48,279 log 3948 5768 Unauthorized: /api/auth/login/
 WARNING 2026-07-18 09:08:48,280 basehttp 3948 5768 "POST /api/auth/login/ HTTP/1.1" 401 71
 WARNING 2026-07-18 09:08:51,347 log 3948 5768 Unauthorized: /api/auth/login/
 WARNING 2026-07-18 09:08:51,348 basehttp 3948 5768 "POST /api/auth/login/ HTTP/1.1" 401 71
+WARNING 2026-07-18 09:38:46,997 log 10716 10568 Not Found: /media/productos/arroz-extra-coste??o5kg.png
+WARNING 2026-07-18 09:38:46,997 basehttp 10716 10568 "GET /media/productos/arroz-extra-coste%3F%3Fo5kg.png HTTP/1.1" 404 2683
+WARNING 2026-07-18 09:38:49,855 log 10716 11128 Not Found: /media/productos/arroz-extra-coste??o5kg.png
+WARNING 2026-07-18 09:38:49,856 basehttp 10716 11128 "GET /media/productos/arroz-extra-coste%3F%3Fo5kg.png HTTP/1.1" 404 2683
+WARNING 2026-07-18 09:39:09,433 log 10716 21180 Not Found: /media/productos/arroz-extra-coste??o5kg.png
+WARNING 2026-07-18 09:39:09,434 basehttp 10716 21180 "GET /media/productos/arroz-extra-coste%3F%3Fo5kg.png HTTP/1.1" 404 2683
+WARNING 2026-07-18 09:39:13,422 log 10716 20752 Not Found: /media/productos/arroz-extra-coste??o5kg.png
+WARNING 2026-07-18 09:39:13,422 basehttp 10716 20752 "GET /media/productos/arroz-extra-coste%3F%3Fo5kg.png HTTP/1.1" 404 2683
+WARNING 2026-07-18 09:39:16,231 log 10716 18984 Not Found: /media/productos/arroz-extra-coste??o5kg.png
+WARNING 2026-07-18 09:39:16,232 basehttp 10716 18984 "GET /media/productos/arroz-extra-coste%3F%3Fo5kg.png HTTP/1.1" 404 2683
+WARNING 2026-07-18 09:39:24,506 log 10716 4104 Not Found: /media/productos/arroz-extra-coste??o5kg.png
+WARNING 2026-07-18 09:39:24,507 basehttp 10716 4104 "GET /media/productos/arroz-extra-coste%3F%3Fo5kg.png HTTP/1.1" 404 2683
+WARNING 2026-07-18 09:42:48,730 log 9168 22240 Bad Request: /api/reportes/ventas/
+WARNING 2026-07-18 09:42:48,731 basehttp 9168 22240 "GET /api/reportes/ventas/?filtro=personalizado&fecha_inicio=2026-05-01&fecha_fin=2026-07-18 HTTP/1.1" 400 61
