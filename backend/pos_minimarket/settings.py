@@ -60,20 +60,45 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'pos_minimarket.wsgi.application'
 
-db_engine = config('DB_ENGINE', default='postgresql')
+try:
+    import pymysql
+    pymysql.install_as_MySQLdb()
+except ImportError:
+    pass
 
-if 'test' in sys.argv:
+db_engine = config('DB_ENGINE', default='postgresql').lower()
+
+if 'test' in sys.argv or db_engine == 'sqlite':
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
-elif db_engine == 'sqlite':
+elif 'mysql' in db_engine:
+    options = {}
+    if config('DB_USE_SSL', default=True, cast=bool):
+        ssl_ca = config('DB_SSL_CA', default='')
+        if ssl_ca:
+            ca_path = os.path.join(BASE_DIR, ssl_ca)
+            if os.path.exists(ca_path):
+                options['ssl'] = {'ca': ca_path}
+            else:
+                options['ssl'] = {'ssl_mode': 'REQUIRED'}
+        else:
+            options['ssl'] = {'ssl_mode': 'REQUIRED'}
+
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': config('DB_NAME', default='defaultdb'),
+            'USER': config('DB_USER', default='avnadmin'),
+            'PASSWORD': config('DB_PASSWORD', default=''),
+            'HOST': config('DB_HOST', default=''),
+            'PORT': config('DB_PORT', default='3306'),
+            'OPTIONS': options,
+            'CONN_MAX_AGE': 600,
+            'CONN_HEALTH_CHECKS': True,
         }
     }
 else:
@@ -94,6 +119,7 @@ else:
             'CONN_HEALTH_CHECKS': True,
         }
     }
+
 
 
 
@@ -203,8 +229,19 @@ CORS_ALLOWED_ORIGINS = [
 ]
 frontend_url = config('FRONTEND_URL', default='')
 if frontend_url:
-    CORS_ALLOWED_ORIGINS.append(frontend_url)
+    clean_url = frontend_url.rstrip('/')
+    if clean_url not in CORS_ALLOWED_ORIGINS:
+        CORS_ALLOWED_ORIGINS.append(clean_url)
+
 CORS_ALLOW_CREDENTIALS = True
+
+# Session & Cookie settings for Cross-Site HTTPS Production
+if not DEBUG:
+    SESSION_COOKIE_SECURE = True
+    SESSION_COOKIE_SAMESITE = 'None'
+    CSRF_COOKIE_SECURE = True
+    CSRF_COOKIE_SAMESITE = 'None'
+
 
 LOGGING = {
     'version': 1,

@@ -249,13 +249,14 @@ class CookieTokenObtainPairView(TokenObtainPairView):
             refresh_token = response.data.get('refresh')
             
             secure_cookie = not settings.DEBUG
+            samesite_val = 'None' if secure_cookie else 'Lax'
             
             response.set_cookie(
                 key='access_token',
                 value=access_token,
                 httponly=True,
                 secure=secure_cookie,
-                samesite='Lax',
+                samesite=samesite_val,
                 path='/',
                 max_age=3600 * 2,
             )
@@ -264,7 +265,7 @@ class CookieTokenObtainPairView(TokenObtainPairView):
                 value=refresh_token,
                 httponly=True,
                 secure=secure_cookie,
-                samesite='Lax',
+                samesite=samesite_val,
                 path='/',
                 max_age=3600 * 24,
             )
@@ -293,13 +294,14 @@ class CookieTokenRefreshView(TokenRefreshView):
         if response.status_code == 200:
             access_token = response.data.get('access')
             secure_cookie = not settings.DEBUG
+            samesite_val = 'None' if secure_cookie else 'Lax'
             
             response.set_cookie(
                 key='access_token',
                 value=access_token,
                 httponly=True,
                 secure=secure_cookie,
-                samesite='Lax',
+                samesite=samesite_val,
                 path='/',
                 max_age=3600 * 2,
             )
@@ -310,7 +312,7 @@ class CookieTokenRefreshView(TokenRefreshView):
                     value=new_refresh_token,
                     httponly=True,
                     secure=secure_cookie,
-                    samesite='Lax',
+                    samesite=samesite_val,
                     path='/',
                     max_age=3600 * 24,
                 )
@@ -326,7 +328,10 @@ class CookieLogoutView(APIView):
     permission_classes = [AllowAny]
     def post(self, request):
         response = Response({'status': 'success', 'mensaje': 'Sesión cerrada exitosamente'})
-        response.delete_cookie('access_token', path='/')
-        response.delete_cookie('refresh_token', path='/')
+        secure_cookie = not settings.DEBUG
+        samesite_val = 'None' if secure_cookie else 'Lax'
+        response.delete_cookie('access_token', path='/', samesite=samesite_val)
+        response.delete_cookie('refresh_token', path='/', samesite=samesite_val)
         return response
+
 
