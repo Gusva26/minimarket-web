@@ -19,9 +19,11 @@ const ValoracionPage = {
             <div class="table-toolbar">
               <h6 class="toolbar-title"><i class="fas fa-chart-pie" style="color:var(--accent)"></i>Distribución de Capital</h6>
             </div>
-            <div style="padding:1rem;display:flex;justify-content:center">
-              <canvas id="chartCapitalCategoria" style="max-height:280px"></canvas>
+            <div style="padding:1rem;position:relative;width:100%;height:280px;max-width:100%;overflow:hidden">
+              <canvas id="chartCapitalCategoria"></canvas>
             </div>
+
+
           </div>
           <div class="table-container">
             <div class="table-toolbar">
@@ -140,6 +142,7 @@ const ValoracionPage = {
 
   renderCategorias: function (categorias) {
     this._categoriasData = categorias;
+    const catFilter = document.getElementById('filterValoracionCategoria')?.value || '';
 
     const tbody = document.getElementById('tbodyCategoriasValor');
     if (!categorias.length) {
@@ -147,17 +150,32 @@ const ValoracionPage = {
       return;
     }
 
-    tbody.innerHTML = categorias.map(c => `
-      <tr>
-        <td data-label="Categoría" style="font-weight:600">${c.nombre}</td>
-        <td data-label="Items" class="text-center">${c.total_items}</td>
-        <td data-label="Valor" class="text-end fw-bold" style="color:var(--primary)">${Utils.formatMoney(c.valor_categoria)}</td>
-      </tr>
-    `).join('');
+    tbody.innerHTML = categorias.map(c => {
+      const isSelected = catFilter === c.nombre;
+      const bgStyle = isSelected ? 'background-color: rgba(99,102,241,0.15); font-weight: bold;' : '';
+      return `
+        <tr data-categoria="${Utils.escapeHtml(c.nombre)}" style="cursor:pointer; transition: background-color 0.2s ease; ${bgStyle}">
+          <td data-label="Categoría" style="font-weight:600">${c.nombre}</td>
+          <td data-label="Items" class="text-center">${c.total_items}</td>
+          <td data-label="Valor" class="text-end fw-bold" style="color:var(--primary)">${Utils.formatMoney(c.valor_categoria)}</td>
+        </tr>
+      `;
+    }).join('');
+
+    tbody.querySelectorAll('tr').forEach(row => {
+      row.addEventListener('click', () => {
+        const cat = row.getAttribute('data-categoria');
+        const select = document.getElementById('filterValoracionCategoria');
+        if (select) {
+          select.value = select.value === cat ? '' : cat;
+          this.filterProductos();
+        }
+      });
+    });
 
     // Populate the category filter dropdown
     const select = document.getElementById('filterValoracionCategoria');
-    if (select) {
+    if (select && select.children.length <= 1) {
       select.innerHTML = '<option value="">Todas las categorías</option>' +
         categorias.map(c => `<option value="${c.nombre}">${c.nombre}</option>`).join('');
     }
@@ -171,7 +189,7 @@ const ValoracionPage = {
   _renderProductosRows: function (productos) {
     const tbody = document.getElementById('tbodyProductosValor');
     if (!productos.length) {
-      tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state py-3"><div class="empty-title">No hay productos registrados</div></div></td></tr>';
+      tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state py-3"><div class="empty-title">No se encontraron productos para esta categoría</div></div></td></tr>';
       return;
     }
 
@@ -203,6 +221,8 @@ const ValoracionPage = {
     });
 
     this._renderProductosRows(filtered);
+    this.renderCategorias(this._categoriasData);
+    this.renderChart(this._categoriasData);
   },
 
   renderChart: function (categorias) {
@@ -219,7 +239,19 @@ const ValoracionPage = {
     const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text').trim();
     const labels = categorias.map(c => c.nombre);
     const valores = categorias.map(c => c.valor_categoria);
-    const colors = categorias.map((_, i) => `hsl(${(i * 360 / categorias.length + 200) % 360}, 70%, 55%)`);
+    const catSelected = document.getElementById('filterValoracionCategoria')?.value || '';
+    const selectedIndex = labels.findIndex(l => l === catSelected);
+
+    const offsets = labels.map((_, i) => (selectedIndex === i ? 16 : 0));
+    const bgColors = labels.map((_, i) => {
+      const baseColor = `hsl(${(i * 360 / labels.length + 200) % 360}, 75%, 55%)`;
+      if (selectedIndex === -1) return baseColor;
+      return selectedIndex === i ? baseColor : `hsla(${(i * 360 / labels.length + 200) % 360}, 20%, 40%, 0.25)`;
+    });
+    const borderColors = labels.map((_, i) => {
+      if (selectedIndex === i) return '#ffffff';
+      return getComputedStyle(document.documentElement).getPropertyValue('--card-bg').trim() || '#1a1a2e';
+    });
 
     const config = {
       type: 'doughnut',
@@ -227,28 +259,50 @@ const ValoracionPage = {
         labels: labels,
         datasets: [{
           data: valores,
-          backgroundColor: colors,
-          borderWidth: 2,
-          borderColor: getComputedStyle(document.documentElement).getPropertyValue('--card-bg').trim() || '#1a1a2e'
+          backgroundColor: bgColors,
+          borderColor: borderColors,
+          borderWidth: labels.map((_, i) => (selectedIndex === i ? 3 : 1)),
+          offset: offsets,
         }]
       },
       options: {
         responsive: true,
-        maintainAspectRatio: true,
+        maintainAspectRatio: false,
+        resizeDelay: 150,
+        layout: {
+          padding: 10
+        },
+        onHover: (event, chartElement) => {
+          canvas.style.cursor = chartElement[0] ? 'pointer' : 'default';
+        },
+
+        onClick: (event, activeElements) => {
+          if (activeElements && activeElements.length > 0) {
+            const index = activeElements[0].index;
+            const categoryName = labels[index];
+            const selectCat = document.getElementById('filterValoracionCategoria');
+            if (selectCat) {
+              selectCat.value = selectCat.value === categoryName ? '' : categoryName;
+              this.filterProductos();
+            }
+          }
+        },
         plugins: {
           legend: {
             position: 'bottom',
             labels: {
               color: textColor,
-              padding: 15,
-              usePointStyle: true
+              padding: 10,
+              font: { size: 11 },
+              usePointStyle: true,
+              boxWidth: 8
             }
           },
           tooltip: {
             callbacks: {
               label: function (context) {
-                const value = context.parsed;
-                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                const value = context.parsed || 0;
+                const total = context.dataset.data.reduce((a, b) => a + (parseFloat(b) || 0), 0);
                 const pct = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
                 return ` ${context.label}: ${Utils.formatMoney(value)} (${pct}%)`;
               }
@@ -260,4 +314,6 @@ const ValoracionPage = {
 
     this._chartInstance = new Chart(ctx, config);
   }
+
 };
+

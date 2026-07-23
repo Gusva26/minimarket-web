@@ -2,53 +2,210 @@
    RESPONSIVE.CSS — Global Responsive Overrides
    ============================================ */
 
-@media (max-width: 768px) {
-  .sidebar {
-    transform: translateX(-100%);
-    width: 280px !important;
-  }
-  .sidebar.mobile-open { transform: translateX(0); }
-  .sidebar ~ .main-content { margin-left: 0 !important; }
-  .main-content { padding: 1rem; padding-top: 3.5rem; }
-  .page-header { flex-direction: column; align-items: flex-start; }
-  .page-header .page-actions { width: 100%; }
-  .page-header .page-actions .btn { flex: 1; }
-  .kpi-card .kpi-value { font-size: 1.4rem; }
-  .kpi-grid { grid-template-columns: 1fr 1fr !important; }
-  .dashboard-two-col { grid-template-columns: 1fr !important; }
-  .quick-grid { grid-template-columns: repeat(3,1fr) !important; }
-  .filters-bar { flex-direction: column; }
-  .filters-bar .filter-group { width: 100%; }
-  .table-toolbar { flex-direction: column; align-items: flex-start; }
-  .toast-container { left: 1rem; right: 1rem; max-width: none; }
-
-  .chart-grid { grid-template-columns: 1fr; }
-  .charts-bottom { grid-template-columns: 1fr; }
-}
-
-/* Mobile hamburger */
+/* Mobile Hamburger Button */
 .mobile-hamburger {
   display: none;
   position: fixed;
-  top: 10px;
-  left: 10px;
-  z-index: 998;
+  top: 14px;
+  left: 14px;
+  z-index: 997;
   width: 40px;
   height: 40px;
-  border-radius: var(--radius);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-md);
-  color: var(--text);
-  font-size: 1.1rem;
+  border-radius: 10px;
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border, #cbd5e1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  color: var(--primary, #3b82f6);
+  font-size: 1.15rem;
   cursor: pointer;
   align-items: center;
   justify-content: center;
-  transition: var(--transition);
+  transition: all 0.2s ease;
+  opacity: 1;
 }
-.mobile-hamburger:hover { background: var(--surface-hover); }
+.mobile-hamburger:hover {
+  background: var(--surface-hover, #f8fafc);
+  transform: scale(1.05);
+}
 
-@media (max-width: 768px) {
-  .mobile-hamburger { display: flex; }
-  .sidebar.mobile-open ~ .mobile-hamburger { display: none; }
+[data-theme="dark"] .mobile-hamburger {
+  background: #1e293b;
+  border-color: #334155;
+  color: #60a5fa;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
 }
+
+/* ---------- 1. Large Screen / Laptops (<= 1200px) ---------- */
+@media (max-width: 1200px) {
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 1rem !important;
+  }
+}
+
+/* ---------- 2. Tablets (<= 992px) ---------- */
+@media (max-width: 992px) {
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .dashboard-two-col {
+    grid-template-columns: 1fr !important;
+  }
+  .chart-grid, .charts-bottom {
+    grid-template-columns: 1fr !important;
+  }
+  .col-xl-4, .col-xl-8 {
+    width: 100% !important;
+  }
+}
+
+/* ---------- 3. Mobile Devices & Small Tablets (<= 768px) ---------- */
+@media (max-width: 768px) {
+  .mobile-hamburger {
+    display: flex;
+  }
+
+  .sidebar.mobile-open ~ .mobile-hamburger {
+    display: none !important;
+  }
+
+
+  .sidebar {
+    transform: translateX(-100%);
+    width: 280px !important;
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 999;
+  }
+
+  .sidebar.mobile-open {
+    transform: translateX(0);
+  }
+
+  .sidebar ~ .main-content,
+  .main-content {
+    margin-left: 0 !important;
+    padding: 1rem !important;
+    padding-top: 4rem !important;
+    width: 100% !important;
+  }
+
+  .topbar-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 0.75rem 1rem;
+  }
+
+  .topbar-left, .topbar-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .page-header .page-actions {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .page-header .page-actions .btn {
+    flex: 1;
+    min-width: 140px;
+  }
+
+  .kpi-card {
+    padding: 1rem !important;
+  }
+
+  .kpi-card .kpi-value {
+    font-size: 1.3rem !important;
+  }
+
+  .quick-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .filters-bar, .filters-container {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    gap: 0.75rem !important;
+  }
+
+  .filters-bar .filter-group,
+  .filters-container .filter-group {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .table-toolbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .table-toolbar .toolbar-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .toast-container {
+    left: 1rem;
+    right: 1rem;
+    max-width: none;
+  }
+
+  .modal-dialog {
+    margin: 0.5rem;
+    max-width: calc(100% - 1rem) !important;
+  }
+
+  .modal-content {
+    padding: 1.25rem !important;
+  }
+}
+
+/* ---------- 4. Small Mobile Phones (<= 576px) ---------- */
+@media (max-width: 576px) {
+  .kpi-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .quick-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .kpi-card .kpi-value {
+    font-size: 1.2rem !important;
+  }
+
+  .btn {
+    font-size: 0.85rem;
+    padding: 0.5rem 0.85rem;
+  }
+
+  .modal-footer {
+    flex-direction: column-reverse;
+    gap: 0.5rem;
+  }
+
+  .modal-footer .btn {
+    width: 100%;
+  }
+
+  .table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+

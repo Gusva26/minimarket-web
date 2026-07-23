@@ -270,18 +270,17 @@ class CookieTokenObtainPairView(TokenObtainPairView):
                 max_age=3600 * 24,
             )
             
-            del response.data['access']
-            if 'refresh' in response.data:
-                del response.data['refresh']
+            response.data['access_token'] = access_token
+            response.data['refresh_token'] = refresh_token
             response.data['status'] = 'success'
         return response
 
 
 class CookieTokenRefreshView(TokenRefreshView):
     def post(self, request, *args, **kwargs):
-        refresh_token = request.COOKIES.get('refresh_token')
+        refresh_token = request.COOKIES.get('refresh_token') or request.data.get('refresh') or request.data.get('refresh_token')
         if not refresh_token:
-            return Response({'error': 'Refresh token missing in cookies'}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({'error': 'Refresh token missing'}, status=status.HTTP_401_UNAUTHORIZED)
         
         serializer = self.get_serializer(data={'refresh': refresh_token})
         try:
@@ -293,6 +292,7 @@ class CookieTokenRefreshView(TokenRefreshView):
         
         if response.status_code == 200:
             access_token = response.data.get('access')
+            new_refresh_token = response.data.get('refresh') or refresh_token
             secure_cookie = not settings.DEBUG
             samesite_val = 'None' if secure_cookie else 'Lax'
             
@@ -305,7 +305,6 @@ class CookieTokenRefreshView(TokenRefreshView):
                 path='/',
                 max_age=3600 * 2,
             )
-            new_refresh_token = response.data.get('refresh')
             if new_refresh_token:
                 response.set_cookie(
                     key='refresh_token',
@@ -316,12 +315,13 @@ class CookieTokenRefreshView(TokenRefreshView):
                     path='/',
                     max_age=3600 * 24,
                 )
-                del response.data['refresh']
                 
-            del response.data['access']
+            response.data['access_token'] = access_token
+            response.data['refresh_token'] = new_refresh_token
             response.data['status'] = 'success'
             
         return response
+
 
 
 class CookieLogoutView(APIView):

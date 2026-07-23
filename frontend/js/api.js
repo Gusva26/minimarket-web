@@ -20,36 +20,63 @@ const API = {
     // Direct live request to backend (Backend manages versioned caching)
 
 
+    const headers = (!isFormData && data) ? {'Content-Type': 'application/json'} : {};
+    const token = localStorage.getItem('access_token');
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
     const config = {
       method,
-      headers: !isFormData && data ? {'Content-Type': 'application/json'} : {},
+      headers,
       body: isFormData ? data : (data ? JSON.stringify(data) : undefined),
       credentials: 'include'
     };
+
 
     let response = await fetch(this.baseURL + endpoint, config);
 
     if (response.status === 401 && !endpoint.includes('auth/login') && !endpoint.includes('auth/refresh')) {
       try {
+        const refreshToken = localStorage.getItem('refresh_token');
+        const refreshHeaders = { 'Content-Type': 'application/json' };
+        if (token) refreshHeaders['Authorization'] = `Bearer ${token}`;
+
         const refreshRes = await fetch(this.baseURL + 'auth/refresh/', {
           method: 'POST',
+          headers: refreshHeaders,
+          body: JSON.stringify({ refresh: refreshToken }),
           credentials: 'include',
         });
+
         if (refreshRes.ok) {
+          const refreshData = await refreshRes.json();
+          if (refreshData.access_token) {
+            localStorage.setItem('access_token', refreshData.access_token);
+            config.headers['Authorization'] = `Bearer ${refreshData.access_token}`;
+          }
+          if (refreshData.refresh_token) {
+            localStorage.setItem('refresh_token', refreshData.refresh_token);
+          }
           response = await fetch(this.baseURL + endpoint, config);
         } else {
           localStorage.removeItem('logged_in');
           localStorage.removeItem('user');
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('refresh_token');
           window.location.hash = '#/login';
           throw new Error('Sesión expirada');
         }
       } catch (err) {
         localStorage.removeItem('logged_in');
         localStorage.removeItem('user');
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
         window.location.hash = '#/login';
         throw new Error('Sesión expirada');
       }
     }
+
 
     if (rawResponse) return response;
 

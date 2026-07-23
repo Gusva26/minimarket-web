@@ -1,6 +1,12 @@
 const Auth = {
   async login(username, password) {
     const data = await API.post('auth/login/', {username, password});
+    if (data && data.access_token) {
+      localStorage.setItem('access_token', data.access_token);
+    }
+    if (data && data.refresh_token) {
+      localStorage.setItem('refresh_token', data.refresh_token);
+    }
     localStorage.setItem('logged_in', 'true');
     await this.loadUser();
     return true;
@@ -30,6 +36,8 @@ const Auth = {
     }
     localStorage.removeItem('logged_in');
     localStorage.removeItem('user');
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
     window.location.hash = '#/login';
   },
 
@@ -39,8 +47,12 @@ const Auth = {
       if (!user) {
         localStorage.removeItem('logged_in');
         localStorage.removeItem('user');
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
         window.location.hash = '#/login';
       }
     }
   }
 };
+
+

@@ -342,12 +342,32 @@ class KardexListView(generics.ListAPIView):
         else:
             qs = Kardex.objects.filter(mercado=mercado).select_related('producto', 'usuario', 'mercado')
 
-        producto_id = self.request.query_params.get('producto_id')
+        producto_id = self.request.query_params.get('producto_id') or self.request.query_params.get('producto')
+        q = self.request.query_params.get('q') or self.request.query_params.get('buscar')
         fecha_desde = self.request.query_params.get('fecha_desde')
         fecha_hasta = self.request.query_params.get('fecha_hasta')
 
         if producto_id:
             qs = qs.filter(producto_id=producto_id)
+
+        if q:
+            qs = qs.filter(
+                Q(producto__nombre__icontains=q) |
+                Q(producto__codigo_barras__icontains=q) |
+                Q(referencia_tipo__icontains=q) |
+                Q(referencia_detalle__icontains=q)
+            )
+
+        tipo_movimiento = self.request.query_params.get('tipo_movimiento')
+        if tipo_movimiento:
+            if tipo_movimiento == 'ENTRADA':
+                qs = qs.filter(tipo_movimiento__in=['ENTRADA', 'ENTRADA_TRANSFERENCIA'])
+            elif tipo_movimiento == 'SALIDA':
+                qs = qs.filter(tipo_movimiento__in=['SALIDA', 'SALIDA_TRANSFERENCIA'])
+            elif tipo_movimiento == 'AJUSTE':
+                qs = qs.filter(tipo_movimiento__in=['AJUSTE_POSITIVO', 'AJUSTE_NEGATIVO'])
+            else:
+                qs = qs.filter(tipo_movimiento=tipo_movimiento)
 
         if fecha_desde:
             qs = qs.filter(fecha__gte=fecha_desde)
@@ -355,6 +375,8 @@ class KardexListView(generics.ListAPIView):
             qs = qs.filter(fecha__lte=fecha_hasta)
 
         return qs.order_by('-fecha')
+
+
 
     def list(self, request, *args, **kwargs):
         mercado_id = request.user.mercado_id

@@ -809,3 +809,47 @@ WARNING 2026-07-22 22:52:40,639 log 31628 14184 Unauthorized: /api/auth/login/
 WARNING 2026-07-22 22:52:40,641 basehttp 31628 14184 "POST /api/auth/login/ HTTP/1.1" 401 71
 WARNING 2026-07-22 23:39:08,523 log 19892 12500 Forbidden: /api/reportes/ventas/excel/
 WARNING 2026-07-22 23:39:08,524 basehttp 19892 12500 "GET /api/reportes/ventas/excel/?filtro=personalizado HTTP/1.1" 403 63
+WARNING 2026-07-23 12:47:10,893 log 23032 23184 Not Found: /
+WARNING 2026-07-23 12:47:10,894 basehttp 23032 23184 "GET / HTTP/1.1" 404 2297
+WARNING 2026-07-23 12:47:10,955 log 23032 23184 Not Found: /favicon.ico
+WARNING 2026-07-23 12:47:10,956 basehttp 23032 23184 "GET /favicon.ico HTTP/1.1" 404 2348
+WARNING 2026-07-23 12:47:29,091 log 23032 23184 Unauthorized: /api/auth/me/
+WARNING 2026-07-23 12:47:29,092 basehttp 23032 23184 "GET /api/auth/me/ HTTP/1.1" 401 65
+WARNING 2026-07-23 12:47:30,086 log 23032 23184 Unauthorized: /api/auth/me/
+WARNING 2026-07-23 12:47:30,087 basehttp 23032 23184 "GET /api/auth/me/ HTTP/1.1" 401 65
+WARNING 2026-07-23 15:24:29,664 log 3480 18064 Unauthorized: /api/auth/me/
+WARNING 2026-07-23 15:24:29,664 basehttp 3480 18064 "GET /api/auth/me/ HTTP/1.1" 401 65
+WARNING 2026-07-23 15:24:30,664 log 3480 18064 Unauthorized: /api/auth/me/
+WARNING 2026-07-23 15:24:30,664 basehttp 3480 18064 "GET /api/auth/me/ HTTP/1.1" 401 65
+WARNING 2026-07-23 16:08:47,752 log 24172 24876 Unauthorized: /api/auth/login/
+WARNING 2026-07-23 16:08:47,752 basehttp 24172 24876 "POST /api/auth/login/ HTTP/1.1" 401 71
+ERROR 2026-07-23 16:24:12,138 models 8856 9080 Error procesando imagen: [Errno 2] No such file or directory: 'C:\\Users\\Gusva\\Desktop\\migrar BD MINI\\minimarket-web\\media\\productos\\png-clipart-lighter-bic-promotional-merchandise-color-lighter-blue-white-thumb_7axDhvC.png'
+Traceback (most recent call last):
+  File "C:\Users\Gusva\Desktop\migrar BD MINI\minimarket-web\backend\inventario\models.py", line 63, in save
+    img = Image.open(self.imagen)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\PIL\Image.py", line 3281, in open
+    fp.seek(0)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\files\utils.py", line 46, in <lambda>
+    seek = property(lambda self: self.file.seek)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\fields\files.py", line 48, in _get_file
+    self._file = self.storage.open(self.name, "rb")
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\files\storage\base.py", line 22, in open
+    return self._open(name, mode)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\files\storage\filesystem.py", line 68, in _open
+    return File(open(self.path(name), mode))
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\Gusva\\Desktop\\migrar BD MINI\\minimarket-web\\media\\productos\\png-clipart-lighter-bic-promotional-merchandise-color-lighter-blue-white-thumb_7axDhvC.png'
+ERROR 2026-07-23 16:24:28,641 models 24580 24152 Error procesando imagen: [Errno 2] No such file or directory: 'C:\\Users\\Gusva\\Desktop\\migrar BD MINI\\minimarket-web\\media\\productos\\png-clipart-lighter-bic-promotional-merchandise-color-lighter-blue-white-thumb_7axDhvC.png'
+Traceback (most recent call last):
+  File "C:\Users\Gusva\Desktop\migrar BD MINI\minimarket-web\backend\inventario\models.py", line 63, in save
+    img = Image.open(self.imagen)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\PIL\Image.py", line 3281, in open
+    fp.seek(0)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\files\utils.py", line 46, in <lambda>
+    seek = property(lambda self: self.file.seek)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\fields\files.py", line 48, in _get_file
+    self._file = self.storage.open(self.name, "rb")
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\files\storage\base.py", line 22, in open
+    return self._open(name, mode)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\files\storage\filesystem.py", line 68, in _open
+    return File(open(self.path(name), mode))
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\Gusva\\Desktop\\migrar BD MINI\\minimarket-web\\media\\productos\\png-clipart-lighter-bic-promotional-merchandise-color-lighter-blue-white-thumb_7axDhvC.png'

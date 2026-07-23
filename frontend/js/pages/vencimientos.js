@@ -136,27 +136,44 @@ const VencimientosPage = {
   renderCards: function (resumen) {
     const cards = document.getElementById('vencimientosCards');
     if (!cards) return;
+
+    const active = document.getElementById('filterVencimientoEstado')?.value || '';
+
+    const activeStyle = (key) => active === key 
+      ? 'transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.18); opacity: 1;' 
+      : (active !== '' ? 'opacity: 0.6;' : '');
+
     cards.innerHTML = `
-      <div class="kpi-card kpi-danger">
+      <div class="kpi-card kpi-danger" data-estado="critico" style="cursor:pointer; transition: all 0.2s ease; ${activeStyle('critico')}" title="Filtrar lotes críticos (< 7 días)">
         <div class="kpi-icon"><i class="fas fa-exclamation-circle"></i></div>
         <div class="kpi-label">Lotes Críticos</div>
         <div class="kpi-value">${resumen.criticos}</div>
         <div style="font-size:.75rem;color:var(--danger)">Vencen en menos de 7 días</div>
       </div>
-      <div class="kpi-card kpi-warning">
+      <div class="kpi-card kpi-warning" data-estado="advertencia" style="cursor:pointer; transition: all 0.2s ease; ${activeStyle('advertencia')}" title="Filtrar lotes en advertencia (7 - 30 días)">
         <div class="kpi-icon"><i class="fas fa-hourglass-half"></i></div>
         <div class="kpi-label">Lotes Advertencia</div>
         <div class="kpi-value">${resumen.advertencia}</div>
         <div style="font-size:.75rem;color:var(--warning)">Vencen en 7 - 30 días</div>
       </div>
-      <div class="kpi-card kpi-info">
+      <div class="kpi-card kpi-info" data-estado="" style="cursor:pointer; transition: all 0.2s ease; ${activeStyle('')}" title="Ver todos los lotes">
         <div class="kpi-icon"><i class="fas fa-boxes"></i></div>
         <div class="kpi-label">Total Lotes</div>
         <div class="kpi-value">${resumen.total}</div>
         <div style="font-size:.75rem;color:var(--text-muted)">Agrupados por producto/fecha</div>
       </div>
     `;
+
+    cards.querySelectorAll('.kpi-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const est = card.getAttribute('data-estado');
+        const selectEst = document.getElementById('filterVencimientoEstado');
+        if (selectEst) selectEst.value = est;
+        this.cargarVencimientos(1);
+      });
+    });
   },
+
 
   renderUnidades: function (unidades) {
     const tbody = document.getElementById('tbodyVencimientos');

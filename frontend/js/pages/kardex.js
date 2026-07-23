@@ -1,6 +1,6 @@
 const KardexPage = {
   currentPage: 1,
-  filtros: { producto: '', fecha_desde: '', fecha_hasta: '' },
+  filtros: { producto_id: '', q: '', fecha_desde: '', fecha_hasta: '', tipo_movimiento: '' },
   _productos: [],
 
   render: async function (container) {
@@ -73,9 +73,14 @@ const KardexPage = {
     const btnLimpiar = document.getElementById('btnLimpiar');
 
     const doFilter = () => {
-      const nombreBuscado = inputProducto ? inputProducto.value.trim() : '';
-      const prod = this._productos.find(p => p.nombre.toLowerCase() === nombreBuscado.toLowerCase());
-      this.filtros.producto = prod ? prod.id : '';
+      const texto = inputProducto ? inputProducto.value.trim() : '';
+      const prodExacto = this._productos.find(p => 
+        p.nombre.toLowerCase() === texto.toLowerCase() || 
+        (p.codigo_barras && p.codigo_barras === texto)
+      );
+
+      this.filtros.producto_id = prodExacto ? prodExacto.id : '';
+      this.filtros.q = prodExacto ? '' : texto;
       this.filtros.fecha_desde = inputFechaDesde ? inputFechaDesde.value : '';
       this.filtros.fecha_hasta = inputFechaHasta ? inputFechaHasta.value : '';
       this.currentPage = 1;
@@ -98,7 +103,7 @@ const KardexPage = {
         if (inputProducto) inputProducto.value = '';
         if (inputFechaDesde) inputFechaDesde.value = '';
         if (inputFechaHasta) inputFechaHasta.value = '';
-        this.filtros = { producto: '', fecha_desde: '', fecha_hasta: '' };
+        this.filtros = { producto_id: '', q: '', fecha_desde: '', fecha_hasta: '', tipo_movimiento: '' };
         this.currentPage = 1;
         this.cargarKardex();
       });
@@ -116,7 +121,8 @@ const KardexPage = {
       this._productos = data.results || data || [];
       datalist.innerHTML = '';
       this._productos.forEach(p => {
-        datalist.innerHTML += `<option value="${p.nombre}">`;
+        const codigo = p.codigo_barras ? ` (${p.codigo_barras})` : '';
+        datalist.innerHTML += `<option value="${Utils.escapeHtml(p.nombre)}">${codigo}</option>`;
       });
     } catch (e) {
       console.error('Error cargando productos', e);
@@ -139,7 +145,14 @@ const KardexPage = {
 
     try {
       let url = `kardex/?page=${p}`;
-      if (this.filtros.producto) url += `&producto=${this.filtros.producto}`;
+      if (this.filtros.producto_id) {
+        url += `&producto_id=${this.filtros.producto_id}`;
+      } else if (this.filtros.q) {
+        url += `&q=${encodeURIComponent(this.filtros.q)}`;
+      }
+      if (this.filtros.tipo_movimiento) {
+        url += `&tipo_movimiento=${this.filtros.tipo_movimiento}`;
+      }
       if (this.filtros.fecha_desde) url += `&fecha_desde=${this.filtros.fecha_desde}`;
       if (this.filtros.fecha_hasta) url += `&fecha_hasta=${this.filtros.fecha_hasta}`;
 
@@ -161,29 +174,46 @@ const KardexPage = {
 
   renderResumen: function (resumen, data) {
     const container = document.getElementById('resumenCards');
+    const active = this.filtros.tipo_movimiento || '';
+
+    const activeStyle = (key) => active === key 
+      ? 'transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.18); opacity: 1;' 
+      : (active !== '' ? 'opacity: 0.6;' : '');
+
+
     container.innerHTML = `
-      <div class="kpi-card kpi-primary">
+      <div class="kpi-card kpi-primary" data-tipo="" style="cursor:pointer; transition: all 0.2s ease; ${activeStyle('')}" title="Ver todos los movimientos">
         <div class="kpi-icon"><i class="fas fa-list"></i></div>
         <div class="kpi-label">Total Movimientos</div>
         <div class="kpi-value">${data.count ?? 0}</div>
       </div>
-      <div class="kpi-card kpi-success">
+      <div class="kpi-card kpi-success" data-tipo="ENTRADA" style="cursor:pointer; transition: all 0.2s ease; ${activeStyle('ENTRADA')}" title="Filtrar sólo entradas">
         <div class="kpi-icon"><i class="fas fa-plus-circle"></i></div>
         <div class="kpi-label">Entradas</div>
         <div class="kpi-value">${resumen.entradas ?? 0}</div>
       </div>
-      <div class="kpi-card kpi-danger">
+      <div class="kpi-card kpi-danger" data-tipo="SALIDA" style="cursor:pointer; transition: all 0.2s ease; ${activeStyle('SALIDA')}" title="Filtrar sólo salidas">
         <div class="kpi-icon"><i class="fas fa-minus-circle"></i></div>
         <div class="kpi-label">Salidas</div>
         <div class="kpi-value">${resumen.salidas ?? 0}</div>
       </div>
-      <div class="kpi-card kpi-info">
+      <div class="kpi-card kpi-info" data-tipo="AJUSTE" style="cursor:pointer; transition: all 0.2s ease; ${activeStyle('AJUSTE')}" title="Filtrar sólo ajustes">
         <div class="kpi-icon"><i class="fas fa-adjust"></i></div>
         <div class="kpi-label">Ajustes</div>
         <div class="kpi-value">${resumen.ajustes ?? 0}</div>
       </div>
     `;
+
+    container.querySelectorAll('.kpi-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const tipo = card.getAttribute('data-tipo');
+        this.filtros.tipo_movimiento = tipo;
+        this.currentPage = 1;
+        this.cargarKardex();
+      });
+    });
   },
+
 
   renderReferencia: function (m) {
     const refTipo = (m.referencia_tipo || '').toLowerCase();
@@ -248,8 +278,11 @@ const KardexPage = {
 
 
     tbody.innerHTML = movimientos.map(m => {
-      const saldoCls = m.saldo_nuevo > m.saldo_anterior ? 'kpi-success' : m.saldo_nuevo < m.saldo_anterior ? 'kpi-danger' : '';
-      const userDisplayName = m.usuario?.get_full_name || m.usuario?.username || 'N/A';
+      const tipoUpper = (m.tipo_movimiento || '').toUpperCase();
+      const isSalida = tipoUpper.includes('SALIDA') || tipoUpper.includes('NEGATIVO');
+      const textStyle = isSalida ? 'color: var(--danger, #ef4444);' : 'color: var(--success, #10b981);';
+      const userDisplayName = m.usuario?.get_full_name || m.usuario?.username || 'Administrador';
+
       return `<tr>
         <td data-label="Fecha" class="align-middle"><small style="color:var(--text-muted); font-size:0.82rem; font-weight:500">${Utils.formatDateTime(m.fecha)}</small></td>
         <td data-label="Producto" class="align-middle">
@@ -257,13 +290,14 @@ const KardexPage = {
           <small style="color:var(--text-muted); font-size:0.78rem">ID: #${m.producto?.id || ''}</small>
         </td>
         <td data-label="Tipo" class="align-middle">${tipoBadge[m.tipo_movimiento] || `<span class="badge">${Utils.escapeHtml(m.tipo_movimiento)}</span>`}</td>
-        <td data-label="Cantidad" class="text-end fw-bold align-middle" style="font-size:0.92rem">${m.cantidad}</td>
+        <td data-label="Cantidad" class="text-end fw-bold align-middle" style="font-size:0.92rem; ${textStyle}">${m.cantidad}</td>
         <td data-label="Saldo Anterior" class="text-end align-middle" style="color:var(--text-muted); font-weight:500">${m.saldo_anterior}</td>
-        <td data-label="Saldo Nuevo" class="text-end fw-bold align-middle" style="font-size:0.95rem; color:${saldoCls === 'kpi-success' ? 'var(--success)' : saldoCls === 'kpi-danger' ? 'var(--danger)' : 'var(--text)'}">${m.saldo_nuevo}</td>
+        <td data-label="Saldo Nuevo" class="text-end fw-bold align-middle" style="font-size:0.95rem; ${textStyle}">${m.saldo_nuevo}</td>
         <td data-label="Usuario" class="align-middle"><span style="font-size:0.85rem; font-weight:600">${Utils.escapeHtml(userDisplayName)}</span></td>
         <td data-label="Documento / Origen" class="align-middle text-end">${this.renderReferencia(m)}</td>
       </tr>`;
     }).join('');
+
   },
 
 
