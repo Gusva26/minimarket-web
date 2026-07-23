@@ -60,7 +60,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'pos_minimarket.wsgi.application'
 
-db_engine = config('DB_ENGINE', default='sqlite')
+db_engine = config('DB_ENGINE', default='postgresql')
 
 if 'test' in sys.argv:
     DATABASES = {
@@ -77,26 +77,25 @@ elif db_engine == 'sqlite':
         }
     }
 else:
+    options = {}
+    if config('DB_USE_SSL', default=True, cast=bool):
+        options['sslmode'] = 'require'
+
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': config('DB_NAME', default='minimarket'),
-            'USER': config('DB_USER', default='root'),
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': config('DB_NAME', default='postgres'),
+            'USER': config('DB_USER', default='postgres'),
             'PASSWORD': config('DB_PASSWORD', default=''),
-            'HOST': config('DB_HOST', default='localhost'),
-            'PORT': config('DB_PORT', default='3306'),
-            'OPTIONS': {
-                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-            }
+            'HOST': config('DB_HOST', default='db.qbxyktylozbtdbuwvfid.supabase.co'),
+            'PORT': config('DB_PORT', default='5432'),
+            'OPTIONS': options,
+            'CONN_MAX_AGE': 600,
+            'CONN_HEALTH_CHECKS': True,
         }
     }
 
-    if config('DB_USE_SSL', default=False, cast=bool):
-        ssl_ca = config('DB_SSL_CA', default='')
-        if ssl_ca:
-            DATABASES['default']['OPTIONS']['ssl'] = {'ca': ssl_ca}
-        else:
-            DATABASES['default']['OPTIONS']['ssl'] = {}
+
 
 
 AUTH_USER_MODEL = 'usuarios.Usuario'

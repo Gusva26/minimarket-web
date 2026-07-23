@@ -212,8 +212,10 @@ const App = {
   },
 
   async handleRoute() {
+    if (typeof API !== 'undefined' && API.clearCache) API.clearCache();
     this.savePageState();
     this._pageToken = Date.now() + Math.random();
+
     const pageToken = this._pageToken;
 
     let hash = window.location.hash.replace('#/', '') || 'dashboard';
@@ -243,6 +245,12 @@ const App = {
     const navEl = document.querySelector('.sidebar');
     if (navEl) navEl.style.display = route.auth ? '' : 'none';
 
+    const topbarHeader = document.getElementById('topbarHeader');
+    if (topbarHeader) {
+      topbarHeader.style.display = route.auth ? 'flex' : 'none';
+      if (route.auth) this.initBranchSelector();
+    }
+
     document.title = `${route.title} - Minimarket`;
     this.currentPage = hash;
 
@@ -255,6 +263,7 @@ const App = {
       this.navbar.render();
       this.navbar.highlight(hash);
     }
+
 
     Utils.clearModals();
 
@@ -293,7 +302,63 @@ const App = {
     }
   },
 
+  async initBranchSelector() {
+    const selector = document.getElementById('topbarBranchSelector');
+    const badge = document.getElementById('topbarBranchBadge');
+    const user = Auth.getUser();
+    if (!user || !selector) return;
+
+    if (badge) {
+      badge.textContent = user.mercado_nombre || 'Todas las sucursales';
+    }
+
+    if (user.is_admin || user.is_superuser) {
+      selector.disabled = false;
+      try {
+        const mercados = await API.get('mercados/');
+        const list = Array.isArray(mercados) ? mercados : (mercados.results || []);
+        
+        let html = '';
+        if (user.is_superuser) {
+          const selAll = !user.mercado_id ? 'selected' : '';
+          html += `<option value="all" ${selAll}>🌐 Todas las sucursales (Consolidado)</option>`;
+        }
+        
+        list.forEach(m => {
+          const sel = user.mercado_id === m.id ? 'selected' : '';
+          html += `<option value="${m.id}" ${sel}>📍 ${m.nombre}</option>`;
+        });
+        
+        selector.innerHTML = html;
+      } catch(err) {
+        console.error("Error cargando selector de sucursales:", err);
+      }
+
+      selector.onchange = async (e) => {
+        const val = e.target.value;
+        const targetId = val === 'all' ? null : parseInt(val);
+        try {
+          const res = await API.post('auth/cambiar-mercado/', { mercado_id: targetId });
+          await Auth.loadUser();
+          if (typeof Toast !== 'undefined' && Toast.success) {
+            Toast.success(`Sucursal cambiada a: ${res.mercado_nombre}`);
+          }
+          this.handleRoute();
+        } catch(err) {
+          if (typeof Toast !== 'undefined' && Toast.error) {
+            Toast.error(err.message || "Error al cambiar sucursal");
+          }
+          selector.value = user.mercado_id || 'all';
+        }
+      };
+    } else {
+      selector.innerHTML = `<option value="${user.mercado_id || ''}">📍 ${user.mercado_nombre || 'Sucursal Asignada'}</option>`;
+      selector.disabled = true;
+    }
+  },
+
   ensureSectionOpen(hash) {
+
     for (const [section, routes] of Object.entries(this.groupMap)) {
       if (routes.includes(hash)) {
         const group = document.getElementById(`group-${section}`);

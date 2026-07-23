@@ -42,20 +42,46 @@ class CompraViewSet(viewsets.ModelViewSet):
         if fecha_hasta:
             qs = qs.filter(fecha__lte=f'{fecha_hasta}T23:59:59')
         if q:
+            q_clean = q.strip()
             qs = qs.filter(
-                Q(id__icontains=q) |
-                Q(proveedor__nombre__icontains=q) |
-                Q(detalles__producto__nombre__icontains=q)
+                Q(id__icontains=q_clean) |
+                Q(proveedor__nombre__icontains=q_clean) |
+                Q(detalles__producto__nombre__icontains=q_clean) |
+                Q(serie_comprobante__icontains=q_clean) |
+                Q(numero_comprobante__icontains=q_clean)
             ).distinct()
 
         return qs
 
+
+
+    def list(self, request, *args, **kwargs):
+        from django.core.cache import cache
+        from inventario.utils import get_mercado_cache_version
+
+        mercado_id = request.user.mercado_id
+        version = get_mercado_cache_version(mercado_id)
+        params_str = "_".join([f"{k}:{v}" for k, v in sorted(request.query_params.items())])
+        cache_key = f"compras_mercado_{mercado_id}_v{version}_{params_str}"
+        cached_data = cache.get(cache_key)
+        if cached_data:
+            return Response(cached_data)
+
+        response = super().list(request, *args, **kwargs)
+        cache.set(cache_key, response.data, 600)
+        return response
+
     def create(self, request, *args, **kwargs):
+
         serializer = CompraCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         data = serializer.validated_data
         proveedor_id = data.get('proveedor_id')
+        tipo_comprobante = data.get('tipo_comprobante', 'FACTURA')
+        serie_comprobante = data.get('serie_comprobante')
+        numero_comprobante = data.get('numero_comprobante')
+        observaciones = data.get('observaciones')
         fecha = data.get('fecha', timezone.now())
         detalles_data = data['detalles']
 
@@ -64,12 +90,15 @@ class CompraViewSet(viewsets.ModelViewSet):
                 compra = Compra.objects.create(
                     usuario=request.user,
                     proveedor_id=proveedor_id,
+                    tipo_comprobante=tipo_comprobante,
+                    serie_comprobante=serie_comprobante,
+                    numero_comprobante=numero_comprobante,
+                    observaciones=observaciones,
                     fecha=fecha,
                 )
 
                 detalles_obj = []
                 mercado = request.user.mercado if request.user.mercado else None
-                # Dictionary to accumulate totals per product for Kardex
                 kardex_totals = {}
 
                 for det in detalles_data:
@@ -93,7 +122,6 @@ class CompraViewSet(viewsets.ModelViewSet):
                     detalle.subtotal = det['cantidad'] * det['precio_costo_unitario']
                     detalles_obj.append(detalle)
 
-                    # Accumulate for Kardex
                     prod_id = producto.id
                     if prod_id not in kardex_totals:
                         kardex_totals[prod_id] = {
@@ -107,8 +135,9 @@ class CompraViewSet(viewsets.ModelViewSet):
 
                     producto.stock += det['cantidad']
                     producto.costo = det['precio_costo_unitario']
+                    if det.get('precio_venta_sugerido'):
+                        producto.precio = det['precio_venta_sugerido']
 
-                    # Create UnidadProducto records for each unit/quantity
                     fecha_venc = det.get('fecha_vencimiento')
                     if not fecha_venc:
                         fecha_venc = "2099-12-31"
@@ -116,7 +145,6 @@ class CompraViewSet(viewsets.ModelViewSet):
                     cantidad = det['cantidad']
                     um = producto.unidad_medida
                     if um in ('UND', 'PAQ', 'CAJ', 'BOL'):
-                        # For whole units, create one record per unit
                         for _ in range(int(cantidad)):
                             UnidadProducto.objects.create(
                                 producto=producto,
@@ -126,7 +154,6 @@ class CompraViewSet(viewsets.ModelViewSet):
                                 estado='disponible',
                             )
                     else:
-                        # For decimal products (KG, LT), create a single record
                         UnidadProducto.objects.create(
                             producto=producto,
                             mercado=mercado,
@@ -138,8 +165,8 @@ class CompraViewSet(viewsets.ModelViewSet):
 
                 DetalleCompra.objects.bulk_create(detalles_obj)
 
-                # Create Kardex entries once per product
                 for prod_id, info in kardex_totals.items():
+                    ref_doc = f"{compra.tipo_comprobante} {compra.serie_comprobante or ''}-{compra.numero_comprobante or compra.id}".strip()
                     crear_kardex(
                         producto=info['obj'],
                         mercado=mercado,
@@ -149,16 +176,21 @@ class CompraViewSet(viewsets.ModelViewSet):
                         saldo_nuevo=info['obj'].stock,
                         ref_tipo='Compra',
                         ref_id=compra.id,
-                        ref_detalle=f'Compra a {compra.proveedor.nombre if compra.proveedor else "N/A"}',
+                        ref_detalle=f'Compra {ref_doc} ({compra.proveedor.nombre if compra.proveedor else "N/A"})',
                         usuario=request.user
                     )
 
                 compra.actualizar_total()
 
+                from inventario.utils import invalidate_mercado_cache
+                invalidate_mercado_cache(request.user.mercado_id)
+
                 return Response(
                     CompraSerializer(compra).data,
                     status=status.HTTP_201_CREATED,
                 )
+
+
 
         except Producto.DoesNotExist:
             return Response(

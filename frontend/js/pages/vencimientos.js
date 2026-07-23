@@ -23,16 +23,18 @@ const VencimientosPage = {
         </div>
         <div class="filter-group" style="width: 220px;">
           <label class="form-label small fw-bold text-muted">Categoría</label>
-          <select id="filterVencimientoCategoria" placeholder="Todas las categorías"></select>
+          <select class="form-select form-select-sm" id="filterVencimientoCategoria">
+            <option value="">Todas las Categorías</option>
+          </select>
         </div>
         <div class="filter-group" style="width: 220px;">
           <label class="form-label small fw-bold text-muted">Estado de Vencimiento</label>
-          <select id="filterVencimientoEstado" placeholder="Todos los estados">
+          <select class="form-select form-select-sm" id="filterVencimientoEstado">
             <option value="">Todos los Estados</option>
             <option value="vencido">Vencidos</option>
-            <option value="critico">Críticos (< 7 días)</option>
+            <option value="critico">Críticos (&lt; 7 días)</option>
             <option value="advertencia">Advertencia (7-30 días)</option>
-            <option value="seguro">Seguros (> 30 días)</option>
+            <option value="seguro">Seguros (&gt; 30 días)</option>
           </select>
         </div>
       </div>
@@ -59,10 +61,6 @@ const VencimientosPage = {
       </div>
     `;
     this.currentPage = 1;
-    
-    // Destroy previous instances if they exist
-    Object.values(this.tomSelects).forEach(ts => ts.destroy());
-    this.tomSelects = {};
 
     await this.cargarFiltros();
     await this.cargarVencimientos();
@@ -74,30 +72,21 @@ const VencimientosPage = {
       const sel = document.getElementById('filterVencimientoCategoria');
       if (!sel) return;
       const cats = await API.get('categorias/');
-      const options = [{value: '', text: 'Todas las Categorías'}].concat(
-        (cats.results || cats).map(c => ({value: c.id, text: c.nombre}))
-      );
-
-      if (!document.getElementById('filterVencimientoCategoria')) return;
-      this.tomSelects['categoria'] = new TomSelect('#filterVencimientoCategoria', {
-        options: options,
-        create: false,
-        placeholder: 'Todas las categorías',
-        onChange: () => this.cargarVencimientos(1)
-      });
-
-      this.tomSelects['estado'] = new TomSelect('#filterVencimientoEstado', {
-        create: false,
-        placeholder: 'Todos los estados',
-        onChange: () => this.cargarVencimientos(1)
-      });
-
+      const list = cats.results || cats || [];
+      sel.innerHTML = '<option value="">Todas las Categorías</option>' +
+        list.map(c => `<option value="${c.id}">${Utils.escapeHtml(c.nombre)}</option>`).join('');
     } catch (e) { console.error('Error cargando categorías', e); }
   },
 
   setupListeners: function() {
     const q = document.getElementById('filterVencimientoQ');
-    q.addEventListener('input', () => this.cargarVencimientos(1));
+    if (q) q.addEventListener('input', () => this.cargarVencimientos(1));
+
+    const filterCat = document.getElementById('filterVencimientoCategoria');
+    if (filterCat) filterCat.addEventListener('change', () => this.cargarVencimientos(1));
+
+    const filterEst = document.getElementById('filterVencimientoEstado');
+    if (filterEst) filterEst.addEventListener('change', () => this.cargarVencimientos(1));
 
     const btnExportar = document.getElementById('btnExportarVencimientos');
     if (btnExportar) btnExportar.addEventListener('click', () => this.exportarExcel());
@@ -120,8 +109,9 @@ const VencimientosPage = {
     tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4" style="color:var(--text-muted)"><div class="spinner-modern" style="margin:0 auto"></div></td></tr>';
 
     const q = document.getElementById('filterVencimientoQ')?.value || '';
-    const cat = this.tomSelects['categoria']?.getValue() || '';
-    const est = this.tomSelects['estado']?.getValue() || '';
+    const cat = document.getElementById('filterVencimientoCategoria')?.value || '';
+    const est = document.getElementById('filterVencimientoEstado')?.value || '';
+
 
     try {
       const data = await API.get(`inventario/vencimientos/?page=${page}&q=${q}&categoria=${cat}&estado=${est}`);
@@ -134,9 +124,10 @@ const VencimientosPage = {
       
       if (pagination) {
         Utils.renderPagination(pagination, 'paginationVencimientos', this.currentPage, (p) => {
-          this.cargarVencimientos(p);
+          this._doCargarVencimientos(p);
         });
       }
+
     } catch (e) {
       if (tbody) tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4" style="color:var(--danger)">Error: ${e.message}</td></tr>`;
     }

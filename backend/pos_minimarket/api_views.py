@@ -109,7 +109,46 @@ class AuthUserView(APIView):
         })
 
 
+class CambiarMercadoView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        if not (user.is_superuser or user.rol == 'ADMIN'):
+            return Response({'error': 'No tienes permisos para cambiar de sucursal.'}, status=status.HTTP_403_FORBIDDEN)
+
+        mercado_id = request.data.get('mercado_id')
+        if mercado_id is None or mercado_id == '' or mercado_id == 'all':
+            if not user.is_superuser:
+                return Response({'error': 'Solo el superusuario puede seleccionar todas las sucursales.'}, status=status.HTTP_400_BAD_REQUEST)
+            user.mercado = None
+            user.save(update_fields=['mercado'])
+            from inventario.utils import invalidate_mercado_cache
+            invalidate_mercado_cache(None)
+            return Response({
+                'status': 'success',
+                'mercado_id': None,
+                'mercado_nombre': 'Todas las sucursales'
+            })
+
+        from inventario.models import Mercado
+        try:
+            mercado = Mercado.objects.get(pk=mercado_id, activo=True)
+            user.mercado = mercado
+            user.save(update_fields=['mercado'])
+            from inventario.utils import invalidate_mercado_cache
+            invalidate_mercado_cache(mercado.id)
+            return Response({
+                'status': 'success',
+                'mercado_id': mercado.id,
+                'mercado_nombre': mercado.nombre
+            })
+        except Mercado.DoesNotExist:
+            return Response({'error': 'La sucursal seleccionada no existe o no está activa.'}, status=status.HTTP_404_NOT_FOUND)
+
+
 class PasswordResetView(APIView):
+
     permission_classes = [AllowAny]
 
     def post(self, request):

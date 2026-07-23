@@ -10,7 +10,8 @@ const ValoracionPage = {
         <h3><i class="fas fa-chart-line text-gradient"></i>Valoración de Inventario</h3>
       </div>
 
-      <div class="kpi-grid" style="grid-template-columns:repeat(2,1fr)" id="valoracionCards"></div>
+      <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:1rem" id="valoracionCards"></div>
+
 
       <div class="row g-4" style="margin-top:0.5rem">
         <div class="col-xl-4">
@@ -59,10 +60,11 @@ const ValoracionPage = {
             <div class="table-responsive">
               <table class="table">
                 <thead>
-                  <tr><th>Producto</th><th class="text-center">Stock</th><th class="text-end">Costo Unit.</th><th class="text-end">Valor Total</th></tr>
+                  <tr><th>Producto</th><th class="text-center">Stock</th><th class="text-end">Costo Unit.</th><th class="text-end">Valor Costo</th><th class="text-end">Valor Venta</th></tr>
                 </thead>
                 <tbody id="tbodyProductosValor">
-                  <tr><td colspan="4" class="text-center py-4" style="color:var(--text-muted)"><div class="spinner-modern" style="margin:0 auto"></div></td></tr>
+                  <tr><td colspan="5" class="text-center py-4" style="color:var(--text-muted)"><div class="spinner-modern" style="margin:0 auto"></div></td></tr>
+
                 </tbody>
               </table>
             </div>
@@ -78,7 +80,7 @@ const ValoracionPage = {
   cargarValoracion: async function (page = 1) {
     this.currentPage = page;
     try {
-      const data = await API.get(`inventario/valoracion/?page=${page}`);
+      const data = await API.get(`inventario/valoracion/?page=${page}&page_size=10`);
       this.renderCards(data);
       this.renderCategorias(data.categorias_valor || []);
       this.renderProductos(data.productos || []);
@@ -95,10 +97,12 @@ const ValoracionPage = {
       }
 
       if (data.pagination) {
+        Utils._pageSize = 10;
         Utils.renderPagination(data.pagination, 'valoracionPagination', this.currentPage, (p) => {
           this.cargarValoracion(p);
         });
       }
+
     } catch (e) {
       document.getElementById('tbodyCategoriasValor').innerHTML = `<tr><td colspan="3" class="text-center py-4" style="color:var(--danger)">Error: ${e.message}</td></tr>`;
       document.getElementById('tbodyProductosValor').innerHTML = `<tr><td colspan="4" class="text-center py-4" style="color:var(--danger)">Error: ${e.message}</td></tr>`;
@@ -109,15 +113,27 @@ const ValoracionPage = {
     document.getElementById('valoracionCards').innerHTML = `
       <div class="kpi-card kpi-primary">
         <div class="kpi-icon"><i class="fas fa-coins"></i></div>
-        <div class="kpi-label">Valor Total del Inventario</div>
-        <div class="kpi-value">${Utils.formatMoney(data.gran_total || 0)}</div>
-        <div style="font-size:.75rem;color:var(--text-muted)">A costo de adquisición</div>
+        <div class="kpi-label">Valor al Costo (Inversión)</div>
+        <div class="kpi-value">${Utils.formatMoney(data.gran_total_costo || data.gran_total || 0)}</div>
+        <div style="font-size:.75rem;color:var(--text-muted)">Costo de adquisición</div>
+      </div>
+      <div class="kpi-card kpi-success">
+        <div class="kpi-icon"><i class="fas fa-store"></i></div>
+        <div class="kpi-label">Valor Comercial Venta</div>
+        <div class="kpi-value">${Utils.formatMoney(data.gran_total_venta || 0)}</div>
+        <div style="font-size:.75rem;color:var(--text-muted)">Ingreso bruto proyectado</div>
       </div>
       <div class="kpi-card kpi-info">
+        <div class="kpi-icon"><i class="fas fa-chart-line"></i></div>
+        <div class="kpi-label">Utilidad Proyectada</div>
+        <div class="kpi-value">${Utils.formatMoney(data.utilidad_potencial || 0)}</div>
+        <small class="text-success fw-bold mt-1" style="font-size:0.75rem">Margen: ${(data.margen_potencial_porcentaje || 0).toFixed(1)}%</small>
+      </div>
+      <div class="kpi-card kpi-warning">
         <div class="kpi-icon"><i class="fas fa-boxes"></i></div>
         <div class="kpi-label">Unidades Totales</div>
         <div class="kpi-value">${data.total_unidades || 0}</div>
-        <div style="font-size:.75rem;color:var(--text-muted)">Items en inventario</div>
+        <div style="font-size:.75rem;color:var(--text-muted)">Items físicos en stock</div>
       </div>
     `;
   },
@@ -163,16 +179,18 @@ const ValoracionPage = {
       return `
         <tr>
           <td data-label="Producto">
-            <div style="font-weight:600">${p.nombre}</div>
-            <small style="color:var(--text-muted)">${p.categoria?.nombre || 'Sin categoría'}</small>
+            <div style="font-weight:600">${Utils.escapeHtml(p.nombre)}</div>
+            <small style="color:var(--text-muted)">${Utils.escapeHtml(p.categoria?.nombre || 'Sin categoría')}</small>
           </td>
           <td data-label="Stock" class="text-center"><span class="badge badge-info">${p.stock}</span></td>
           <td data-label="Costo Unit." class="text-end">${Utils.formatMoney(p.costo)}</td>
-          <td data-label="Valor Total" class="text-end fw-bold" style="color:var(--primary)">${Utils.formatMoney(p.valor_total)}</td>
+          <td data-label="Valor Costo" class="text-end fw-bold" style="color:var(--primary)">${Utils.formatMoney(p.valor_total)}</td>
+          <td data-label="Valor Venta" class="text-end text-success fw-bold">${Utils.formatMoney(p.valor_venta || (parseFloat(p.precio) * parseFloat(p.stock)))}</td>
         </tr>
       `;
     }).join('');
   },
+
 
   filterProductos: function () {
     const query = (document.getElementById('filterValoracionQ')?.value || '').toLowerCase();

@@ -96,6 +96,17 @@ class TransferenciaDetalleSerializer(serializers.ModelSerializer):
         fields = ['id', 'transferencia', 'producto_origen', 'producto_destino', 'cantidad', 'fecha_vencimiento']
 
 
+class TransferenciaListSerializer(serializers.ModelSerializer):
+    mercado_origen = MercadoSimpleSerializer(read_only=True)
+    mercado_destino = MercadoSimpleSerializer(read_only=True)
+    usuario_envio = UsuarioSimpleSerializer(read_only=True, allow_null=True)
+    usuario_recepcion = UsuarioSimpleSerializer(read_only=True, allow_null=True)
+
+    class Meta:
+        model = Transferencia
+        fields = ['id', 'mercado_origen', 'mercado_destino', 'usuario_envio', 'usuario_recepcion', 'fecha_envio', 'fecha_recepcion', 'estado', 'observaciones']
+
+
 class TransferenciaSerializer(serializers.ModelSerializer):
     detalles = TransferenciaDetalleSerializer(many=True, read_only=True)
     mercado_origen = MercadoSimpleSerializer(read_only=True)
@@ -106,3 +117,4 @@ class TransferenciaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transferencia
         fields = ['id', 'mercado_origen', 'mercado_destino', 'usuario_envio', 'usuario_recepcion', 'fecha_envio', 'fecha_recepcion', 'estado', 'observaciones', 'detalles']
+

@@ -19,7 +19,7 @@ from compras.api import CompraViewSet
 from proveedores.api import ProveedorViewSet
 from reportes.api import ReporteVentasView, ExportarReporteExcelView, ExportarReportePDFView
 from .api_views import (
-    DashboardView, AuthUserView, PasswordResetView, PasswordResetValidateView, PasswordResetConfirmView,
+    DashboardView, AuthUserView, CambiarMercadoView, PasswordResetView, PasswordResetValidateView, PasswordResetConfirmView,
     CookieTokenObtainPairView, CookieTokenRefreshView, CookieLogoutView
 )
 
@@ -43,7 +43,9 @@ urlpatterns = [
     path('auth/logout/', CookieLogoutView.as_view(), name='token_logout'),
     path('auth/verify/', TokenVerifyView.as_view(), name='token_verify'),
     path('auth/me/', AuthUserView.as_view(), name='auth_user'),
+    path('auth/cambiar-mercado/', CambiarMercadoView.as_view(), name='cambiar_mercado'),
     path('auth/password-reset/', PasswordResetView.as_view(), name='password_reset'),
+
     path('auth/password-reset/validate/', PasswordResetValidateView.as_view(), name='password_reset_validate'),
     path('auth/password-reset/confirm/', PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
 

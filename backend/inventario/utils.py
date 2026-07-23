@@ -6,10 +6,9 @@ from .models import UnidadProducto, Kardex
 
 
 def get_mercado_cache_version(mercado_id):
-    """Obtiene la versión actual de la caché para un mercado."""
-    if not mercado_id:
-        return 1
-    return cache.get_or_set(f"version_mercado_{mercado_id}", 1)
+    """Obtiene la versión actual de la caché para un mercado o para todos (superadmin)."""
+    key = f"version_mercado_{mercado_id}" if mercado_id else "version_mercado_all"
+    return cache.get_or_set(key, 1)
 
 
 def cached_list(cache_key_prefix, mercado_id, params_str, timeout=300):
@@ -35,14 +34,18 @@ def mercado_filter(request):
     return {}
 
 
-def invalidate_mercado_cache(mercado_id):
-    """Invalida la caché de un mercado incrementando su versión."""
-    if not mercado_id:
-        return
-    try:
-        cache.incr(f"version_mercado_{mercado_id}")
-    except ValueError:
-        cache.set(f"version_mercado_{mercado_id}", 1)
+def invalidate_mercado_cache(mercado_id=None):
+    """Invalida la caché de un mercado e invalida la caché global del superadmin."""
+    keys = ["version_mercado_all"]
+    if mercado_id:
+        keys.append(f"version_mercado_{mercado_id}")
+
+    for k in keys:
+        try:
+            cache.incr(k)
+        except ValueError:
+            cache.set(k, 1)
+
 
 
 def descontar_stock_fefo(producto, cantidad, mercado, venta_detalle=None):

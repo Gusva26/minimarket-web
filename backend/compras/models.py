@@ -8,7 +8,12 @@ class Compra(models.Model):
     fecha = models.DateTimeField(default=timezone.now)
     usuario = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True, blank=True)
     proveedor = models.ForeignKey(Proveedor, on_delete=models.SET_NULL, null=True, blank=True, related_name='compras')
+    tipo_comprobante = models.CharField(max_length=50, default='FACTURA', help_text='FACTURA, BOLETA, GUIA_REMISION, TICKET')
+    serie_comprobante = models.CharField(max_length=20, blank=True, null=True, help_text='Serie del comprobante de compra (ej: F001)')
+    numero_comprobante = models.CharField(max_length=30, blank=True, null=True, help_text='Número de comprobante de compra')
+    observaciones = models.TextField(blank=True, null=True)
     total = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+
 
     def __str__(self):
         return f"Compra a {self.proveedor.nombre if self.proveedor else 'N/A'} el {self.fecha.strftime('%d/%m/%Y')}"
@@ -21,6 +26,11 @@ class Compra(models.Model):
         verbose_name = 'Compra'
         verbose_name_plural = 'Compras'
         ordering = ['-fecha']
+        indexes = [
+            models.Index(fields=['-fecha']),
+            models.Index(fields=['proveedor', '-fecha']),
+        ]
+
 
 class DetalleCompra(models.Model):
     compra = models.ForeignKey(Compra, on_delete=models.CASCADE, related_name='detalles')

@@ -6,7 +6,9 @@ const ProductosPage = {
   currentProductoId: null,
 
   render: async function (container) {
+    if (typeof API !== 'undefined' && API.clearCache) API.clearCache();
     const isAdmin = Auth.isAdmin();
+
     container.innerHTML = `
       <div class="page-header">
         <h3><i class="fas fa-box text-gradient"></i>Productos</h3>
@@ -15,6 +17,38 @@ const ProductosPage = {
           ${isAdmin ? '<button class="btn btn-ghost btn-sm" id="btnImportarProductos"><i class="fas fa-file-import"></i>Importar</button>' : ''}
           ${isAdmin ? '<button class="btn btn-success btn-sm" id="btnExportarProductos"><i class="fas fa-file-excel"></i>Exportar Excel</button>' : ''}
           ${isAdmin ? '<button class="btn btn-accent btn-sm" id="btnKardex"><i class="fas fa-book"></i>Kardex</button>' : ''}
+        </div>
+      </div>
+
+      <div class="kpi-grid mb-4" id="productosKpiGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem">
+        <div class="kpi-card" style="cursor:pointer" id="cardKpiTotal">
+          <div class="kpi-icon icon-primary"><i class="fas fa-boxes"></i></div>
+          <div class="kpi-info">
+            <span class="kpi-title">Total Catálogo</span>
+            <span class="kpi-value" id="kpiTotalProductos">--</span>
+          </div>
+        </div>
+        <div class="kpi-card" style="cursor:pointer" id="cardKpiNormal">
+          <div class="kpi-icon icon-success"><i class="fas fa-check-circle"></i></div>
+          <div class="kpi-info">
+            <span class="kpi-title">Stock Normal</span>
+            <span class="kpi-value text-success" id="kpiStockNormal">--</span>
+          </div>
+        </div>
+
+        <div class="kpi-card" style="cursor:pointer" id="cardKpiStockBajo">
+          <div class="kpi-icon icon-warning"><i class="fas fa-exclamation-triangle"></i></div>
+          <div class="kpi-info">
+            <span class="kpi-title">Stock Bajo</span>
+            <span class="kpi-value text-warning" id="kpiStockBajo">--</span>
+          </div>
+        </div>
+        <div class="kpi-card" style="cursor:pointer" id="cardKpiSinStock">
+          <div class="kpi-icon icon-danger"><i class="fas fa-times-circle"></i></div>
+          <div class="kpi-info">
+            <span class="kpi-title">Sin Stock</span>
+            <span class="kpi-value text-danger" id="kpiSinStock">--</span>
+          </div>
         </div>
       </div>
 
@@ -43,6 +77,7 @@ const ProductosPage = {
           <button class="btn btn-ghost btn-sm" id="btnLimpiarFiltrosProducto"><i class="fas fa-undo"></i>Limpiar</button>
         </div>
       </div>
+
 
       <div class="table-container" style="margin-top:1rem">
         <div class="table-responsive">
@@ -217,10 +252,82 @@ const ProductosPage = {
       </div>
     `;
 
-    await this.loadFiltrosCategoria();
-    await this.loadProductos();
+    this.bindKpiEvents();
+    await Promise.all([
+      this.loadFiltrosCategoria(),
+      this.cargarResumenStock(),
+      this.loadProductos()
+    ]);
     this.bindEvents(container);
+
   },
+
+  cargarResumenStock: async function() {
+    try {
+      const [dataAll, dataBajo, dataSin] = await Promise.all([
+        API.get('productos/?page_size=1'),
+        API.get('productos/?stock_status=bajo&page_size=1'),
+        API.get('productos/?stock_status=sin_stock&page_size=1')
+      ]);
+
+      const total = dataAll.count || 0;
+      const bajo = dataBajo.count || 0;
+      const sin = dataSin.count || 0;
+      const normal = Math.max(0, total - bajo - sin);
+
+      const elTotal = document.getElementById('kpiTotalProductos');
+      const elNormal = document.getElementById('kpiStockNormal');
+      const elBajo = document.getElementById('kpiStockBajo');
+      const elSin = document.getElementById('kpiSinStock');
+
+      if (elTotal) elTotal.textContent = total;
+      if (elNormal) elNormal.textContent = normal;
+      if (elBajo) elBajo.textContent = bajo;
+      if (elSin) elSin.textContent = sin;
+    } catch(e) {
+      console.error('Error al cargar resumen KPI de stock', e);
+    }
+  },
+
+  bindKpiEvents: function () {
+    const cards = {
+      '': document.getElementById('cardKpiTotal'),
+      'normal': document.getElementById('cardKpiNormal'),
+      'bajo': document.getElementById('cardKpiStockBajo'),
+      'sin_stock': document.getElementById('cardKpiSinStock')
+    };
+
+    const setActiveCard = (filterVal) => {
+      Object.entries(cards).forEach(([key, card]) => {
+        if (card) {
+          if (key === filterVal) card.classList.add('active');
+          else card.classList.remove('active');
+        }
+      });
+    };
+
+    Object.entries(cards).forEach(([val, card]) => {
+      if (card) {
+        card.addEventListener('click', () => {
+          const select = document.getElementById('filterStockStatus');
+          if (select) select.value = val;
+          this.stockStatusFilter = val;
+          this.currentPage = 1;
+          setActiveCard(val);
+          this.loadProductos();
+        });
+      }
+    });
+
+    const select = document.getElementById('filterStockStatus');
+    if (select) {
+      select.addEventListener('change', () => {
+        setActiveCard(select.value);
+      });
+    }
+  },
+
+
 
   bindEvents: function (container) {
     const searchInput = document.getElementById('searchProducto');
@@ -264,9 +371,13 @@ const ProductosPage = {
         this.categoriaFilter = '';
         this.stockStatusFilter = '';
         this.currentPage = 1;
+        document.querySelectorAll('#productosKpiGrid .kpi-card').forEach(c => c.classList.remove('active'));
+        const cardTotal = document.getElementById('cardKpiTotal');
+        if (cardTotal) cardTotal.classList.add('active');
         this.loadProductos();
       });
     }
+
 
     const btnNuevo = document.getElementById('btnNuevoProducto');
     if (btnNuevo) btnNuevo.addEventListener('click', () => this.openCreateModal());

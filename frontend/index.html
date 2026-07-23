@@ -98,6 +98,19 @@
     </button>
 
     <main class="main-content">
+      <header class="topbar-header" id="topbarHeader" style="display: none;">
+        <div class="topbar-left">
+          <div class="topbar-branch-wrapper" id="topbarBranchWrapper">
+            <i class="fas fa-store branch-icon-header"></i>
+            <select id="topbarBranchSelector" class="form-select form-select-sm topbar-branch-select" title="Seleccionar Sucursal">
+              <option value="">Cargando sucursales...</option>
+            </select>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <span id="topbarBranchBadge" class="badge bg-primary-subtle text-primary fw-bold"></span>
+        </div>
+      </header>
       <div id="app-content">
         <div class="loading-page">
           <div class="spinner-modern spinner-modern-lg"></div>
@@ -105,6 +118,7 @@
         </div>
       </div>
     </main>
+
   </div>
 
   <div id="toast-container" class="toast-container"></div>

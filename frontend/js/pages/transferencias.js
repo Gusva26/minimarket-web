@@ -197,11 +197,18 @@ const TransferenciasPage = {
       const user = Auth.getUser();
       const userMercadoId = user?.mercado_id || user?.mercado;
 
-      const recibidas = transferencias.filter(t => t.mercado_destino === userMercadoId || t.mercado_destino?.id === userMercadoId);
-      const enviadas = transferencias.filter(t => t.mercado_origen === userMercadoId || t.mercado_origen?.id === userMercadoId);
+      let recibidas, enviadas;
+      if (!userMercadoId) {
+        recibidas = transferencias;
+        enviadas = transferencias;
+      } else {
+        recibidas = transferencias.filter(t => t.mercado_destino === userMercadoId || t.mercado_destino?.id === userMercadoId);
+        enviadas = transferencias.filter(t => t.mercado_origen === userMercadoId || t.mercado_origen?.id === userMercadoId);
+      }
 
-      const pendientes = recibidas.filter(t => t.estado === 'EN_TRANSITO');
-      const completadas = recibidas.filter(t => t.estado === 'COMPLETADA');
+      const pendientes = transferencias.filter(t => t.estado === 'EN_TRANSITO');
+      const completadas = transferencias.filter(t => t.estado === 'COMPLETADA');
+
 
       this.renderListado(content, pendientes, enviadas, completadas);
 
@@ -546,6 +553,9 @@ const TransferenciasPage = {
         ` : ''}
 
         <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-primary btn-pill" id="btnImprimirGuia">
+            <i class="fas fa-print me-1"></i>Imprimir Guía de Recepción
+          </button>
           ${enTransito && esOrigen ? `
             <button class="btn btn-outline-danger btn-pill" data-action="anular" data-id="${t.id}">
               <i class="fas fa-undo me-1"></i>Anular Transferencia
@@ -562,6 +572,13 @@ const TransferenciasPage = {
         </div>
       `;
 
+      const btnImprimir = document.getElementById('btnImprimirGuia');
+      if (btnImprimir) {
+        btnImprimir.addEventListener('click', () => {
+          Utils.imprimirGuiaTransferencia(t);
+        });
+      }
+
       body.querySelectorAll('[data-action]').forEach(btn => {
         btn.addEventListener('click', () => {
           const action = btn.dataset.action;
@@ -572,6 +589,7 @@ const TransferenciasPage = {
           else if (action === 'rechazar') this.abrirModalRechazo(tid);
         });
       });
+
     } catch (e) {
       body.innerHTML = `<div class="alert alert-danger">Error: ${e.message}</div>`;
     }

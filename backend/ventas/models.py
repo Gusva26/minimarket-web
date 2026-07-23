@@ -94,6 +94,13 @@ class Venta(models.Model):
 
     class Meta:
         unique_together = ('mercado', 'tipo_comprobante', 'serie', 'numero')
+        indexes = [
+            models.Index(fields=['mercado', '-fecha_hora']),
+            models.Index(fields=['-fecha_hora']),
+            models.Index(fields=['mercado', 'estado']),
+            models.Index(fields=['mercado', 'metodo_pago']),
+        ]
+
 
     def __str__(self):
         return f"{self.tipo_comprobante} {self.serie}-{self.numero:06d} | S/ {self.total} ({self.estado})"

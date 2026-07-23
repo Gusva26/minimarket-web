@@ -115,13 +115,9 @@ const HistorialPage = {
   },
 
   cargarVentas: async function(page = 1) {
-    if (!this._debouncedCargar) {
-      this._debouncedCargar = Utils.debounce(async (p) => {
-        await this._doCargarVentas(p);
-      }, 100);
-    }
-    this._debouncedCargar(page);
+    await this._doCargarVentas(page);
   },
+
 
   _doCargarVentas: async function(page) {
     this.currentPage = page;

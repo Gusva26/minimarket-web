@@ -296,3 +296,504 @@ WARNING 2026-07-18 09:39:24,506 log 10716 4104 Not Found: /media/productos/arroz
 WARNING 2026-07-18 09:39:24,507 basehttp 10716 4104 "GET /media/productos/arroz-extra-coste%3F%3Fo5kg.png HTTP/1.1" 404 2683
 WARNING 2026-07-18 09:42:48,730 log 9168 22240 Bad Request: /api/reportes/ventas/
 WARNING 2026-07-18 09:42:48,731 basehttp 9168 22240 "GET /api/reportes/ventas/?filtro=personalizado&fecha_inicio=2026-05-01&fecha_fin=2026-07-18 HTTP/1.1" 400 61
+WARNING 2026-07-22 02:08:17,793 log 21940 28392 Unauthorized: /api/auth/login/
+WARNING 2026-07-22 02:08:17,794 basehttp 21940 28392 "POST /api/auth/login/ HTTP/1.1" 401 71
+WARNING 2026-07-22 02:37:14,038 log 21940 9704 Unauthorized: /api/auth/login/
+WARNING 2026-07-22 02:37:14,039 basehttp 21940 9704 "POST /api/auth/login/ HTTP/1.1" 401 71
+WARNING 2026-07-22 02:38:15,855 log 21940 9704 Unauthorized: /api/auth/login/
+WARNING 2026-07-22 02:38:15,856 basehttp 21940 9704 "POST /api/auth/login/ HTTP/1.1" 401 71
+WARNING 2026-07-22 02:38:23,186 log 21940 9704 Unauthorized: /api/auth/login/
+WARNING 2026-07-22 02:38:23,186 basehttp 21940 9704 "POST /api/auth/login/ HTTP/1.1" 401 71
+WARNING 2026-07-22 02:38:38,060 log 21940 9704 Unauthorized: /api/auth/login/
+WARNING 2026-07-22 02:38:38,061 basehttp 21940 9704 "POST /api/auth/login/ HTTP/1.1" 401 71
+ERROR 2026-07-22 03:37:15,890 log 24092 25120 Internal Server Error: /api/reportes/ventas/
+Traceback (most recent call last):
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "C:\Users\Gusva\Desktop\migrar BD MINI\minimarket-web\backend\reportes\api.py", line 136, in get
+    metodos = list(ventas.values('metodo_pago').annotate(
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\query.py", line 1630, in annotate
+    return self._annotate(args, kwargs, select=True)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\query.py", line 1680, in _annotate
+    clone.query.add_annotation(
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\sql\query.py", line 1198, in add_annotation
+    annotation = annotation.resolve_expression(self, allow_joins=True, reuse=None)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\aggregates.py", line 88, in resolve_expression
+    raise FieldError(
+django.core.exceptions.FieldError: Cannot compute Sum('total'): 'total' is an aggregate
+ERROR 2026-07-22 03:37:15,893 basehttp 24092 25120 "GET /api/reportes/ventas/?filtro=hoy HTTP/1.1" 500 131744
+ERROR 2026-07-22 03:37:17,976 log 24092 25120 Internal Server Error: /api/reportes/ventas/
+Traceback (most recent call last):
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "C:\Users\Gusva\Desktop\migrar BD MINI\minimarket-web\backend\reportes\api.py", line 136, in get
+    metodos = list(ventas.values('metodo_pago').annotate(
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\query.py", line 1630, in annotate
+    return self._annotate(args, kwargs, select=True)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\query.py", line 1680, in _annotate
+    clone.query.add_annotation(
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\sql\query.py", line 1198, in add_annotation
+    annotation = annotation.resolve_expression(self, allow_joins=True, reuse=None)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\aggregates.py", line 88, in resolve_expression
+    raise FieldError(
+django.core.exceptions.FieldError: Cannot compute Sum('total'): 'total' is an aggregate
+ERROR 2026-07-22 03:37:17,978 basehttp 24092 25120 "GET /api/reportes/ventas/?filtro=hoy HTTP/1.1" 500 131744
+ERROR 2026-07-22 03:37:23,980 log 24092 25120 Internal Server Error: /api/reportes/ventas/
+Traceback (most recent call last):
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "C:\Users\Gusva\Desktop\migrar BD MINI\minimarket-web\backend\reportes\api.py", line 136, in get
+    metodos = list(ventas.values('metodo_pago').annotate(
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\query.py", line 1630, in annotate
+    return self._annotate(args, kwargs, select=True)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\query.py", line 1680, in _annotate
+    clone.query.add_annotation(
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\sql\query.py", line 1198, in add_annotation
+    annotation = annotation.resolve_expression(self, allow_joins=True, reuse=None)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\aggregates.py", line 88, in resolve_expression
+    raise FieldError(
+django.core.exceptions.FieldError: Cannot compute Sum('total'): 'total' is an aggregate
+ERROR 2026-07-22 03:37:23,981 basehttp 24092 25120 "GET /api/reportes/ventas/?filtro=hoy HTTP/1.1" 500 131744
+ERROR 2026-07-22 03:37:26,069 log 24092 25120 Internal Server Error: /api/reportes/ventas/
+Traceback (most recent call last):
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "C:\Users\Gusva\Desktop\migrar BD MINI\minimarket-web\backend\reportes\api.py", line 136, in get
+    metodos = list(ventas.values('metodo_pago').annotate(
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\query.py", line 1630, in annotate
+    return self._annotate(args, kwargs, select=True)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\query.py", line 1680, in _annotate
+    clone.query.add_annotation(
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\sql\query.py", line 1198, in add_annotation
+    annotation = annotation.resolve_expression(self, allow_joins=True, reuse=None)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\aggregates.py", line 88, in resolve_expression
+    raise FieldError(
+django.core.exceptions.FieldError: Cannot compute Sum('total'): 'total' is an aggregate
+ERROR 2026-07-22 03:37:26,070 basehttp 24092 25120 "GET /api/reportes/ventas/?filtro=hoy HTTP/1.1" 500 131744
+WARNING 2026-07-22 03:46:49,776 log 12808 25260 Bad Request: /api/reportes/ventas/
+WARNING 2026-07-22 03:46:49,777 basehttp 12808 25260 "GET /api/reportes/ventas/?filtro=personalizado&fecha_inicio=2026-04-02&fecha_fin=2026-07-22 HTTP/1.1" 400 61
+ERROR 2026-07-22 04:24:09,377 log 10904 32400 Internal Server Error: /api/inventario/valoracion/
+Traceback (most recent call last):
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "C:\Users\Gusva\Desktop\migrar BD MINI\minimarket-web\backend\inventario\api.py", line 415, in get
+    valor_costo=ExpressionWrapper(F('stock') * F('costo'), output_field=DecimalField()),
+NameError: name 'ExpressionWrapper' is not defined
+ERROR 2026-07-22 04:24:09,379 basehttp 10904 32400 "GET /api/inventario/valoracion/?page=1 HTTP/1.1" 500 103232
+ERROR 2026-07-22 04:24:13,547 log 10904 28260 Internal Server Error: /api/inventario/valoracion/
+Traceback (most recent call last):
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "C:\Users\Gusva\Desktop\migrar BD MINI\minimarket-web\backend\inventario\api.py", line 415, in get
+    valor_costo=ExpressionWrapper(F('stock') * F('costo'), output_field=DecimalField()),
+NameError: name 'ExpressionWrapper' is not defined
+ERROR 2026-07-22 04:24:13,548 basehttp 10904 28260 "GET /api/inventario/valoracion/?page=1 HTTP/1.1" 500 103232
+WARNING 2026-07-22 10:20:52,292 log 28272 30048 Unauthorized: /api/auth/me/
+WARNING 2026-07-22 10:20:52,292 basehttp 28272 30048 "GET /api/auth/me/ HTTP/1.1" 401 65
+WARNING 2026-07-22 11:33:55,814 log 28272 13616 Not Found: /api/ventas/
+WARNING 2026-07-22 11:33:55,815 basehttp 28272 13616 "GET /api/ventas/?page=0 HTTP/1.1" 404 31
+ERROR 2026-07-22 11:59:40,951 log 22172 31800 Internal Server Error: /api/compras/
+Traceback (most recent call last):
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\viewsets.py", line 125, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "C:\Users\Gusva\Desktop\migrar BD MINI\minimarket-web\backend\.\compras\api.py", line 67, in list
+    response = super().list(request, *args, **kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\mixins.py", line 38, in list
+    queryset = self.filter_queryset(self.get_queryset())
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\generics.py", line 154, in filter_queryset
+    queryset = backend().filter_queryset(self.request, queryset, self)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\filters.py", line 304, in filter_queryset
+    return queryset.order_by(*ordering)
+AttributeError: 'NoneType' object has no attribute 'order_by'
+WARNING 2026-07-22 12:31:32,201 log 2900 24108 Unauthorized: /api/auth/me/
+WARNING 2026-07-22 12:31:32,202 basehttp 2900 24108 "GET /api/auth/me/ HTTP/1.1" 401 65
+WARNING 2026-07-22 14:40:30,626 log 22612 12280 Unauthorized: /api/mercados/
+WARNING 2026-07-22 14:40:30,629 log 22612 30348 Unauthorized: /api/categorias/
+WARNING 2026-07-22 14:40:30,630 basehttp 22612 12280 "GET /api/mercados/ HTTP/1.1" 401 65
+WARNING 2026-07-22 14:40:30,630 log 22612 31172 Unauthorized: /api/productos/
+WARNING 2026-07-22 14:40:30,632 basehttp 22612 30348 "GET /api/categorias/ HTTP/1.1" 401 65
+WARNING 2026-07-22 14:40:30,633 basehttp 22612 31172 "GET /api/productos/?page=1 HTTP/1.1" 401 65
+ERROR 2026-07-22 14:47:44,733 log 27632 32132 Internal Server Error: /api/productos/
+Traceback (most recent call last):
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\viewsets.py", line 125, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "C:\Users\Gusva\Desktop\migrar BD MINI\minimarket-web\backend\inventario\api.py", line 95, in list
+    response = super().list(request, *args, **kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\mixins.py", line 38, in list
+    queryset = self.filter_queryset(self.get_queryset())
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\generics.py", line 154, in filter_queryset
+    queryset = backend().filter_queryset(self.request, queryset, self)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\filters.py", line 304, in filter_queryset
+    return queryset.order_by(*ordering)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\query.py", line 1701, in order_by
+    obj.query.add_ordering(*field_names)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\sql\query.py", line 2253, in add_ordering
+    self.names_to_path(item.split(LOOKUP_SEP), self.model._meta)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\sql\query.py", line 1772, in names_to_path
+    raise FieldError(
+django.core.exceptions.FieldError: Cannot resolve keyword 'stock_priority' into field. Choices are: categoria, categoria_id, codigo_barras, costo, detalles_compra, id, imagen, mercado, mercado_id, movimientos_kardex, nombre, precio, stock, stock_minimo, transferencias_destino, transferencias_origen, unidad_medida, unidades, ventadetalle
+ERROR 2026-07-22 14:47:44,736 basehttp 27632 32132 "GET /api/productos/?page=1&stock_status=sin_stock HTTP/1.1" 500 131973
+ERROR 2026-07-22 14:47:47,718 log 27632 32132 Internal Server Error: /api/productos/
+Traceback (most recent call last):
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\viewsets.py", line 125, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "C:\Users\Gusva\Desktop\migrar BD MINI\minimarket-web\backend\inventario\api.py", line 95, in list
+    response = super().list(request, *args, **kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\mixins.py", line 38, in list
+    queryset = self.filter_queryset(self.get_queryset())
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\generics.py", line 154, in filter_queryset
+    queryset = backend().filter_queryset(self.request, queryset, self)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\filters.py", line 304, in filter_queryset
+    return queryset.order_by(*ordering)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\query.py", line 1701, in order_by
+    obj.query.add_ordering(*field_names)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\sql\query.py", line 2253, in add_ordering
+    self.names_to_path(item.split(LOOKUP_SEP), self.model._meta)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\sql\query.py", line 1772, in names_to_path
+    raise FieldError(
+django.core.exceptions.FieldError: Cannot resolve keyword 'stock_priority' into field. Choices are: categoria, categoria_id, codigo_barras, costo, detalles_compra, id, imagen, mercado, mercado_id, movimientos_kardex, nombre, precio, stock, stock_minimo, transferencias_destino, transferencias_origen, unidad_medida, unidades, ventadetalle
+ERROR 2026-07-22 14:47:47,721 basehttp 27632 32132 "GET /api/productos/?page=1&stock_status=bajo HTTP/1.1" 500 132116
+ERROR 2026-07-22 14:47:53,723 log 27632 32132 Internal Server Error: /api/productos/
+Traceback (most recent call last):
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\viewsets.py", line 125, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "C:\Users\Gusva\Desktop\migrar BD MINI\minimarket-web\backend\inventario\api.py", line 95, in list
+    response = super().list(request, *args, **kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\mixins.py", line 38, in list
+    queryset = self.filter_queryset(self.get_queryset())
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\generics.py", line 154, in filter_queryset
+    queryset = backend().filter_queryset(self.request, queryset, self)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\filters.py", line 304, in filter_queryset
+    return queryset.order_by(*ordering)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\query.py", line 1701, in order_by
+    obj.query.add_ordering(*field_names)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\sql\query.py", line 2253, in add_ordering
+    self.names_to_path(item.split(LOOKUP_SEP), self.model._meta)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\sql\query.py", line 1772, in names_to_path
+    raise FieldError(
+django.core.exceptions.FieldError: Cannot resolve keyword 'stock_priority' into field. Choices are: categoria, categoria_id, codigo_barras, costo, detalles_compra, id, imagen, mercado, mercado_id, movimientos_kardex, nombre, precio, stock, stock_minimo, transferencias_destino, transferencias_origen, unidad_medida, unidades, ventadetalle
+ERROR 2026-07-22 14:47:53,725 basehttp 27632 32132 "GET /api/productos/?page=1&stock_status=bajo HTTP/1.1" 500 132116
+ERROR 2026-07-22 14:48:01,689 log 27632 29832 Internal Server Error: /api/productos/
+Traceback (most recent call last):
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\viewsets.py", line 125, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "C:\Users\Gusva\Desktop\migrar BD MINI\minimarket-web\backend\inventario\api.py", line 95, in list
+    response = super().list(request, *args, **kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\mixins.py", line 38, in list
+    queryset = self.filter_queryset(self.get_queryset())
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\generics.py", line 154, in filter_queryset
+    queryset = backend().filter_queryset(self.request, queryset, self)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\filters.py", line 304, in filter_queryset
+    return queryset.order_by(*ordering)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\query.py", line 1701, in order_by
+    obj.query.add_ordering(*field_names)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\sql\query.py", line 2253, in add_ordering
+    self.names_to_path(item.split(LOOKUP_SEP), self.model._meta)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\sql\query.py", line 1772, in names_to_path
+    raise FieldError(
+django.core.exceptions.FieldError: Cannot resolve keyword 'stock_priority' into field. Choices are: categoria, categoria_id, codigo_barras, costo, detalles_compra, id, imagen, mercado, mercado_id, movimientos_kardex, nombre, precio, stock, stock_minimo, transferencias_destino, transferencias_origen, unidad_medida, unidades, ventadetalle
+ERROR 2026-07-22 14:48:01,690 basehttp 27632 29832 "GET /api/productos/?stock_status=sin_stock&page_size=1 HTTP/1.1" 500 132058
+ERROR 2026-07-22 14:48:01,723 log 27632 26696 Internal Server Error: /api/productos/
+Traceback (most recent call last):
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\viewsets.py", line 125, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "C:\Users\Gusva\Desktop\migrar BD MINI\minimarket-web\backend\inventario\api.py", line 95, in list
+    response = super().list(request, *args, **kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\mixins.py", line 38, in list
+    queryset = self.filter_queryset(self.get_queryset())
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\generics.py", line 154, in filter_queryset
+    queryset = backend().filter_queryset(self.request, queryset, self)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\filters.py", line 304, in filter_queryset
+    return queryset.order_by(*ordering)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\query.py", line 1701, in order_by
+    obj.query.add_ordering(*field_names)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\sql\query.py", line 2253, in add_ordering
+    self.names_to_path(item.split(LOOKUP_SEP), self.model._meta)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\sql\query.py", line 1772, in names_to_path
+    raise FieldError(
+django.core.exceptions.FieldError: Cannot resolve keyword 'stock_priority' into field. Choices are: categoria, categoria_id, codigo_barras, costo, detalles_compra, id, imagen, mercado, mercado_id, movimientos_kardex, nombre, precio, stock, stock_minimo, transferencias_destino, transferencias_origen, unidad_medida, unidades, ventadetalle
+ERROR 2026-07-22 14:48:01,724 basehttp 27632 26696 "GET /api/productos/?stock_status=bajo&page_size=1 HTTP/1.1" 500 132201
+ERROR 2026-07-22 14:48:03,719 log 27632 26696 Internal Server Error: /api/productos/
+Traceback (most recent call last):
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\viewsets.py", line 125, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "C:\Users\Gusva\Desktop\migrar BD MINI\minimarket-web\backend\inventario\api.py", line 95, in list
+    response = super().list(request, *args, **kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\mixins.py", line 38, in list
+    queryset = self.filter_queryset(self.get_queryset())
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\generics.py", line 154, in filter_queryset
+    queryset = backend().filter_queryset(self.request, queryset, self)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\filters.py", line 304, in filter_queryset
+    return queryset.order_by(*ordering)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\query.py", line 1701, in order_by
+    obj.query.add_ordering(*field_names)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\sql\query.py", line 2253, in add_ordering
+    self.names_to_path(item.split(LOOKUP_SEP), self.model._meta)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\sql\query.py", line 1772, in names_to_path
+    raise FieldError(
+django.core.exceptions.FieldError: Cannot resolve keyword 'stock_priority' into field. Choices are: categoria, categoria_id, codigo_barras, costo, detalles_compra, id, imagen, mercado, mercado_id, movimientos_kardex, nombre, precio, stock, stock_minimo, transferencias_destino, transferencias_origen, unidad_medida, unidades, ventadetalle
+ERROR 2026-07-22 14:48:03,722 basehttp 27632 26696 "GET /api/productos/?page=1&stock_status=bajo HTTP/1.1" 500 132116
+ERROR 2026-07-22 14:48:08,242 log 27632 27720 Internal Server Error: /api/productos/
+Traceback (most recent call last):
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\viewsets.py", line 125, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "C:\Users\Gusva\Desktop\migrar BD MINI\minimarket-web\backend\inventario\api.py", line 95, in list
+    response = super().list(request, *args, **kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\mixins.py", line 38, in list
+    queryset = self.filter_queryset(self.get_queryset())
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\generics.py", line 154, in filter_queryset
+    queryset = backend().filter_queryset(self.request, queryset, self)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\filters.py", line 304, in filter_queryset
+    return queryset.order_by(*ordering)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\query.py", line 1701, in order_by
+    obj.query.add_ordering(*field_names)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\sql\query.py", line 2253, in add_ordering
+    self.names_to_path(item.split(LOOKUP_SEP), self.model._meta)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\sql\query.py", line 1772, in names_to_path
+    raise FieldError(
+django.core.exceptions.FieldError: Cannot resolve keyword 'stock_priority' into field. Choices are: categoria, categoria_id, codigo_barras, costo, detalles_compra, id, imagen, mercado, mercado_id, movimientos_kardex, nombre, precio, stock, stock_minimo, transferencias_destino, transferencias_origen, unidad_medida, unidades, ventadetalle
+ERROR 2026-07-22 14:48:08,258 basehttp 27632 27720 "GET /api/productos/?stock_status=bajo&page_size=1 HTTP/1.1" 500 132201
+ERROR 2026-07-22 14:48:08,257 log 27632 31596 Internal Server Error: /api/productos/
+Traceback (most recent call last):
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\viewsets.py", line 125, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "C:\Users\Gusva\Desktop\migrar BD MINI\minimarket-web\backend\inventario\api.py", line 95, in list
+    response = super().list(request, *args, **kwargs)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\mixins.py", line 38, in list
+    queryset = self.filter_queryset(self.get_queryset())
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\generics.py", line 154, in filter_queryset
+    queryset = backend().filter_queryset(self.request, queryset, self)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\filters.py", line 304, in filter_queryset
+    return queryset.order_by(*ordering)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\query.py", line 1701, in order_by
+    obj.query.add_ordering(*field_names)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\sql\query.py", line 2253, in add_ordering
+    self.names_to_path(item.split(LOOKUP_SEP), self.model._meta)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\sql\query.py", line 1772, in names_to_path
+    raise FieldError(
+django.core.exceptions.FieldError: Cannot resolve keyword 'stock_priority' into field. Choices are: categoria, categoria_id, codigo_barras, costo, detalles_compra, id, imagen, mercado, mercado_id, movimientos_kardex, nombre, precio, stock, stock_minimo, transferencias_destino, transferencias_origen, unidad_medida, unidades, ventadetalle
+ERROR 2026-07-22 14:48:08,259 basehttp 27632 31596 "GET /api/productos/?stock_status=sin_stock&page_size=1 HTTP/1.1" 500 132058
+WARNING 2026-07-22 16:42:23,496 log 7608 30900 Unauthorized: /api/auth/me/
+WARNING 2026-07-22 16:42:23,497 basehttp 7608 30900 "GET /api/auth/me/ HTTP/1.1" 401 65
+WARNING 2026-07-22 18:45:43,074 log 7608 2216 Unauthorized: /api/mercados/
+WARNING 2026-07-22 18:45:43,076 log 7608 29048 Unauthorized: /api/categorias/
+WARNING 2026-07-22 18:45:43,077 log 7608 8916 Unauthorized: /api/productos/
+WARNING 2026-07-22 18:45:43,080 basehttp 7608 2216 "GET /api/mercados/ HTTP/1.1" 401 65
+WARNING 2026-07-22 18:45:43,080 log 7608 29440 Unauthorized: /api/productos/
+WARNING 2026-07-22 18:45:43,081 basehttp 7608 29048 "GET /api/categorias/ HTTP/1.1" 401 65
+WARNING 2026-07-22 18:45:43,081 basehttp 7608 8916 "GET /api/productos/?page_size=1 HTTP/1.1" 401 65
+WARNING 2026-07-22 18:45:43,084 log 7608 14912 Unauthorized: /api/productos/
+WARNING 2026-07-22 18:45:43,088 basehttp 7608 29440 "GET /api/productos/?stock_status=bajo&page_size=1 HTTP/1.1" 401 65
+WARNING 2026-07-22 18:45:43,088 log 7608 27824 Unauthorized: /api/productos/
+WARNING 2026-07-22 18:45:43,093 basehttp 7608 14912 "GET /api/productos/?stock_status=sin_stock&page_size=1 HTTP/1.1" 401 65
+WARNING 2026-07-22 18:45:43,093 basehttp 7608 27824 "GET /api/productos/?page=1 HTTP/1.1" 401 65

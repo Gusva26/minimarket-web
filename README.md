@@ -88,7 +88,7 @@ graph TD
 
 Para ejecutar el proyecto de forma local, asegúrate de contar con:
 - **Python:** Versión `3.8` o superior.
-- **Base de Datos:** Servidor de base de datos **MySQL** (`5.7` o `8.0+`).
+- **Base de Datos:** **PostgreSQL** (Hospedado en **Supabase** o local).
 - **Navegador:** Cualquier navegador moderno compatible con JS ES6.
 
 ---
@@ -108,7 +108,7 @@ proyecto-minimarket-FINAL/
 │   ├── proveedores/                    # Directorio de proveedores
 │   ├── reportes/                       # Consultas y exportador Excel/PDF
 │   ├── manage.py                       # Administrador de comandos de Django
-│   ├── requirements.txt                # Dependencias del backend
+│   ├── requirements.txt                # Dependencias del backend (psycopg2-binary)
 │   └── .env                            # Variables de configuración local
 ├── frontend/                           # Aplicación de Cliente (SPA)
 │   ├── index.html                      # Archivo de entrada HTML
@@ -155,12 +155,15 @@ SECRET_KEY=django-insecure-pos-minimarket-key
 DEBUG=True
 ALLOWED_HOSTS=*
 
-# Base de datos (MySQL)
-DB_NAME=minimarket
-DB_USER=root
-DB_PASSWORD=contrasenia_mysql
-DB_HOST=localhost
-DB_PORT=3306
+# Base de datos (PostgreSQL - Supabase)
+DB_ENGINE=postgresql
+DB_NAME=postgres
+DB_USER=postgres
+DB_PASSWORD=tu_contraseña_supabase
+DB_HOST=db.qbxyktylozbtdbuwvfid.supabase.co
+DB_PORT=5432
+DB_USE_SSL=True
+
 
 # Integraciones Externas
 APISPERU_TOKEN=tu_token_de_apisperu

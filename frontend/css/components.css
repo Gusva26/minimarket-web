@@ -38,33 +38,116 @@
 .kpi-card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1.25rem;
-  box-shadow: var(--shadow);
-  transition: all var(--transition);
+  border-radius: 14px;
+  padding: 1.25rem 1.4rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
-.kpi-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-3px); }
+
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: transparent;
+  transition: background 0.25s ease;
+}
+
+.kpi-card:hover {
+  box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.08);
+  transform: translateY(-3px);
+  border-color: var(--border-hover, var(--primary));
+}
+
+.kpi-card:hover::before {
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+}
+
+/* Active Filter State for KPI Cards — Without Border Ring */
+.kpi-card.active {
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06) !important;
+}
+
+.kpi-card.active::before {
+  background: linear-gradient(90deg, var(--primary), var(--accent)) !important;
+}
+
+
+
 .kpi-card .kpi-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: var(--radius);
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
-  margin-bottom: 0.75rem;
+  font-size: 1.3rem;
+  margin-bottom: 0.85rem;
+  transition: transform 0.25s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
 }
-.kpi-card .kpi-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.03em; }
-.kpi-card .kpi-value { font-size: 1.75rem; font-weight: 700; color: var(--text); line-height: 1.2; margin: 4px 0; }
+
+.kpi-card:hover .kpi-icon {
+  transform: scale(1.08) rotate(-3deg);
+}
+
+/* Glowing Icon Gradients */
+.kpi-icon.icon-primary, .kpi-primary .kpi-icon {
+  background: linear-gradient(135deg, #4F46E5 0%, #6366F1 100%);
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+}
+
+.kpi-icon.icon-success, .kpi-success .kpi-icon {
+  background: linear-gradient(135deg, #059669 0%, #10B981 100%);
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.kpi-icon.icon-warning, .kpi-warning .kpi-icon {
+  background: linear-gradient(135deg, #D97706 0%, #F59E0B 100%);
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.kpi-icon.icon-danger, .kpi-danger .kpi-icon {
+  background: linear-gradient(135deg, #DC2626 0%, #EF4444 100%);
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.kpi-icon.icon-info, .kpi-info .kpi-icon {
+  background: linear-gradient(135deg, #0284C7 0%, #38BDF8 100%);
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3);
+}
+
+.kpi-card .kpi-title, .kpi-card .kpi-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.kpi-card .kpi-value {
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.15;
+  margin: 6px 0 2px 0;
+  letter-spacing: -0.02em;
+}
+
 .kpi-card .kpi-change { font-size: 0.75rem; font-weight: 600; }
-.kpi-primary .kpi-icon { background: var(--primary-lighter); color: var(--primary); }
-.kpi-accent .kpi-icon { background: var(--accent-light); color: var(--accent); }
-.kpi-success .kpi-icon { background: var(--success-light); color: var(--success); }
-.kpi-warning .kpi-icon { background: var(--warning-light); color: var(--warning); }
-.kpi-danger .kpi-icon { background: var(--danger-light); color: var(--danger); }
-.kpi-info .kpi-icon { background: var(--info-light); color: var(--info); }
+
 
 /* ---------- Badges ---------- */
 .badge {

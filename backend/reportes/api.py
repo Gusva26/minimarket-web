@@ -21,30 +21,33 @@ class ReporteVentasView(APIView):
 
     def get(self, request):
         mercado_admin = request.user.mercado
-        version = get_mercado_cache_version(mercado_admin.id)
+        mercado_id = mercado_admin.id if mercado_admin else None
+        version = get_mercado_cache_version(mercado_id)
         
-        # Generar una llave de caché basada en los parámetros de búsqueda y la versión
         params_str = "_".join([f"{k}:{v}" for k, v in sorted(request.query_params.items())])
-        cache_key = f"reporte_ventas_{mercado_admin.id}_v{version}_{params_str}"
+        cache_key = f"reporte_ventas_{mercado_id or 'all'}_v{version}_{params_str}"
         
         cached_data = cache.get(cache_key)
         if cached_data:
             return Response(cached_data)
 
-        ahora = timezone.now().strftime('%d/%b/%Y %H:%M:%S')
-        print(f'[{ahora}] "GET {request.path} HTTP/1.1" 200 (DB QUERY)')
+        ahora = timezone.localtime(timezone.now())
+        hoy = ahora.date()
+
         serializer = ReporteVentasSerializer(data=request.query_params)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
 
-        ahora = timezone.localtime(timezone.now())
-        hoy = ahora.date()
         filtro = data.get('filtro', 'hoy')
 
         fecha_inicio = ahora.replace(hour=0, minute=0, second=0, microsecond=0)
         fecha_fin = ahora.replace(hour=23, minute=59, second=59, microsecond=999999)
 
-        if filtro == 'semana':
+        if filtro == 'ayer':
+            ayer = hoy - timedelta(days=1)
+            fecha_inicio = timezone.make_aware(datetime.combine(ayer, datetime.min.time()))
+            fecha_fin = timezone.make_aware(datetime.combine(ayer, datetime.max.time()))
+        elif filtro == 'semana':
             lunes = hoy - timedelta(days=hoy.weekday())
             fecha_inicio = timezone.make_aware(datetime.combine(lunes, datetime.min.time()))
             fecha_fin = ahora.replace(hour=23, minute=59, second=59, microsecond=999999)
@@ -52,6 +55,12 @@ class ReporteVentasView(APIView):
             primero = hoy.replace(day=1)
             fecha_inicio = timezone.make_aware(datetime.combine(primero, datetime.min.time()))
             fecha_fin = ahora.replace(hour=23, minute=59, second=59, microsecond=999999)
+        elif filtro == 'mes_anterior':
+            primer_dia_este_mes = hoy.replace(day=1)
+            ultimo_dia_mes_pasado = primer_dia_este_mes - timedelta(days=1)
+            primer_dia_mes_pasado = ultimo_dia_mes_pasado.replace(day=1)
+            fecha_inicio = timezone.make_aware(datetime.combine(primer_dia_mes_pasado, datetime.min.time()))
+            fecha_fin = timezone.make_aware(datetime.combine(ultimo_dia_mes_pasado, datetime.max.time()))
 
         if data.get('fecha_exacta'):
             fecha_dt = data['fecha_exacta']
@@ -63,21 +72,20 @@ class ReporteVentasView(APIView):
         if data.get('fecha_fin'):
             fecha_fin = data['fecha_fin']
 
-        mercado_admin = request.user.mercado
+        mfiltro_v = {'fecha_hora__range': (fecha_inicio, fecha_fin)}
+        mfiltro_d = {'venta__fecha_hora__range': (fecha_inicio, fecha_fin)}
+        mfiltro_c = {'fecha_apertura__range': (fecha_inicio, fecha_fin), 'estado': 'CERRADA'}
+        mfiltro_p = {}
 
-        ventas = Venta.objects.filter(
-            mercado=mercado_admin,
-            fecha_hora__range=(fecha_inicio, fecha_fin)
-        )
-        detalles = VentaDetalle.objects.filter(
-            venta__mercado=mercado_admin,
-            venta__fecha_hora__range=(fecha_inicio, fecha_fin)
-        )
-        cajas = Caja.objects.filter(
-            mercado=mercado_admin,
-            fecha_apertura__range=(fecha_inicio, fecha_fin),
-            estado='CERRADA',
-        )
+        if mercado_admin:
+            mfiltro_v['mercado'] = mercado_admin
+            mfiltro_d['venta__mercado'] = mercado_admin
+            mfiltro_c['mercado'] = mercado_admin
+            mfiltro_p['mercado'] = mercado_admin
+
+        ventas = Venta.objects.filter(**mfiltro_v)
+        detalles = VentaDetalle.objects.filter(**mfiltro_d)
+        cajas = Caja.objects.filter(**mfiltro_c)
 
         usuario_id = data.get('usuario_id')
         categoria_id = data.get('categoria_id')
@@ -96,11 +104,11 @@ class ReporteVentasView(APIView):
 
         utilidad_data = detalles.annotate(
             costo_total=ExpressionWrapper(
-                F('cantidad') * F('producto__costo'),
+                F('cantidad') * F('costo_unitario'),
                 output_field=DecimalField(),
             ),
             ganancia_fila=ExpressionWrapper(
-                F('subtotal') - (F('cantidad') * F('producto__costo')),
+                F('subtotal') - (F('cantidad') * F('costo_unitario')),
                 output_field=DecimalField(),
             ),
         ).aggregate(
@@ -114,68 +122,99 @@ class ReporteVentasView(APIView):
         utilidad_total = utilidad_data['utilidad_total'] or 0
         margen_porcentaje = float((utilidad_total / total_vendido * 100)) if total_vendido > 0 else 0
         cantidad_ventas = ventas.count()
+        ticket_promedio = float(total_vendido / cantidad_ventas) if cantidad_ventas > 0 else 0.0
 
         top_productos = list(detalles.values('producto__nombre', 'producto_id').annotate(
             total_qty=Sum('cantidad'),
             total_revenue=Sum('subtotal'),
         ).order_by('-total_revenue')[:10])
 
-        detalles_periodo = VentaDetalle.objects.filter(
-            venta__mercado=mercado_admin,
-            venta__fecha_hora__range=(fecha_inicio, fecha_fin),
-        )
-        ids_vendidos = detalles_periodo.values_list('producto_id', flat=True).distinct()
+        ids_vendidos = detalles.values_list('producto_id', flat=True).distinct()
+        baja_rotacion_qs = Producto.objects.filter(stock__gt=0, **mfiltro_p).exclude(id__in=ids_vendidos).order_by('stock')[:10]
+        baja_rotacion = list(baja_rotacion_qs.values('id', 'nombre', 'stock', 'precio'))
 
-        baja_rotacion_qs = Producto.objects.filter(
-            mercado=mercado_admin,
-            stock__gt=0,
-        ).exclude(id__in=ids_vendidos).order_by('stock')[:10]
+        metodos = list(ventas.values('metodo_pago').annotate(
+            num_conteo=Count('id'),
+            monto=Sum('total')
+        ).order_by('-monto'))
 
-        baja_rotacion = list(baja_rotacion_qs.values('id', 'nombre', 'stock'))
+        cat_stats = list(detalles.values('producto__categoria__nombre').annotate(
+            monto=Sum('subtotal'),
+            cantidad=Sum('cantidad')
+        ).order_by('-monto'))
 
-        audit_cajas_data = cajas.annotate(
-            total_real=ExpressionWrapper(
-                F('monto_final_efectivo_real') + F('monto_final_yape_real') + F('monto_final_plin_real'),
-                output_field=DecimalField(),
-            ),
-            total_esperado=ExpressionWrapper(
-                F('monto_esperado_efectivo') + F('monto_esperado_yape') + F('monto_esperado_plin'),
-                output_field=DecimalField(),
-            ),
-        )
-        descuadre_total = 0
-        for c in audit_cajas_data:
-            m_real = float(c.total_real or 0)
-            m_esp = float(c.total_esperado or 0)
-            descuadre_total += (m_real - m_esp)
-
-        audit_cajas = float(descuadre_total)
-
-        metodos = ventas.values('metodo_pago').annotate(
-            total=Count('metodo_pago')
-        ).order_by('-total')
+        cajeros_stats = list(ventas.values('usuario__username', 'usuario__first_name', 'usuario__last_name').annotate(
+            total_monto=Sum('total'),
+            num_ventas=Count('id')
+        ).order_by('-total_monto'))
 
         ventas_time = {}
+        if filtro in ('hoy', 'ayer'):
+            for h in range(7, 23):
+                ventas_time[f"{h:02d}:00"] = 0.0
+        elif filtro == 'semana':
+            lunes = hoy - timedelta(days=hoy.weekday())
+            dias_semana = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
+            for i in range(7):
+                d = lunes + timedelta(days=i)
+                key = f"{dias_semana[i]} {d.strftime('%d/%m')}"
+                ventas_time[key] = 0.0
+        elif filtro in ('mes', 'mes_anterior'):
+            d_start = fecha_inicio.date()
+            d_end = fecha_fin.date()
+            curr = d_start
+            while curr <= d_end:
+                ventas_time[curr.strftime('%d/%m')] = 0.0
+                curr += timedelta(days=1)
+        elif filtro == 'personalizado':
+            d_start = fecha_inicio.date()
+            d_end = fecha_fin.date()
+            curr = d_start
+            while curr <= d_end and (curr - d_start).days <= 60:
+                ventas_time[curr.strftime('%d/%m')] = 0.0
+                curr += timedelta(days=1)
+
         for v in ventas.order_by('fecha_hora'):
-            key = v.fecha_hora.strftime('%H:00') if filtro == 'hoy' else v.fecha_hora.strftime('%d/%m')
-            ventas_time[key] = ventas_time.get(key, 0) + float(v.total)
+            v_local = timezone.localtime(v.fecha_hora)
+            if filtro in ('hoy', 'ayer'):
+                key = v_local.strftime('%H:00')
+            elif filtro == 'semana':
+                dias_semana = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
+                key = f"{dias_semana[v_local.weekday()]} {v_local.strftime('%d/%m')}"
+            else:
+                key = v_local.strftime('%d/%m')
+
+            if key in ventas_time:
+                ventas_time[key] += float(v.total)
+            else:
+                ventas_time[key] = float(v.total)
+
 
         result = {
             'total_vendido': float(total_vendido),
             'utilidad_total': float(utilidad_total),
             'margen_porcentaje': round(margen_porcentaje, 2),
             'cantidad_ventas': cantidad_ventas,
+            'ticket_promedio': round(ticket_promedio, 2),
             'costo_total': float(costo_total),
             'top_productos': top_productos,
             'baja_rotacion': baja_rotacion,
-            'audit_cajas': audit_cajas,
             'fechas_chart': list(ventas_time.keys()),
             'totales_chart': list(ventas_time.values()),
-            'metodos_pago_chart': [m['metodo_pago'] for m in metodos],
-            'totales_metodos_chart': [m['total'] for m in metodos],
+            'metodos_pago_chart': [m['metodo_pago'] or 'Efectivo' for m in metodos],
+            'totales_metodos_chart': [float(m['monto'] or 0) for m in metodos],
+            'categorias_chart': [c['producto__categoria__nombre'] or 'Sin Categoría' for c in cat_stats],
+            'totales_categorias_chart': [float(c['monto'] or 0) for c in cat_stats],
+            'cajeros_stats': [
+                {
+                    'nombre': f"{c['usuario__first_name'] or ''} {c['usuario__last_name'] or ''}".strip() or c['usuario__username'],
+                    'monto': float(c['total_monto'] or 0),
+                    'ventas': c['num_ventas']
+                } for c in cajeros_stats
+            ]
         }
 
-        cache.set(cache_key, result, 600)  # 10 minutos
+        cache.set(cache_key, result, 600)
         return Response(result)
 
 
@@ -199,10 +238,11 @@ class ExportarReporteExcelView(APIView):
             primero = hoy.replace(day=1)
             fecha_inicio = timezone.make_aware(datetime.combine(primero, datetime.min.time()))
 
-        ventas = Venta.objects.filter(
-            mercado=mercado_admin,
-            fecha_hora__range=(fecha_inicio, fecha_fin),
-        ).order_by('-fecha_hora')
+        mfiltro = {'fecha_hora__range': (fecha_inicio, fecha_fin)}
+        if mercado_admin:
+            mfiltro['mercado'] = mercado_admin
+
+        ventas = Venta.objects.filter(**mfiltro).order_by('-fecha_hora')
 
         data = []
         for v in ventas:
@@ -249,10 +289,11 @@ class ExportarReportePDFView(APIView):
             primero = hoy.replace(day=1)
             fecha_inicio = timezone.make_aware(datetime.combine(primero, datetime.min.time()))
 
-        ventas = Venta.objects.filter(
-            mercado=mercado_admin,
-            fecha_hora__range=(fecha_inicio, fecha_fin),
-        ).order_by('-fecha_hora')
+        mfiltro = {'fecha_hora__range': (fecha_inicio, fecha_fin)}
+        if mercado_admin:
+            mfiltro['mercado'] = mercado_admin
+
+        ventas = Venta.objects.filter(**mfiltro).order_by('-fecha_hora')
 
         total_ventas = ventas.aggregate(total=Sum('total'))['total'] or 0
 
@@ -315,3 +356,4 @@ class ExportarReportePDFView(APIView):
                 {'error': 'xhtml2pdf no está instalado'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
+

@@ -41,10 +41,16 @@ class CajaViewSet(viewsets.ModelViewSet):
     serializer_class = CajaSerializer
 
     def get_queryset(self):
-        qs = Caja.objects.filter(mercado=self.request.user.mercado)
+        mercado = self.request.user.mercado
+        if mercado is None:
+            qs = Caja.objects.all().select_related('usuario', 'mercado')
+        else:
+            qs = Caja.objects.filter(mercado=mercado).select_related('usuario', 'mercado')
+
         if self.request.user.rol == 'VENDEDOR' and not self.request.user.is_superuser:
             qs = qs.filter(usuario=self.request.user)
         return qs
+
 
     @action(detail=False, methods=['post'])
     def apertura(self, request):
@@ -133,15 +139,40 @@ class VentaViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == 'create':
             return VentaCreateSerializer
+        elif self.action == 'list':
+            from .serializers import VentaListSerializer
+            return VentaListSerializer
         return VentaSerializer
 
     def get_queryset(self):
-        qs = Venta.objects.filter(mercado=self.request.user.mercado)
+        mercado = self.request.user.mercado
+        if mercado is None:
+            qs = Venta.objects.all()
+        else:
+            qs = Venta.objects.filter(mercado=mercado)
+
         if self.request.user.rol == 'VENDEDOR' and not self.request.user.is_superuser:
             qs = qs.filter(usuario=self.request.user)
-        return qs.prefetch_related('detalles__producto', 'cliente', 'usuario', 'caja')
+
+        qs = qs.select_related('cliente', 'usuario', 'mercado')
+        if self.action != 'list':
+            qs = qs.select_related('caja').prefetch_related('detalles__producto')
+        return qs
+
+
 
     def list(self, request, *args, **kwargs):
+        from django.core.cache import cache
+        from inventario.utils import get_mercado_cache_version
+
+        mercado_id = request.user.mercado_id
+        version = get_mercado_cache_version(mercado_id)
+        params_str = "_".join([f"{k}:{v}" for k, v in sorted(request.query_params.items())])
+        cache_key = f"ventas_mercado_{mercado_id}_v{version}_{params_str}"
+        cached_data = cache.get(cache_key)
+        if cached_data:
+            return Response(cached_data)
+
         qs = self.filter_queryset(self.get_queryset())
 
         fecha_inicio = request.query_params.get('fecha_inicio')
@@ -160,31 +191,38 @@ class VentaViewSet(viewsets.ModelViewSet):
             end = timezone.make_aware(datetime.combine(d, datetime.max.time()))
             qs = qs.filter(fecha_hora__lte=end)
         if metodo_pago:
-            qs = qs.filter(metodo_pago=metodo_pago)
+            qs = qs.filter(metodo_pago__iexact=metodo_pago)
         if tipo_comprobante:
-            qs = qs.filter(tipo_comprobante=tipo_comprobante)
+            qs = qs.filter(tipo_comprobante__iexact=tipo_comprobante)
         if estado:
-            qs = qs.filter(estado=estado)
+            qs = qs.filter(estado__iexact=estado)
         if q:
-            if q.isdigit():
-                qs = qs.filter(id=q)
-            else:
-                qs = qs.filter(
-                    Q(detalles__producto__nombre__icontains=q) |
-                    Q(usuario__username__icontains=q) |
-                    Q(cliente__nombre__icontains=q) |
-                    Q(num_operacion__icontains=q) |
-                    Q(serie__icontains=q)
-                ).distinct()
+            q_clean = q.strip()
+            q_filter = (
+                Q(detalles__producto__nombre__icontains=q_clean) |
+                Q(usuario__username__icontains=q_clean) |
+                Q(cliente__nombre__icontains=q_clean) |
+                Q(cliente__num_documento__icontains=q_clean) |
+                Q(num_operacion__icontains=q_clean) |
+                Q(serie__icontains=q_clean)
+            )
+            if q_clean.isdigit():
+                q_filter |= Q(id=int(q_clean)) | Q(numero=int(q_clean))
+            qs = qs.filter(q_filter).distinct()
+
 
         qs = qs.order_by('-fecha_hora')
 
         page = self.paginate_queryset(qs)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
+            res_obj = self.get_paginated_response(serializer.data).data
+            cache.set(cache_key, res_obj, 600)
+            return Response(res_obj)
         serializer = self.get_serializer(qs, many=True)
+        cache.set(cache_key, serializer.data, 600)
         return Response(serializer.data)
+
 
     def create(self, request, *args, **kwargs):
         serializer = VentaCreateSerializer(data=request.data)
@@ -310,9 +348,10 @@ class VentaViewSet(viewsets.ModelViewSet):
                         tipo_movimiento='SALIDA', cantidad=cantidad,
                         saldo_anterior=saldo_anterior, saldo_nuevo=producto.stock,
                         ref_tipo='Venta', ref_id=venta.id,
-                        ref_detalle=f'Venta #{venta.id}',
+                        ref_detalle=f'{venta.tipo_comprobante} {venta.serie}-{venta.numero:06d}',
                         usuario=request.user,
                     )
+
 
                     costo_total += costo_unitario * cantidad
 
@@ -332,8 +371,12 @@ class VentaViewSet(viewsets.ModelViewSet):
         except Exception as e:
             return Response({'error': f'Error al procesar la venta: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+        from inventario.utils import invalidate_mercado_cache
+        invalidate_mercado_cache(request.user.mercado_id)
+
         result = VentaSerializer(venta)
         return Response(result.data, status=status.HTTP_201_CREATED)
+
 
     @action(detail=True, methods=['post'])
     def anular(self, request, pk=None):

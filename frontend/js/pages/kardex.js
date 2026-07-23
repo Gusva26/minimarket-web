@@ -48,7 +48,7 @@ const KardexPage = {
                 <th class="text-end">Saldo Anterior</th>
                 <th class="text-end">Saldo Nuevo</th>
                 <th>Usuario</th>
-                <th class="text-end">Referencia</th>
+                <th class="text-end">Documento / Origen del Movimiento</th>
               </tr>
             </thead>
             <tbody id="tbodyKardex">
@@ -64,6 +64,7 @@ const KardexPage = {
     await this.cargarProductos();
     await this.cargarKardex();
   },
+
 
   bindEvents: function () {
     const inputProducto = document.getElementById('filtroProducto');
@@ -184,6 +185,54 @@ const KardexPage = {
     `;
   },
 
+  renderReferencia: function (m) {
+    const refTipo = (m.referencia_tipo || '').toLowerCase();
+    const refId = m.referencia_id ? `#${m.referencia_id}` : '';
+    let detalle = m.referencia_detalle || '';
+
+    let icon = 'fa-file-alt';
+    let badgeStyle = 'background-color:#64748b; color:#ffffff;';
+    let label = m.referencia_tipo || 'Movimiento';
+
+    if (refTipo.includes('inicial') || refTipo.includes('carga')) {
+      icon = 'fa-boxes-stacked';
+      badgeStyle = 'background-color:#475569; color:#ffffff;';
+      label = 'Inventario Inicial';
+    } else if (refTipo === 'venta' || refTipo.startsWith('venta') || refTipo.includes('pos')) {
+      icon = 'fa-receipt';
+      badgeStyle = 'background-color:#10b981; color:#ffffff;';
+      label = 'Venta POS';
+    } else if (refTipo.includes('compra')) {
+      icon = 'fa-truck';
+      badgeStyle = 'background-color:#3b82f6; color:#ffffff;';
+      label = 'Compra Proveedor';
+    } else if (refTipo.includes('transferencia')) {
+      icon = 'fa-right-left';
+      badgeStyle = 'background-color:#0284c7; color:#ffffff;';
+      label = 'Transferencia';
+    } else if (refTipo.includes('ajuste') || refTipo.includes('merma')) {
+      icon = 'fa-triangle-exclamation';
+      badgeStyle = 'background-color:#f59e0b; color:#000000;';
+      label = 'Ajuste / Merma';
+    }
+
+
+    // Si el detalle repite "Venta #1" o "Venta POS", lo omitimos para evitar redundancia
+    if (detalle.toLowerCase() === `venta #${m.referencia_id}` || detalle.toLowerCase() === 'venta pos' || detalle.toLowerCase() === 'venta') {
+      detalle = '';
+    }
+
+    return `
+      <div style="line-height:1.4">
+        <span class="badge" style="${badgeStyle} font-size:0.82rem; font-weight:700; padding:6px 10px; display:inline-block; letter-spacing:0.02em">
+          <i class="fas ${icon} me-1"></i>${label} ${refId}
+        </span>
+        ${detalle ? `<div style="font-size:0.88rem; font-weight:600; color:var(--text-main, #0f172a); margin-top:5px; opacity:0.95">${Utils.escapeHtml(detalle)}</div>` : ''}
+      </div>
+    `;
+  },
+
+
   renderMovimientos: function (movimientos) {
     const tbody = document.getElementById('tbodyKardex');
     if (!movimientos.length) {
@@ -192,30 +241,33 @@ const KardexPage = {
     }
 
     const tipoBadge = {
-      ENTRADA: '<span class="badge badge-success"><i class="fas fa-plus-circle"></i>Entrada</span>',
-      SALIDA: '<span class="badge badge-danger"><i class="fas fa-minus-circle"></i>Salida</span>',
-      AJUSTE_POSITIVO: '<span class="badge badge-info"><i class="fas fa-plus-square"></i>Ajuste +</span>',
-      AJUSTE_NEGATIVO: '<span class="badge badge-warning"><i class="fas fa-minus-square"></i>Ajuste -</span>',
+      ENTRADA: '<span class="badge badge-success"><i class="fas fa-plus-circle me-1"></i>Entrada</span>',
+      SALIDA: '<span class="badge badge-danger"><i class="fas fa-minus-circle me-1"></i>Salida</span>',
+      AJUSTE_POSITIVO: '<span class="badge badge-info"><i class="fas fa-plus-square me-1"></i>Ajuste +</span>',
+      AJUSTE_NEGATIVO: '<span class="badge badge-warning"><i class="fas fa-minus-square me-1"></i>Ajuste -</span>',
+      ENTRADA_TRANSFERENCIA: '<span class="badge badge-info"><i class="fas fa-arrow-down me-1"></i>Entrada Transf.</span>',
+      SALIDA_TRANSFERENCIA: '<span class="badge badge-warning"><i class="fas fa-arrow-up me-1"></i>Salida Transf.</span>',
     };
 
     tbody.innerHTML = movimientos.map(m => {
       const saldoCls = m.saldo_nuevo > m.saldo_anterior ? 'kpi-success' : m.saldo_nuevo < m.saldo_anterior ? 'kpi-danger' : '';
       const userDisplayName = m.usuario?.get_full_name || m.usuario?.username || 'N/A';
       return `<tr>
-        <td data-label="Fecha"><small style="color:var(--text-muted)">${Utils.formatDateTime(m.fecha)}</small></td>
-        <td data-label="Producto">
-          <div style="font-weight:600">${Utils.escapeHtml(m.producto?.nombre || '---')}</div>
-          <small style="color:var(--text-muted)">ID: #${m.producto?.id || ''}</small>
+        <td data-label="Fecha" class="align-middle"><small style="color:var(--text-muted); font-size:0.82rem; font-weight:500">${Utils.formatDateTime(m.fecha)}</small></td>
+        <td data-label="Producto" class="align-middle">
+          <div style="font-weight:700; font-size:0.9rem; color:var(--text-main, #0f172a)">${Utils.escapeHtml(m.producto?.nombre || '---')}</div>
+          <small style="color:var(--text-muted); font-size:0.78rem">ID: #${m.producto?.id || ''}</small>
         </td>
-        <td data-label="Tipo">${tipoBadge[m.tipo_movimiento] || `<span class="badge">${Utils.escapeHtml(m.tipo_movimiento)}</span>`}</td>
-        <td data-label="Cantidad" class="text-end fw-bold">${m.cantidad}</td>
-        <td data-label="Saldo Anterior" class="text-end" style="color:var(--text-muted)">${m.saldo_anterior}</td>
-        <td data-label="Saldo Nuevo" class="text-end fw-bold" style="color:${saldoCls === 'kpi-success' ? 'var(--success)' : saldoCls === 'kpi-danger' ? 'var(--danger)' : 'var(--text)'}">${m.saldo_nuevo}</td>
-        <td data-label="Usuario"><small>${Utils.escapeHtml(userDisplayName)}</small></td>
-        <td data-label="Referencia" class="text-end"><small style="color:var(--text-muted)">${Utils.escapeHtml(m.referencia_tipo || '')} ${m.referencia_id ? '#' + m.referencia_id : ''}</small></td>
+        <td data-label="Tipo" class="align-middle">${tipoBadge[m.tipo_movimiento] || `<span class="badge">${Utils.escapeHtml(m.tipo_movimiento)}</span>`}</td>
+        <td data-label="Cantidad" class="text-end fw-bold align-middle" style="font-size:0.92rem">${m.cantidad}</td>
+        <td data-label="Saldo Anterior" class="text-end align-middle" style="color:var(--text-muted); font-weight:500">${m.saldo_anterior}</td>
+        <td data-label="Saldo Nuevo" class="text-end fw-bold align-middle" style="font-size:0.95rem; color:${saldoCls === 'kpi-success' ? 'var(--success)' : saldoCls === 'kpi-danger' ? 'var(--danger)' : 'var(--text)'}">${m.saldo_nuevo}</td>
+        <td data-label="Usuario" class="align-middle"><span style="font-size:0.85rem; font-weight:600">${Utils.escapeHtml(userDisplayName)}</span></td>
+        <td data-label="Documento / Origen" class="align-middle text-end">${this.renderReferencia(m)}</td>
       </tr>`;
     }).join('');
   },
+
 
   exportarExcel: function () {
     const table = document.querySelector('.table-container table');

@@ -4,7 +4,9 @@ from decimal import Decimal
 
 import pandas as pd
 from django.db import transaction
-from django.db.models import Count, F, Sum, Q
+from django.db.models import Count, F, Sum, Q, ExpressionWrapper, DecimalField, Case, When, Value, IntegerField
+
+
 from django.utils import timezone
 from django.core.cache import cache
 from rest_framework import status, viewsets, generics
@@ -26,8 +28,9 @@ from .models import (
 from .serializers import (
     CategoriaSerializer, KardexSerializer, UnidadProductoSerializer,
     MercadoSerializer, ProductoCreateUpdateSerializer, ProductoSerializer,
-    TransferenciaSerializer,
+    TransferenciaSerializer, TransferenciaListSerializer,
 )
+
 
 from .utils import (
     descontar_stock_fefo, devolver_stock_a_unidades, crear_kardex,
@@ -39,24 +42,41 @@ class ProductoViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, IsAdminOrReadOnly]
     search_fields = ['nombre', 'codigo_barras']
     ordering_fields = ['nombre', 'precio', 'stock']
-    ordering = ['nombre']
 
     def get_queryset(self):
-        qs = Producto.objects.filter(mercado=self.request.user.mercado).select_related('categoria', 'mercado')
+        mercado = self.request.user.mercado
+        if mercado is None:
+            qs = Producto.objects.all().select_related('categoria', 'mercado')
+        else:
+            qs = Producto.objects.filter(mercado=mercado).select_related('categoria', 'mercado')
 
         categoria = self.request.query_params.get('categoria')
         if categoria:
             qs = qs.filter(categoria_id=categoria)
 
+        qs = qs.annotate(
+            stock_priority=Case(
+                When(stock=0, then=Value(1)),
+                When(stock__lt=F('stock_minimo'), then=Value(2)),
+                default=Value(3),
+                output_field=IntegerField()
+            )
+        )
+
         stock_status = self.request.query_params.get('stock_status')
         if stock_status == 'bajo':
-            qs = qs.filter(stock__gt=0, stock__lt=F('stock_minimo'))
+            qs = qs.filter(stock__gt=0, stock__lt=F('stock_minimo')).order_by('stock', 'nombre')
         elif stock_status == 'sin_stock':
-            qs = qs.filter(stock=0)
+            qs = qs.filter(stock=0).order_by('nombre')
         elif stock_status == 'normal':
-            qs = qs.filter(stock__gte=F('stock_minimo'))
+            qs = qs.filter(stock__gte=F('stock_minimo')).order_by('nombre')
+        else:
+            qs = qs.order_by('stock_priority', 'nombre')
 
         return qs
+
+
+
 
     def get_serializer_class(self):
         if self.action in ('create', 'update', 'partial_update'):
@@ -274,7 +294,12 @@ class CategoriaViewSet(viewsets.ModelViewSet):
     search_fields = ['nombre']
 
     def get_queryset(self):
-        return Categoria.objects.filter(mercado=self.request.user.mercado).annotate(
+        mercado = self.request.user.mercado
+        if mercado is None:
+            qs = Categoria.objects.all().select_related('mercado')
+        else:
+            qs = Categoria.objects.filter(mercado=mercado).select_related('mercado')
+        return qs.annotate(
             cantidad_productos=Count('producto')
         )
 
@@ -311,13 +336,19 @@ class KardexListView(generics.ListAPIView):
     serializer_class = KardexSerializer
 
     def get_queryset(self):
-        qs = Kardex.objects.filter(mercado=self.request.user.mercado)
+        mercado = self.request.user.mercado
+        if mercado is None:
+            qs = Kardex.objects.all().select_related('producto', 'usuario', 'mercado')
+        else:
+            qs = Kardex.objects.filter(mercado=mercado).select_related('producto', 'usuario', 'mercado')
+
         producto_id = self.request.query_params.get('producto_id')
         fecha_desde = self.request.query_params.get('fecha_desde')
         fecha_hasta = self.request.query_params.get('fecha_hasta')
 
         if producto_id:
             qs = qs.filter(producto_id=producto_id)
+
         if fecha_desde:
             qs = qs.filter(fecha__gte=fecha_desde)
         if fecha_hasta:
@@ -379,10 +410,11 @@ class ValoracionInventarioView(APIView):
         mercado = request.user.mercado
         mercado_id = mercado.id if mercado else None
         page_number = request.query_params.get('page', 1)
-        page_size = int(request.query_params.get('page_size', 25))
+        page_size = int(request.query_params.get('page_size', 10))
         version = get_mercado_cache_version(mercado_id)
         cache_key = f"valoracion_mercado_{mercado_id}_v{version}_page{page_number}_ps{page_size}"
-        use_cache = page_size == 25
+        use_cache = page_size == 10
+
 
         if use_cache:
             cached_data = cache.get(cache_key)
@@ -396,8 +428,10 @@ class ValoracionInventarioView(APIView):
             productos_qs = productos_qs.filter(mercado=mercado)
         
         productos_qs = productos_qs.annotate(
-            valor_total=F('stock') * F('costo'),
-        ).order_by('-valor_total')
+            valor_costo=ExpressionWrapper(F('stock') * F('costo'), output_field=DecimalField()),
+            valor_venta=ExpressionWrapper(F('stock') * F('precio'), output_field=DecimalField()),
+            utilidad_proyectada=ExpressionWrapper(F('stock') * (F('precio') - F('costo')), output_field=DecimalField()),
+        ).order_by('-valor_costo')
 
         from django.core.paginator import Paginator
         paginator = Paginator(productos_qs, page_size)
@@ -410,7 +444,10 @@ class ValoracionInventarioView(APIView):
                 'nombre': p.nombre,
                 'stock': str(p.stock),
                 'costo': str(p.costo),
-                'valor_total': str(p.valor_total),
+                'precio': str(p.precio),
+                'valor_total': str(p.valor_costo),
+                'valor_venta': str(p.valor_venta),
+                'utilidad_proyectada': str(p.utilidad_proyectada),
                 'categoria': {'nombre': p.categoria.nombre} if p.categoria else None,
             })
 
@@ -422,9 +459,10 @@ class ValoracionInventarioView(APIView):
         categorias_valor = categorias_valor.filter(valor_categoria__gt=0).order_by('-valor_categoria')
 
         cat_ids = [c.id for c in categorias_valor]
-        items_counts = Producto.objects.filter(
-            categoria_id__in=cat_ids, mercado=mercado, stock__gt=0
-        ).values('categoria_id').annotate(cnt=Count('id'))
+        mfilter_p = {'categoria_id__in': cat_ids, 'stock__gt': 0}
+        if mercado:
+            mfilter_p['mercado'] = mercado
+        items_counts = Producto.objects.filter(**mfilter_p).values('categoria_id').annotate(cnt=Count('id'))
         items_map = {i['categoria_id']: i['cnt'] for i in items_counts}
 
         categorias_data = []
@@ -437,26 +475,43 @@ class ValoracionInventarioView(APIView):
             })
 
         totales = productos_qs.aggregate(
-            gran_total=Sum(F('stock') * F('costo')),
+            gran_total_costo=Sum('valor_costo'),
+            gran_total_venta=Sum('valor_venta'),
+            utilidad_potencial=Sum('utilidad_proyectada'),
             total_unidades=Sum('stock'),
         )
+
+        costo_t = totales['gran_total_costo'] or Decimal('0.00')
+        venta_t = totales['gran_total_venta'] or Decimal('0.00')
+        util_t = totales['utilidad_potencial'] or Decimal('0.00')
+        margen_p = float((util_t / venta_t) * 100) if venta_t > 0 else 0.0
 
         response_data = {
             'productos': productos_data,
             'pagination': {
                 'count': paginator.count,
+                'total_pages': paginator.num_pages,
                 'num_pages': paginator.num_pages,
                 'current_page': page_obj.number,
                 'has_next': page_obj.has_next(),
                 'has_previous': page_obj.has_previous(),
+                'next': page_obj.has_next(),
+                'previous': page_obj.has_previous(),
+                'page_size': page_size,
             },
+
             'categorias_valor': categorias_data,
-            'gran_total': str(totales['gran_total'] or 0),
+            'gran_total': str(costo_t),
+            'gran_total_costo': str(costo_t),
+            'gran_total_venta': str(venta_t),
+            'utilidad_potencial': str(util_t),
+            'margen_potencial_porcentaje': round(margen_p, 2),
             'total_unidades': str(totales['total_unidades'] or 0),
         }
         
         if use_cache:
-            cache.set(cache_key, response_data, 600) # 10 min
+            cache.set(cache_key, response_data, 600)
+
         return Response(response_data)
 
 
@@ -583,15 +638,25 @@ class ReporteVencimientosView(APIView):
 
 class TransferenciaViewSet(viewsets.GenericViewSet):
     permission_classes = [IsAuthenticated]
-    serializer_class = TransferenciaSerializer
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return TransferenciaListSerializer
+        return TransferenciaSerializer
 
     def get_queryset(self):
         usuario = self.request.user
-        if not usuario.mercado:
-            return Transferencia.objects.none()
-        qs = Transferencia.objects.filter(
-            Q(mercado_origen=usuario.mercado) | Q(mercado_destino=usuario.mercado),
-        )
+        if usuario.mercado is None:
+            qs = Transferencia.objects.all()
+        else:
+            qs = Transferencia.objects.filter(
+                Q(mercado_origen=usuario.mercado) | Q(mercado_destino=usuario.mercado),
+            )
+
+        qs = qs.select_related('mercado_origen', 'mercado_destino', 'usuario_envio', 'usuario_recepcion')
+        if self.action != 'list':
+            qs = qs.prefetch_related('detalles__producto_origen__categoria', 'detalles__producto_destino__categoria')
+
 
         estado = self.request.query_params.get('estado')
         q = self.request.query_params.get('q')
@@ -608,13 +673,27 @@ class TransferenciaViewSet(viewsets.GenericViewSet):
         return qs.order_by('-fecha_envio')
 
     def list(self, request):
+        mercado_id = request.user.mercado_id
+        version = get_mercado_cache_version(mercado_id)
+        params_str = "_".join([f"{k}:{v}" for k, v in sorted(request.query_params.items())])
+        cache_key = f"transferencias_mercado_{mercado_id}_v{version}_{params_str}"
+
+        cached_data = cache.get(cache_key)
+        if cached_data:
+            return Response(cached_data)
+
         queryset = self.filter_queryset(self.get_queryset())
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
+            res_data = self.get_paginated_response(serializer.data).data
+            cache.set(cache_key, res_data, 300)
+            return Response(res_data)
         serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+        res_data = serializer.data
+        cache.set(cache_key, res_data, 300)
+        return Response(res_data)
+
 
     def retrieve(self, request, pk=None):
         transferencia = self.get_object()

@@ -96,10 +96,11 @@ const ComprobantePage = {
 
             <div style="display:flex;gap:8px;flex-wrap:wrap" class="no-print">
               ${venta.estado === 'COMPLETADA'
-                ? `<button onclick="window.print()" class="btn btn-primary" style="flex:1;padding:0.85rem"><i class="fas fa-print me-2"></i>Imprimir Comprobante</button>`
+                ? `<button id="btnImprimirComprobante" class="btn btn-primary" style="flex:1;padding:0.85rem"><i class="fas fa-print me-2"></i>Imprimir Comprobante</button>`
                 : `<button class="btn btn-danger" style="flex:1;padding:0.85rem" disabled><i class="fas fa-ban me-2"></i>VENTA ANULADA</button>`}
               <a href="#/ventas-historial" class="btn btn-ghost" style="padding:0.85rem 1.5rem"><i class="fas fa-arrow-left me-2"></i>Regresar</a>
             </div>
+
           </div>
         </div>
       </div>
@@ -152,5 +153,13 @@ const ComprobantePage = {
       tbody.innerHTML = html;
       printTbody.innerHTML = printHtml;
     }
+
+    const btnImp = document.getElementById('btnImprimirComprobante');
+    if (btnImp) {
+      btnImp.addEventListener('click', () => {
+        Utils.imprimirComprobante(venta);
+      });
+    }
   }
 };
+

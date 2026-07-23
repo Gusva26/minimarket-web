@@ -3,9 +3,23 @@ const API = {
     ? `http://${window.location.hostname}:8000/api/`
     : 'https://minimarket-backend-t8ai.onrender.com/api/',
 
+  _cacheMap: new Map(),
+
+  clearCache() {
+    this._cacheMap.clear();
+  },
+
   async getToken() { return null; },
 
   async request(method, endpoint, data = null, isFormData = false, rawResponse = false) {
+    // Clear cache on any data modification
+    if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method.toUpperCase())) {
+      this.clearCache();
+    }
+
+    // Direct live request to backend (Backend manages versioned caching)
+
+
     const config = {
       method,
       headers: !isFormData && data ? {'Content-Type': 'application/json'} : {},
@@ -54,6 +68,15 @@ const API = {
         }
         throw new Error(JSON.stringify(json));
       }
+
+      // Save to memory cache for GET requests
+      if (method.toUpperCase() === 'GET') {
+        this._cacheMap.set(endpoint, {
+          timestamp: Date.now(),
+          data: json
+        });
+      }
+
       return json;
     }
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -67,3 +90,4 @@ const API = {
   delete: (e, r) => API.request('DELETE', e, null, false, r),
   upload: (e, d) => API.request('POST', e, d, true),
 };
+

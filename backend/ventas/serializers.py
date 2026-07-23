@@ -90,6 +90,20 @@ class VentaSerializer(serializers.ModelSerializer):
         return obj.utilidad
 
 
+class VentaListSerializer(serializers.ModelSerializer):
+    cliente = ClienteSimpleSerializer(read_only=True, allow_null=True)
+    usuario = UsuarioSimpleSerializer(read_only=True, allow_null=True)
+    utilidad = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Venta
+        fields = ['id', 'usuario', 'cliente', 'fecha_hora', 'tipo_comprobante', 'serie', 'numero', 'subtotal', 'igv', 'total', 'descuento', 'costo_total', 'utilidad', 'metodo_pago', 'monto_recibido', 'vuelto', 'num_operacion', 'estado', 'mercado']
+
+    def get_utilidad(self, obj):
+        return obj.utilidad
+
+
+
 class ItemVentaSerializer(serializers.Serializer):
     producto_id = serializers.IntegerField()
     cantidad = serializers.DecimalField(max_digits=10, decimal_places=2)

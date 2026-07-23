@@ -16,3 +16,52 @@
   position: relative;
   z-index: 1;
 }
+
+.topbar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: var(--radius, 12px);
+  padding: 0.6rem 1.25rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.topbar-branch-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-body, #f8fafc);
+  padding: 4px 10px;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--border-color, #e2e8f0);
+}
+
+.branch-icon-header {
+  color: var(--primary, #3b82f6);
+  font-size: 0.95rem;
+}
+
+.topbar-branch-select {
+  border: none;
+  background: transparent;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--text-main, #1e293b);
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.topbar-branch-select:focus {
+  box-shadow: none;
+  background: transparent;
+}
+
