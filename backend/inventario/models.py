@@ -5,6 +5,8 @@ from django.db import models
 from django.utils import timezone
 from django.core.files.base import ContentFile
 from io import BytesIO
+import base64
+
 
 
 logger = logging.getLogger(__name__)
@@ -49,6 +51,7 @@ class Producto(models.Model):
     unidad_medida = models.CharField(max_length=10, choices=UNIDADES_MEDIDA, default='UND')
     codigo_barras = models.CharField(max_length=50, blank=True, null=True, db_index=True, help_text='Código de barras para identificación rápida.')
     imagen = models.ImageField(upload_to='productos/', null=True, blank=True)
+    imagen_base64 = models.TextField(null=True, blank=True, help_text='Data URI Base64 persistente para almacenamiento en nube / BD.')
     mercado = models.ForeignKey(Mercado, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
@@ -60,37 +63,26 @@ class Producto(models.Model):
     def save(self, *args, **kwargs):
         if self.imagen:
             try:
-                img = Image.open(self.imagen)
-                original_mode = img.mode
-                if img.mode != 'RGBA':
-                    img = img.convert('RGBA')
-                
-                # Resize if larger than 500x500
-                max_size = (500, 500)
-                if img.width > 500 or img.height > 500:
-                    img.thumbnail(max_size, Image.LANCZOS)
-                
-                # Remove background with rembg (optional)
-                try:
-                    from rembg import remove
-                    img = remove(img)
-                except ImportError:
-                    pass
-                except Exception as e:
-                    logger.warning(f"rembg falló, usando imagen original: {e}")
-                
-                # Save as PNG (preserves transparency)
-                output = BytesIO()
-                img.save(output, format='PNG', optimize=True)
-                output.seek(0)
-                
-                # New name with .png extension
-                name = os.path.splitext(self.imagen.name)[0] + '.png'
-                self.imagen = ContentFile(output.read(), name=name)
+                # Comprobar si es un archivo recién subido (tiene atributo file)
+                if hasattr(self.imagen, 'file') and not isinstance(self.imagen.file, str):
+                    img = Image.open(self.imagen.file)
+                    if img.mode != 'RGBA':
+                        img = img.convert('RGBA')
+                    
+                    # Redimensionar a máximo 400x400 para optimización Base64
+                    max_size = (400, 400)
+                    if img.width > 400 or img.height > 400:
+                        img.thumbnail(max_size, Image.LANCZOS)
+                    
+                    output = BytesIO()
+                    img.save(output, format='PNG', optimize=True)
+                    b64_data = base64.b64encode(output.getvalue()).decode('utf-8')
+                    self.imagen_base64 = f"data:image/png;base64,{b64_data}"
             except Exception as e:
-                logger.error(f"Error procesando imagen: {e}", exc_info=True)
-                
+                logger.warning(f"No se pudo convertir la imagen a Base64: {e}")
+
         super().save(*args, **kwargs)
+
 
 class Kardex(models.Model):
     TIPO_MOVIMIENTO_CHOICES = (

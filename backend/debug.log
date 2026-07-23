@@ -853,3 +853,57 @@ Traceback (most recent call last):
   File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\files\storage\filesystem.py", line 68, in _open
     return File(open(self.path(name), mode))
 FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\Gusva\\Desktop\\migrar BD MINI\\minimarket-web\\media\\productos\\png-clipart-lighter-bic-promotional-merchandise-color-lighter-blue-white-thumb_7axDhvC.png'
+ERROR 2026-07-23 16:25:55,663 models 20264 18964 Error procesando imagen: [Errno 2] No such file or directory: 'C:\\Users\\Gusva\\Desktop\\migrar BD MINI\\minimarket-web\\media\\productos\\png-clipart-lighter-bic-promotional-merchandise-color-lighter-blue-white-thumb_7axDhvC.png'
+Traceback (most recent call last):
+  File "C:\Users\Gusva\Desktop\migrar BD MINI\minimarket-web\backend\inventario\models.py", line 63, in save
+    img = Image.open(self.imagen)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\PIL\Image.py", line 3281, in open
+    fp.seek(0)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\files\utils.py", line 46, in <lambda>
+    seek = property(lambda self: self.file.seek)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\fields\files.py", line 48, in _get_file
+    self._file = self.storage.open(self.name, "rb")
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\files\storage\base.py", line 22, in open
+    return self._open(name, mode)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\files\storage\filesystem.py", line 68, in _open
+    return File(open(self.path(name), mode))
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\Gusva\\Desktop\\migrar BD MINI\\minimarket-web\\media\\productos\\png-clipart-lighter-bic-promotional-merchandise-color-lighter-blue-white-thumb_7axDhvC.png'
+ERROR 2026-07-23 16:26:11,246 models 20884 24548 Error procesando imagen: [Errno 2] No such file or directory: 'C:\\Users\\Gusva\\Desktop\\migrar BD MINI\\minimarket-web\\media\\productos\\png-clipart-lighter-bic-promotional-merchandise-color-lighter-blue-white-thumb_7axDhvC.png'
+Traceback (most recent call last):
+  File "C:\Users\Gusva\Desktop\migrar BD MINI\minimarket-web\backend\inventario\models.py", line 63, in save
+    img = Image.open(self.imagen)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\PIL\Image.py", line 3281, in open
+    fp.seek(0)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\files\utils.py", line 46, in <lambda>
+    seek = property(lambda self: self.file.seek)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\fields\files.py", line 48, in _get_file
+    self._file = self.storage.open(self.name, "rb")
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\files\storage\base.py", line 22, in open
+    return self._open(name, mode)
+  File "C:\Users\Gusva\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\files\storage\filesystem.py", line 68, in _open
+    return File(open(self.path(name), mode))
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\Gusva\\Desktop\\migrar BD MINI\\minimarket-web\\media\\productos\\png-clipart-lighter-bic-promotional-merchandise-color-lighter-blue-white-thumb_7axDhvC.png'
+WARNING 2026-07-23 16:29:39,411 log 24172 17312 Not Found: /media/productos/png-clipart-lighter-bic-promotional-merchandise-color-lighter-blue-white-thumb_7axDhvC.png
+WARNING 2026-07-23 16:29:39,412 log 24172 2120 Not Found: /media/productos/images_2_shCaq0U.png
+WARNING 2026-07-23 16:29:39,413 basehttp 24172 17312 "GET /media/productos/png-clipart-lighter-bic-promotional-merchandise-color-lighter-blue-white-thumb_7axDhvC.png HTTP/1.1" 404 2937
+WARNING 2026-07-23 16:29:39,413 basehttp 24172 2120 "GET /media/productos/images_2_shCaq0U.png HTTP/1.1" 404 2657
+WARNING 2026-07-23 16:29:39,667 log 24172 24604 Not Found: /media/productos/png-clipart-lighter-bic-promotional-merchandise-color-lighter-blue-white-thumb_7axDhvC.png
+WARNING 2026-07-23 16:29:39,668 log 24172 20892 Not Found: /media/productos/images_2_shCaq0U.png
+WARNING 2026-07-23 16:29:39,669 basehttp 24172 24604 "GET /media/productos/png-clipart-lighter-bic-promotional-merchandise-color-lighter-blue-white-thumb_7axDhvC.png HTTP/1.1" 404 2937
+WARNING 2026-07-23 16:29:39,669 basehttp 24172 20892 "GET /media/productos/images_2_shCaq0U.png HTTP/1.1" 404 2657
+WARNING 2026-07-23 16:29:39,902 log 24172 4060 Not Found: /media/productos/images_2_shCaq0U.png
+WARNING 2026-07-23 16:29:39,903 log 24172 10572 Not Found: /media/productos/png-clipart-lighter-bic-promotional-merchandise-color-lighter-blue-white-thumb_7axDhvC.png
+WARNING 2026-07-23 16:29:39,903 basehttp 24172 10572 "GET /media/productos/png-clipart-lighter-bic-promotional-merchandise-color-lighter-blue-white-thumb_7axDhvC.png HTTP/1.1" 404 2937
+WARNING 2026-07-23 16:29:39,903 basehttp 24172 4060 "GET /media/productos/images_2_shCaq0U.png HTTP/1.1" 404 2657
+WARNING 2026-07-23 16:29:43,096 log 24172 24484 Not Found: /media/productos/images_2_shCaq0U.png
+WARNING 2026-07-23 16:29:43,097 log 24172 11904 Not Found: /media/productos/png-clipart-lighter-bic-promotional-merchandise-color-lighter-blue-white-thumb_7axDhvC.png
+WARNING 2026-07-23 16:29:43,099 basehttp 24172 24484 "GET /media/productos/images_2_shCaq0U.png HTTP/1.1" 404 2657
+WARNING 2026-07-23 16:29:43,099 basehttp 24172 11904 "GET /media/productos/png-clipart-lighter-bic-promotional-merchandise-color-lighter-blue-white-thumb_7axDhvC.png HTTP/1.1" 404 2937
+WARNING 2026-07-23 16:29:43,367 log 24172 1680 Not Found: /media/productos/png-clipart-lighter-bic-promotional-merchandise-color-lighter-blue-white-thumb_7axDhvC.png
+WARNING 2026-07-23 16:29:43,368 log 24172 25420 Not Found: /media/productos/images_2_shCaq0U.png
+WARNING 2026-07-23 16:29:43,369 basehttp 24172 1680 "GET /media/productos/png-clipart-lighter-bic-promotional-merchandise-color-lighter-blue-white-thumb_7axDhvC.png HTTP/1.1" 404 2937
+WARNING 2026-07-23 16:29:43,369 basehttp 24172 25420 "GET /media/productos/images_2_shCaq0U.png HTTP/1.1" 404 2657
+WARNING 2026-07-23 16:29:43,621 log 24172 12408 Not Found: /media/productos/png-clipart-lighter-bic-promotional-merchandise-color-lighter-blue-white-thumb_7axDhvC.png
+WARNING 2026-07-23 16:29:43,622 log 24172 1724 Not Found: /media/productos/images_2_shCaq0U.png
+WARNING 2026-07-23 16:29:43,622 basehttp 24172 12408 "GET /media/productos/png-clipart-lighter-bic-promotional-merchandise-color-lighter-blue-white-thumb_7axDhvC.png HTTP/1.1" 404 2937
+WARNING 2026-07-23 16:29:43,624 basehttp 24172 1724 "GET /media/productos/images_2_shCaq0U.png HTTP/1.1" 404 2657

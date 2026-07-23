@@ -51,10 +51,25 @@ class ProductoSimpleSerializer(serializers.ModelSerializer):
 class ProductoSerializer(serializers.ModelSerializer):
     categoria = CategoriaSimpleSerializer(read_only=True)
     tiene_stock_bajo = serializers.BooleanField(read_only=True)
+    imagen = serializers.SerializerMethodField()
 
     class Meta:
         model = Producto
         fields = ['id', 'nombre', 'codigo_barras', 'categoria', 'precio', 'costo', 'stock', 'stock_minimo', 'unidad_medida', 'imagen', 'mercado', 'tiene_stock_bajo']
+
+    def get_imagen(self, obj):
+        if obj.imagen_base64:
+            return obj.imagen_base64
+        if obj.imagen:
+            try:
+                request = self.context.get('request')
+                if request:
+                    return request.build_absolute_uri(obj.imagen.url)
+                return obj.imagen.url
+            except Exception:
+                return None
+        return None
+
 
 
 class ProductoCreateUpdateSerializer(serializers.ModelSerializer):
