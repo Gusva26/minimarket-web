@@ -925,7 +925,10 @@ class MercadoViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         usuario = self.request.user
-        if (usuario.rol == 'ADMIN' or usuario.is_superuser) and self.request.query_params.get('manage') == 'true':
+        rol_upper = str(getattr(usuario, 'rol', '') or '').upper()
+        is_admin_user = (rol_upper in ['ADMIN', 'ADMINISTRADOR'] or usuario.is_staff or usuario.is_superuser)
+
+        if is_admin_user and self.request.query_params.get('manage') == 'true':
             return Mercado.objects.all()
 
         qs = Mercado.objects.filter(activo=True)
@@ -935,7 +938,11 @@ class MercadoViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['post'], url_path='update-global')
     def update_global(self, request):
-        if not (request.user.rol == 'ADMIN' or request.user.is_superuser):
+        usuario = request.user
+        rol_upper = str(getattr(usuario, 'rol', '') or '').upper()
+        is_admin_user = (rol_upper in ['ADMIN', 'ADMINISTRADOR'] or usuario.is_staff or usuario.is_superuser)
+
+        if not is_admin_user:
             return Response({'error': 'No autorizado'}, status=status.HTTP_403_FORBIDDEN)
             
         nombre_negocio = request.data.get('nombre_negocio', '').strip()
@@ -954,11 +961,7 @@ class MercadoViewSet(viewsets.ModelViewSet):
                 elif full_name.startswith("Minimarket "):
                     branch_name = full_name[11:].strip()
                 else:
-                    parts = full_name.split(" ", 1)
-                    if len(parts) > 1:
-                        branch_name = parts[1].strip()
-                    else:
-                        branch_name = ""
+                    branch_name = ""
                         
                 if branch_name:
                     m.nombre = f"{nombre_negocio} - {branch_name}"
@@ -968,8 +971,12 @@ class MercadoViewSet(viewsets.ModelViewSet):
                 m.ruc = ruc
                 m.telefono = telefono
                 m.save()
+
+        from inventario.utils import invalidate_mercado_cache
+        invalidate_mercado_cache(None)
                 
         return Response({'status': 'ok'})
+
 
 
 

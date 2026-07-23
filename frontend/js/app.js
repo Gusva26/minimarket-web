@@ -146,36 +146,41 @@ const App = {
 
   initTheme() {
     const toggle = document.getElementById('themeToggle');
-    if (!toggle) return;
+    const topbarToggle = document.getElementById('topbarThemeToggle');
 
     const saved = localStorage.getItem('theme') || 'light';
     document.documentElement.setAttribute('data-theme', saved);
-    this.updateThemeIcon(toggle, saved);
+    if (toggle) this.updateThemeIcon(toggle, saved);
+    if (topbarToggle) this.updateThemeIcon(topbarToggle, saved);
 
-    toggle.addEventListener('click', () => {
+    const toggleFn = () => {
       const current = document.documentElement.getAttribute('data-theme');
       const next = current === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', next);
       localStorage.setItem('theme', next);
-      this.updateThemeIcon(toggle, next);
-    });
+      if (toggle) this.updateThemeIcon(toggle, next);
+      if (topbarToggle) this.updateThemeIcon(topbarToggle, next);
+    };
+
+    if (toggle) toggle.addEventListener('click', toggleFn);
+    if (topbarToggle) topbarToggle.addEventListener('click', toggleFn);
   },
 
   updateThemeIcon(btn, theme) {
     const icon = btn.querySelector('i');
-    const text = btn.querySelector('span');
+    const span = btn.querySelector('span');
     if (theme === 'dark') {
-      icon.className = 'fas fa-sun';
-      text.textContent = 'Modo Claro';
+      if (icon) icon.className = 'fas fa-sun text-warning';
+      if (span && btn.id === 'themeToggle') span.textContent = 'Modo Claro';
     } else {
-      icon.className = 'fas fa-moon';
-      text.textContent = 'Modo Oscuro';
+      if (icon) icon.className = 'fas fa-moon';
+      if (span && btn.id === 'themeToggle') span.textContent = 'Modo Oscuro';
     }
   },
 
   savePageState() {
     const prev = this.currentPage;
-    if (!prev) return;
+    if (!prev || prev === 'configuracion' || prev.startsWith('login') || prev.startsWith('password')) return;
     const container = document.getElementById('app-content');
     if (!container) return;
     const inputs = container.querySelectorAll('input, select, textarea');
@@ -188,6 +193,7 @@ const App = {
   },
 
   restorePageState(hash) {
+    if (!hash || hash === 'configuracion' || hash.startsWith('login') || hash.startsWith('password')) return;
     try {
       const saved = sessionStorage.getItem(`filters_${hash}`);
       if (!saved) return;
@@ -206,6 +212,7 @@ const App = {
       });
     } catch(e) { /* ignore */ }
   },
+
 
   isPageActive() {
     return this._pageToken;
@@ -303,59 +310,77 @@ const App = {
   },
 
   async initBranchSelector() {
-    const selector = document.getElementById('topbarBranchSelector');
-    const badge = document.getElementById('topbarBranchBadge');
+    const activeNameEl = document.getElementById('topbarBranchActiveName');
+    const menuList = document.getElementById('topbarBranchMenuList');
     const user = Auth.getUser();
-    if (!user || !selector) return;
+    if (!user || !activeNameEl || !menuList) return;
 
-    if (badge) {
-      badge.textContent = user.mercado_nombre || 'Todas las sucursales';
-    }
+    const isAdmin = user.is_admin || user.is_superuser || user.is_staff || (user.rol && user.rol.toLowerCase().includes('admin'));
 
-    if (user.is_admin || user.is_superuser) {
-      selector.disabled = false;
+    if (isAdmin) {
       try {
         const mercados = await API.get('mercados/');
         const list = Array.isArray(mercados) ? mercados : (mercados.results || []);
         
-        let html = '';
-        if (user.is_superuser) {
-          const selAll = !user.mercado_id ? 'selected' : '';
-          html += `<option value="all" ${selAll}>🌐 Todas las sucursales (Consolidado)</option>`;
+        const activeIdStr = user.mercado_id != null ? String(user.mercado_id) : (list.length ? String(list[0].id) : '');
+        const currentSelected = list.find(m => String(m.id) === activeIdStr) || list[0];
+        
+        if (currentSelected) {
+          activeNameEl.textContent = currentSelected.nombre;
+        } else {
+          activeNameEl.textContent = user.mercado_nombre || 'Seleccionar Sucursal';
         }
+
+        let html = '<div class="px-2 py-1 mb-1 text-muted fw-bold" style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em"><i class="fas fa-map-marker-alt me-1 text-primary"></i>Sucursales Disponibles</div>';
         
         list.forEach(m => {
-          const sel = user.mercado_id === m.id ? 'selected' : '';
-          html += `<option value="${m.id}" ${sel}>📍 ${m.nombre}</option>`;
+          const isSelected = activeIdStr === String(m.id);
+          const activeClass = isSelected ? 'active fw-bold' : '';
+          const checkIcon = isSelected ? '<i class="fas fa-check text-primary ms-auto"></i>' : '';
+          
+          html += `
+            <li>
+              <a class="dropdown-item d-flex align-items-center justify-content-between rounded-2 py-2 mb-1 ${activeClass}" href="#" data-branch-id="${m.id}" style="font-size:0.88rem">
+                <span><i class="fas fa-store me-2 opacity-75"></i>${Utils.escapeHtml(m.nombre)}</span>
+                ${checkIcon}
+              </a>
+            </li>
+          `;
         });
-        
-        selector.innerHTML = html;
-      } catch(err) {
-        console.error("Error cargando selector de sucursales:", err);
-      }
 
-      selector.onchange = async (e) => {
-        const val = e.target.value;
-        const targetId = val === 'all' ? null : parseInt(val);
-        try {
-          const res = await API.post('auth/cambiar-mercado/', { mercado_id: targetId });
-          await Auth.loadUser();
-          if (typeof Toast !== 'undefined' && Toast.success) {
-            Toast.success(`Sucursal cambiada a: ${res.mercado_nombre}`);
-          }
-          this.handleRoute();
-        } catch(err) {
-          if (typeof Toast !== 'undefined' && Toast.error) {
-            Toast.error(err.message || "Error al cambiar sucursal");
-          }
-          selector.value = user.mercado_id || 'all';
-        }
-      };
+        menuList.innerHTML = html;
+
+        // Asignar evento click a cada sucursal
+        menuList.querySelectorAll('a[data-branch-id]').forEach(item => {
+          item.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const targetId = parseInt(item.dataset.branchId);
+            if (isNaN(targetId) || targetId === user.mercado_id) return;
+
+            try {
+              const res = await API.post('auth/cambiar-mercado/', { mercado_id: targetId });
+              await Auth.loadUser();
+              activeNameEl.textContent = res.mercado_nombre;
+              Utils.showToast(`Sucursal activa enviada a: ${res.mercado_nombre}`, 'success');
+              this.handleRoute();
+            } catch(err) {
+              Utils.showToast(err.message || 'Error al cambiar sucursal', 'danger');
+            }
+          });
+        });
+
+      } catch(err) {
+        console.error("Error cargando sucursales:", err);
+      }
     } else {
-      selector.innerHTML = `<option value="${user.mercado_id || ''}">📍 ${user.mercado_nombre || 'Sucursal Asignada'}</option>`;
-      selector.disabled = true;
+      activeNameEl.textContent = user.mercado_nombre || 'Sucursal Asignada';
+      menuList.innerHTML = `<li><span class="dropdown-item disabled text-muted"><i class="fas fa-lock me-2"></i>Acceso restringido a sucursal asignada</span></li>`;
     }
   },
+
+
+
+
 
   ensureSectionOpen(hash) {
 

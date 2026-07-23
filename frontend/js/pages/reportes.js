@@ -153,18 +153,44 @@ const ReportesPage = {
     if (btnExportarPDF) btnExportarPDF.addEventListener('click', () => this.exportar('pdf'));
   },
 
-  exportar: function(formato) {
-    const activo = document.querySelector('#filtrosRapidos .btn.active');
-    const filtro = activo ? activo.dataset.filtro : 'hoy';
-    let params = `filtro=${filtro}`;
-    if (filtro === 'personalizado') {
-      params += `&fecha_inicio=${document.getElementById('rep_fecha_inicio').value}`;
-      params += `&fecha_fin=${document.getElementById('rep_fecha_fin').value}`;
+  exportar: async function(formato) {
+    const loading = Utils.showLoading();
+    try {
+      const activo = document.querySelector('#filtrosRapidos .btn.active');
+      const filtro = activo ? activo.dataset.filtro : 'hoy';
+      let params = `filtro=${filtro}`;
+      if (filtro === 'personalizado') {
+        const fi = document.getElementById('rep_fecha_inicio')?.value;
+        const ff = document.getElementById('rep_fecha_fin')?.value;
+        if (fi) params += `&fecha_inicio=${fi}`;
+        if (ff) params += `&fecha_fin=${ff}`;
+      }
+      const metodo = document.getElementById('rep_metodo_pago')?.value;
+      if (metodo) params += `&metodo_pago=${metodo}`;
+
+      const url = API.baseURL + `reportes/ventas/${formato}/?${params}`;
+      const response = await fetch(url, { credentials: 'include' });
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      const blob = await response.blob();
+      const downloadUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = downloadUrl;
+      const ext = formato === 'excel' ? 'xlsx' : 'pdf';
+      a.download = `reporte_ventas_${filtro}_${new Date().toISOString().split('T')[0]}.${ext}`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(downloadUrl);
+      Utils.showToast(`Reporte ${formato.toUpperCase()} descargado correctamente`, 'success');
+    } catch (e) {
+      Utils.showToast('Error al exportar reporte: ' + e.message, 'danger');
+    } finally {
+      loading.close();
     }
-    const metodo = document.getElementById('rep_metodo_pago').value;
-    if (metodo) params += `&metodo_pago=${metodo}`;
-    window.open(API.baseURL + `reportes/ventas/${formato}/?${params}`, '_blank');
   },
+
 
   cargarReporte: async function(filtro) {
     const loading = Utils.showLoading();

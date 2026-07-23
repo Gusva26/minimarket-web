@@ -14,7 +14,6 @@ const ConfiguracionPage = {
         branchName: parts.slice(1).join(' - ').trim()
       };
     }
-    // Si empieza con el nombre global actual
     const currentGlobal = this.globalBusinessName;
     if (currentGlobal && fullName.startsWith(currentGlobal + ' ')) {
       return {
@@ -22,19 +21,10 @@ const ConfiguracionPage = {
         branchName: fullName.substring(currentGlobal.length + 1).trim()
       };
     }
-    // Soporte para datos iniciales
     if (fullName.startsWith('Minimarket ')) {
       return {
         businessName: 'Minimarket',
         branchName: fullName.substring(11).trim()
-      };
-    }
-    // Separación por espacio por defecto
-    const spaceIdx = fullName.indexOf(' ');
-    if (spaceIdx > 0) {
-      return {
-        businessName: fullName.substring(0, spaceIdx).trim(),
-        branchName: fullName.substring(spaceIdx + 1).trim()
       };
     }
     return {
@@ -43,14 +33,29 @@ const ConfiguracionPage = {
     };
   },
 
+
   render: async function(container) {
     const user = Auth.getUser();
     const myMercadoId = user ? user.mercado_id : null;
+
+    if (user) {
+      if (user.mercado_nombre) {
+        const parsed = this.parseMercadoName(user.mercado_nombre);
+        if (parsed.businessName) this.globalBusinessName = parsed.businessName;
+      }
+      if (user.mercado_ruc) {
+        this.globalRuc = user.mercado_ruc;
+      }
+      if (user.mercado_telefono) {
+        this.globalTelefono = user.mercado_telefono;
+      }
+    }
 
     container.innerHTML = `
       <div class="page-header">
         <h3><i class="fas fa-cog text-gradient"></i>Configuración</h3>
       </div>
+
 
       <div class="row g-4">
         <!-- Panel 1: Configuración General del Negocio -->
@@ -63,16 +68,17 @@ const ConfiguracionPage = {
               <form id="formGlobalNegocio">
                 <div class="form-group mb-3">
                   <label class="form-label">Nombre del Negocio <span class="text-danger">*</span></label>
-                  <input type="text" class="form-control" name="nombre_negocio" id="glob_nombre" placeholder="Ej. Minimarket Súper" required>
+                  <input type="text" class="form-control" name="nombre_negocio" id="glob_nombre" placeholder="Ej. Minimarket Súper" value="${Utils.escapeHtml(this.globalBusinessName || '')}" required>
                 </div>
                 <div class="form-group mb-3">
                   <label class="form-label">RUC <span class="text-danger">*</span></label>
-                  <input type="text" class="form-control" name="ruc" id="glob_ruc" placeholder="11 dígitos" maxlength="11" required>
+                  <input type="text" class="form-control" name="ruc" id="glob_ruc" placeholder="11 dígitos" maxlength="11" value="${Utils.escapeHtml(this.globalRuc || '')}" required>
                 </div>
                 <div class="form-group mb-4">
                   <label class="form-label">Teléfono del Negocio <span class="text-danger">*</span></label>
-                  <input type="text" class="form-control" name="telefono" id="glob_telefono" placeholder="Ej. 555-1234" required>
+                  <input type="text" class="form-control" name="telefono" id="glob_telefono" placeholder="Ej. 555-1234" value="${Utils.escapeHtml(this.globalTelefono || '')}" required>
                 </div>
+
                 <button type="submit" class="btn btn-primary w-100" id="btnGuardarGlobal">
                   <i class="fas fa-save me-2"></i>Guardar Configuración General
                 </button>
@@ -192,44 +198,56 @@ const ConfiguracionPage = {
 
   cargarSucursales: async function(myMercadoId) {
     const tbody = document.getElementById('tbodySucursales');
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="4" class="text-center py-4 text-muted">
-          <div class="spinner-modern m-auto"></div>
-        </td>
-      </tr>
-    `;
+    if (tbody) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="4" class="text-center py-4 text-muted">
+            <div class="spinner-modern m-auto"></div>
+          </td>
+        </tr>
+      `;
+    }
 
     try {
       // Obtenemos todas las sucursales
       const data = await API.get('mercados/?manage=true');
-      this.allSucursales = data.results || data || [];
+      this.allSucursales = Array.isArray(data) ? data : (data.results || []);
 
-      // Determinar nombre del negocio, RUC y teléfono a partir del primer registro
+      // Determinar sucursal de referencia para datos del negocio
       if (this.allSucursales.length > 0) {
-        const first = this.allSucursales[0];
-        this.globalRuc = first.ruc || '';
-        this.globalTelefono = first.telefono || '';
-        const parsed = this.parseMercadoName(first.nombre);
-        this.globalBusinessName = parsed.businessName || 'Minimarket';
+        const targetSuc = this.allSucursales.find(s => s.id == myMercadoId)
+          || this.allSucursales.find(s => s.ruc || s.telefono)
+          || this.allSucursales[0];
 
-        document.getElementById('glob_nombre').value = this.globalBusinessName;
-        document.getElementById('glob_ruc').value = this.globalRuc;
-        document.getElementById('glob_telefono').value = this.globalTelefono;
+        this.globalRuc = targetSuc.ruc || '';
+        this.globalTelefono = targetSuc.telefono || '';
+        const parsed = this.parseMercadoName(targetSuc.nombre);
+        this.globalBusinessName = parsed.businessName || 'SuperMinimarket';
+
+        const globNombreEl = document.getElementById('glob_nombre');
+        const globRucEl = document.getElementById('glob_ruc');
+        const globTelefonoEl = document.getElementById('glob_telefono');
+
+        if (globNombreEl) globNombreEl.value = this.globalBusinessName;
+        if (globRucEl) globRucEl.value = this.globalRuc;
+        if (globTelefonoEl) globTelefonoEl.value = this.globalTelefono;
       }
 
       // Renderizar listado general
       this.renderTabla(myMercadoId);
     } catch (e) {
-      tbody.innerHTML = `
-        <tr>
-          <td colspan="4" class="text-center py-4 text-danger">
-            <i class="fas fa-exclamation-circle me-1"></i> Error al cargar sucursales: ${e.message}
-          </td>
-        </tr>
-      `;
+      if (tbody) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="4" class="text-center py-4 text-danger">
+              <i class="fas fa-exclamation-circle me-1"></i> Error al cargar sucursales: ${e.message}
+            </td>
+          </tr>
+        `;
+      }
     }
   },
+
 
   renderTabla: function(myMercadoId) {
     const tbody = document.getElementById('tbodySucursales');

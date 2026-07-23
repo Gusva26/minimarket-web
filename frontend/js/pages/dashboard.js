@@ -1,19 +1,46 @@
 const DashboardPage = {
   async render(container) {
+    const user = Auth.getUser();
+    const userName = user ? (user.first_name || user.username) : 'Administrador';
+    const userRole = user?.is_superuser ? 'Superadministrador' : 'Administrador de Sucursal';
+    const ahora = new Date();
+    const hora = ahora.getHours();
+    const saludo = hora < 12 ? '¡Buenos días' : hora < 19 ? '¡Buenas tardes' : '¡Buenas noches';
+    const fechaStr = ahora.toLocaleDateString('es-PE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    const fechaFormateada = fechaStr.charAt(0).toUpperCase() + fechaStr.slice(1);
+
     container.innerHTML = `
-      <div class="page-header">
-        <h3><i class="fas fa-chart-pie text-gradient"></i>Dashboard</h3>
-        <div class="page-actions">
-          <button class="btn btn-primary btn-sm" onclick="window.location.hash='#/ventas'"><i class="fas fa-cart-shopping"></i>Nueva Venta</button>
-          <button class="btn btn-accent btn-sm" onclick="window.location.hash='#/cajas'"><i class="fas fa-cash-register"></i>Cajas</button>
+      <div class="dashboard-hero-banner" style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); border-radius: 16px; padding: 1.75rem 2rem; color: white; margin-bottom: 1.5rem; box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.4); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; position: relative; overflow: hidden;">
+        <div style="position: absolute; right: -20px; bottom: -30px; opacity: 0.12; font-size: 10rem; pointer-events: none;"><i class="fas fa-store"></i></div>
+        <div style="z-index: 1;">
+          <div style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.9; font-weight: 600; margin-bottom: 4px;">
+            <i class="fas fa-calendar-day me-1"></i>${fechaFormateada}
+          </div>
+          <h2 style="font-weight: 800; font-size: 1.75rem; margin: 0; letter-spacing: -0.02em;">
+            ${saludo}, ${Utils.escapeHtml(userName)}! 👋
+          </h2>
+          <p style="opacity: 0.88; font-size: 0.9rem; margin: 6px 0 0 0; font-weight: 500; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <span class="badge bg-white text-dark fw-bold" style="padding: 4px 10px; border-radius: 20px; font-size: 0.75rem;"><i class="fas fa-shield-alt text-primary me-1"></i>${userRole}</span>
+            <span>Monitoreo en tiempo real de ventas, inventario y caja.</span>
+          </p>
+        </div>
+        <div style="z-index: 1; display: flex; gap: 10px; flex-wrap: wrap;">
+          <button class="btn btn-light btn-pill fw-bold text-primary shadow-sm" onclick="window.location.hash='#/ventas'" style="padding: 0.65rem 1.25rem; border: none;">
+            <i class="fas fa-cart-shopping me-1"></i>Ir a Caja POS
+          </button>
+          <button class="btn btn-outline-light btn-pill fw-bold shadow-sm" onclick="window.location.hash='#/cajas'" style="padding: 0.65rem 1.25rem;">
+            <i class="fas fa-cash-register me-1"></i>Cajas
+          </button>
         </div>
       </div>
+
       <div id="dash-content">
         <div class="kpi-grid" id="dashSkeleton">
           ${'<div class="skeleton skeleton-card"></div>'.repeat(4)}
         </div>
       </div>
     `;
+
 
     try {
       const data = await API.get('dashboard/');

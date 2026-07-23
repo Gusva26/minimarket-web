@@ -191,47 +191,44 @@ const KardexPage = {
     let detalle = m.referencia_detalle || '';
 
     let icon = 'fa-file-alt';
-    let badgeStyle = 'background-color:#64748b; color:#ffffff;';
+    let badgeStyle = 'background:rgba(100,116,139,0.15); color:#64748b; border:1px solid rgba(100,116,139,0.3);';
     let label = m.referencia_tipo || 'Movimiento';
 
     if (refTipo.includes('inicial') || refTipo.includes('carga')) {
       icon = 'fa-boxes-stacked';
-      badgeStyle = 'background-color:#475569; color:#ffffff;';
+      badgeStyle = 'background:rgba(71,85,105,0.15); color:#475569; border:1px solid rgba(71,85,105,0.3);';
       label = 'Inventario Inicial';
     } else if (refTipo === 'venta' || refTipo.startsWith('venta') || refTipo.includes('pos')) {
       icon = 'fa-receipt';
-      badgeStyle = 'background-color:#10b981; color:#ffffff;';
+      badgeStyle = 'background:rgba(124,58,237,0.15); color:#7c3aed; border:1px solid rgba(124,58,237,0.3);';
       label = 'Venta POS';
     } else if (refTipo.includes('compra')) {
       icon = 'fa-truck';
-      badgeStyle = 'background-color:#3b82f6; color:#ffffff;';
+      badgeStyle = 'background:rgba(16,185,129,0.15); color:#10b981; border:1px solid rgba(16,185,129,0.3);';
       label = 'Compra Proveedor';
     } else if (refTipo.includes('transferencia')) {
       icon = 'fa-right-left';
-      badgeStyle = 'background-color:#0284c7; color:#ffffff;';
+      badgeStyle = 'background:rgba(2,132,199,0.15); color:#0284c7; border:1px solid rgba(2,132,199,0.3);';
       label = 'Transferencia';
     } else if (refTipo.includes('ajuste') || refTipo.includes('merma')) {
       icon = 'fa-triangle-exclamation';
-      badgeStyle = 'background-color:#f59e0b; color:#000000;';
+      badgeStyle = 'background:rgba(245,158,11,0.15); color:#d97706; border:1px solid rgba(245,158,11,0.3);';
       label = 'Ajuste / Merma';
     }
 
-
-    // Si el detalle repite "Venta #1" o "Venta POS", lo omitimos para evitar redundancia
     if (detalle.toLowerCase() === `venta #${m.referencia_id}` || detalle.toLowerCase() === 'venta pos' || detalle.toLowerCase() === 'venta') {
       detalle = '';
     }
 
     return `
       <div style="line-height:1.4">
-        <span class="badge" style="${badgeStyle} font-size:0.82rem; font-weight:700; padding:6px 10px; display:inline-block; letter-spacing:0.02em">
+        <span class="badge" style="${badgeStyle} font-size:0.8rem; font-weight:700; padding:5px 12px; border-radius:20px; display:inline-block;">
           <i class="fas ${icon} me-1"></i>${label} ${refId}
         </span>
-        ${detalle ? `<div style="font-size:0.88rem; font-weight:600; color:var(--text-main, #0f172a); margin-top:5px; opacity:0.95">${Utils.escapeHtml(detalle)}</div>` : ''}
+        ${detalle ? `<div style="font-size:0.85rem; font-weight:600; color:var(--text-main, #0f172a); margin-top:4px; opacity:0.9">${Utils.escapeHtml(detalle)}</div>` : ''}
       </div>
     `;
   },
-
 
   renderMovimientos: function (movimientos) {
     const tbody = document.getElementById('tbodyKardex');
@@ -241,13 +238,14 @@ const KardexPage = {
     }
 
     const tipoBadge = {
-      ENTRADA: '<span class="badge badge-success"><i class="fas fa-plus-circle me-1"></i>Entrada</span>',
-      SALIDA: '<span class="badge badge-danger"><i class="fas fa-minus-circle me-1"></i>Salida</span>',
-      AJUSTE_POSITIVO: '<span class="badge badge-info"><i class="fas fa-plus-square me-1"></i>Ajuste +</span>',
-      AJUSTE_NEGATIVO: '<span class="badge badge-warning"><i class="fas fa-minus-square me-1"></i>Ajuste -</span>',
-      ENTRADA_TRANSFERENCIA: '<span class="badge badge-info"><i class="fas fa-arrow-down me-1"></i>Entrada Transf.</span>',
-      SALIDA_TRANSFERENCIA: '<span class="badge badge-warning"><i class="fas fa-arrow-up me-1"></i>Salida Transf.</span>',
+      ENTRADA: '<span class="badge" style="background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.3);font-weight:700;padding:5px 12px;border-radius:20px;"><i class="fas fa-plus-circle me-1"></i>Entrada</span>',
+      SALIDA: '<span class="badge" style="background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.3);font-weight:700;padding:5px 12px;border-radius:20px;"><i class="fas fa-minus-circle me-1"></i>Salida</span>',
+      AJUSTE_POSITIVO: '<span class="badge" style="background:rgba(59,130,246,0.15);color:#3b82f6;border:1px solid rgba(59,130,246,0.3);font-weight:700;padding:5px 12px;border-radius:20px;"><i class="fas fa-plus-square me-1"></i>Ajuste +</span>',
+      AJUSTE_NEGATIVO: '<span class="badge" style="background:rgba(245,158,11,0.15);color:#d97706;border:1px solid rgba(245,158,11,0.3);font-weight:700;padding:5px 12px;border-radius:20px;"><i class="fas fa-minus-square me-1"></i>Ajuste -</span>',
+      ENTRADA_TRANSFERENCIA: '<span class="badge" style="background:rgba(2,132,199,0.15);color:#0284c7;border:1px solid rgba(2,132,199,0.3);font-weight:700;padding:5px 12px;border-radius:20px;"><i class="fas fa-arrow-down me-1"></i>Entrada Transf.</span>',
+      SALIDA_TRANSFERENCIA: '<span class="badge" style="background:rgba(245,158,11,0.15);color:#d97706;border:1px solid rgba(245,158,11,0.3);font-weight:700;padding:5px 12px;border-radius:20px;"><i class="fas fa-arrow-up me-1"></i>Salida Transf.</span>',
     };
+
 
     tbody.innerHTML = movimientos.map(m => {
       const saldoCls = m.saldo_nuevo > m.saldo_anterior ? 'kpi-success' : m.saldo_nuevo < m.saldo_anterior ? 'kpi-danger' : '';

@@ -797,3 +797,15 @@ WARNING 2026-07-22 18:45:43,088 basehttp 7608 29440 "GET /api/productos/?stock_s
 WARNING 2026-07-22 18:45:43,088 log 7608 27824 Unauthorized: /api/productos/
 WARNING 2026-07-22 18:45:43,093 basehttp 7608 14912 "GET /api/productos/?stock_status=sin_stock&page_size=1 HTTP/1.1" 401 65
 WARNING 2026-07-22 18:45:43,093 basehttp 7608 27824 "GET /api/productos/?page=1 HTTP/1.1" 401 65
+WARNING 2026-07-22 20:49:21,423 log 32968 28716 Unauthorized: /api/mercados/
+WARNING 2026-07-22 20:49:21,424 log 32968 12352 Unauthorized: /api/dashboard/
+WARNING 2026-07-22 20:49:21,425 basehttp 32968 28716 "GET /api/mercados/ HTTP/1.1" 401 65
+WARNING 2026-07-22 20:49:21,425 basehttp 32968 12352 "GET /api/dashboard/ HTTP/1.1" 401 65
+WARNING 2026-07-22 22:50:32,333 log 31628 9436 Unauthorized: /api/auth/me/
+WARNING 2026-07-22 22:50:32,334 basehttp 31628 9436 "GET /api/auth/me/ HTTP/1.1" 401 65
+WARNING 2026-07-22 22:52:32,486 log 31628 14184 Unauthorized: /api/auth/login/
+WARNING 2026-07-22 22:52:32,487 basehttp 31628 14184 "POST /api/auth/login/ HTTP/1.1" 401 71
+WARNING 2026-07-22 22:52:40,639 log 31628 14184 Unauthorized: /api/auth/login/
+WARNING 2026-07-22 22:52:40,641 basehttp 31628 14184 "POST /api/auth/login/ HTTP/1.1" 401 71
+WARNING 2026-07-22 23:39:08,523 log 19892 12500 Forbidden: /api/reportes/ventas/excel/
+WARNING 2026-07-22 23:39:08,524 basehttp 19892 12500 "GET /api/reportes/ventas/excel/?filtro=personalizado HTTP/1.1" 403 63

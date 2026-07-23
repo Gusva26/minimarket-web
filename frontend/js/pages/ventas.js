@@ -128,19 +128,24 @@ const VentasPage = {
           </div>
           <h6 style="font-size:.75rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px">Método de Pago</h6>
           <div class="row g-2 justify-content-center mb-3">
-            <div class="col-4">
+            <div class="col-3">
               <input type="radio" class="btn-check" name="metodo_pago" id="pago_efectivo" value="Efectivo" checked>
-              <label class="btn btn-outline-primary w-100 p-3" for="pago_efectivo" style="border-radius:var(--radius);text-align:center"><i class="fas fa-coins fa-2x mb-1 d-block"></i><small>Efectivo</small></label>
+              <label class="btn btn-outline-success w-100 p-2 text-center" for="pago_efectivo" style="border-radius:var(--radius);"><i class="fas fa-coins fa-lg mb-1 d-block"></i><small class="fw-bold">💵 Efectivo</small></label>
             </div>
-            <div class="col-4">
+            <div class="col-3">
               <input type="radio" class="btn-check" name="metodo_pago" id="pago_yape" value="Yape">
-              <label class="btn btn-outline-info w-100 p-3" for="pago_yape" style="border-radius:var(--radius);text-align:center"><i class="fas fa-mobile-alt fa-2x mb-1 d-block"></i><small>Yape</small></label>
+              <label class="btn btn-outline-primary w-100 p-2 text-center" for="pago_yape" style="border-radius:var(--radius);"><i class="fas fa-mobile-alt fa-lg mb-1 d-block"></i><small class="fw-bold">📱 Yape</small></label>
             </div>
-            <div class="col-4">
+            <div class="col-3">
               <input type="radio" class="btn-check" name="metodo_pago" id="pago_plin" value="Plin">
-              <label class="btn btn-outline-warning w-100 p-3" for="pago_plin" style="border-radius:var(--radius);text-align:center"><i class="fas fa-qrcode fa-2x mb-1 d-block"></i><small>Plin</small></label>
+              <label class="btn btn-outline-info w-100 p-2 text-center" for="pago_plin" style="border-radius:var(--radius);"><i class="fas fa-qrcode fa-lg mb-1 d-block"></i><small class="fw-bold">📱 Plin</small></label>
+            </div>
+            <div class="col-3">
+              <input type="radio" class="btn-check" name="metodo_pago" id="pago_tarjeta" value="Tarjeta">
+              <label class="btn btn-outline-secondary w-100 p-2 text-center" for="pago_tarjeta" style="border-radius:var(--radius);"><i class="fas fa-credit-card fa-lg mb-1 d-block"></i><small class="fw-bold">💳 Tarjeta</small></label>
             </div>
           </div>
+
           <div id="pago_efectivo_container">
             <div class="form-group">
               <label class="form-label">Monto Recibido (S/)</label>

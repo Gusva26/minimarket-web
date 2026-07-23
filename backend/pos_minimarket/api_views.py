@@ -106,7 +106,10 @@ class AuthUserView(APIView):
             'is_active': user.is_active,
             'mercado_id': user.mercado_id,
             'mercado_nombre': user.mercado.nombre if user.mercado else None,
+            'mercado_ruc': user.mercado.ruc if user.mercado else None,
+            'mercado_telefono': user.mercado.telefono if user.mercado else None,
         })
+
 
 
 class CambiarMercadoView(APIView):
@@ -114,13 +117,12 @@ class CambiarMercadoView(APIView):
 
     def post(self, request):
         user = request.user
-        if not (user.is_superuser or user.rol == 'ADMIN'):
+        rol_lower = str(user.rol or '').lower()
+        if not (user.is_superuser or user.is_staff or rol_lower in ['admin', 'administrador']):
             return Response({'error': 'No tienes permisos para cambiar de sucursal.'}, status=status.HTTP_403_FORBIDDEN)
 
         mercado_id = request.data.get('mercado_id')
         if mercado_id is None or mercado_id == '' or mercado_id == 'all':
-            if not user.is_superuser:
-                return Response({'error': 'Solo el superusuario puede seleccionar todas las sucursales.'}, status=status.HTTP_400_BAD_REQUEST)
             user.mercado = None
             user.save(update_fields=['mercado'])
             from inventario.utils import invalidate_mercado_cache
@@ -130,6 +132,7 @@ class CambiarMercadoView(APIView):
                 'mercado_id': None,
                 'mercado_nombre': 'Todas las sucursales'
             })
+
 
         from inventario.models import Mercado
         try:

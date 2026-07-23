@@ -394,7 +394,7 @@ const ProductosPage = {
       btnExportar.addEventListener('click', async () => {
         try {
           const response = await fetch(API.baseURL + 'productos/exportar/', {
-            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('access_token') }
+            credentials: 'include'
           });
           if (!response.ok) throw new Error('Error al exportar');
           const blob = await response.blob();
@@ -406,11 +406,13 @@ const ProductosPage = {
           a.click();
           document.body.removeChild(a);
           URL.revokeObjectURL(url);
+          Utils.showToast('Catálogo de productos exportado correctamente', 'success');
         } catch (e) {
           Utils.showToast('Error al exportar: ' + e.message, 'error');
         }
       });
     }
+
     const btnImportarEnviar = document.getElementById('btnImportarEnviar');
     if (btnImportarEnviar) btnImportarEnviar.addEventListener('click', () => this.importarProductos());
     const btnGuardar = document.getElementById('btnGuardarProducto');

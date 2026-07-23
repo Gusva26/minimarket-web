@@ -1,6 +1,8 @@
+from decimal import Decimal
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions, status
+
 from django.db.models import Sum, Count, Q, F, ExpressionWrapper, DecimalField
 from django.utils import timezone
 from datetime import timedelta, datetime
@@ -17,7 +19,8 @@ import pandas as pd
 
 
 class ReporteVentasView(APIView):
-    permission_classes = [permissions.IsAuthenticated, IsAdminOrSuperUser]
+    permission_classes = [permissions.IsAuthenticated]
+
 
     def get(self, request):
         mercado_admin = request.user.mercado
@@ -219,9 +222,10 @@ class ReporteVentasView(APIView):
 
 
 class ExportarReporteExcelView(APIView):
-    permission_classes = [permissions.IsAuthenticated, IsAdminOrSuperUser]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
+
         ahora = timezone.localtime(timezone.now())
         hoy = ahora.date()
 
@@ -231,18 +235,45 @@ class ExportarReporteExcelView(APIView):
         fecha_inicio = ahora.replace(hour=0, minute=0, second=0, microsecond=0)
         fecha_fin = ahora.replace(hour=23, minute=59, second=59, microsecond=999999)
 
-        if filtro == 'semana':
+        if filtro == 'ayer':
+            ayer = hoy - timedelta(days=1)
+            fecha_inicio = timezone.make_aware(datetime.combine(ayer, datetime.min.time()))
+            fecha_fin = timezone.make_aware(datetime.combine(ayer, datetime.max.time()))
+        elif filtro == 'semana':
             lunes = hoy - timedelta(days=hoy.weekday())
             fecha_inicio = timezone.make_aware(datetime.combine(lunes, datetime.min.time()))
         elif filtro == 'mes':
             primero = hoy.replace(day=1)
             fecha_inicio = timezone.make_aware(datetime.combine(primero, datetime.min.time()))
+        elif filtro == 'mes_anterior':
+            primer_dia_este_mes = hoy.replace(day=1)
+            ultimo_dia_mes_pasado = primer_dia_este_mes - timedelta(days=1)
+            primer_dia_mes_pasado = ultimo_dia_mes_pasado.replace(day=1)
+            fecha_inicio = timezone.make_aware(datetime.combine(primer_dia_mes_pasado, datetime.min.time()))
+            fecha_fin = timezone.make_aware(datetime.combine(ultimo_dia_mes_pasado, datetime.max.time()))
+
+        fi_param = request.query_params.get('fecha_inicio')
+        ff_param = request.query_params.get('fecha_fin')
+        if fi_param:
+            try:
+                dt = datetime.strptime(fi_param, '%Y-%m-%d')
+                fecha_inicio = timezone.make_aware(datetime.combine(dt.date(), datetime.min.time()))
+            except Exception: pass
+        if ff_param:
+            try:
+                dt = datetime.strptime(ff_param, '%Y-%m-%d')
+                fecha_fin = timezone.make_aware(datetime.combine(dt.date(), datetime.max.time()))
+            except Exception: pass
 
         mfiltro = {'fecha_hora__range': (fecha_inicio, fecha_fin)}
         if mercado_admin:
             mfiltro['mercado'] = mercado_admin
 
-        ventas = Venta.objects.filter(**mfiltro).order_by('-fecha_hora')
+        metodo_pago = request.query_params.get('metodo_pago')
+        if metodo_pago:
+            mfiltro['metodo_pago'] = metodo_pago
+
+        ventas = Venta.objects.filter(**mfiltro).select_related('cliente', 'usuario', 'mercado').order_by('-fecha_hora')
 
         data = []
         for v in ventas:
@@ -270,7 +301,7 @@ class ExportarReporteExcelView(APIView):
 
 
 class ExportarReportePDFView(APIView):
-    permission_classes = [permissions.IsAuthenticated, IsAdminOrSuperUser]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
         ahora = timezone.localtime(timezone.now())
@@ -282,60 +313,254 @@ class ExportarReportePDFView(APIView):
         fecha_inicio = ahora.replace(hour=0, minute=0, second=0, microsecond=0)
         fecha_fin = ahora.replace(hour=23, minute=59, second=59, microsecond=999999)
 
-        if filtro == 'semana':
+        if filtro == 'ayer':
+            ayer = hoy - timedelta(days=1)
+            fecha_inicio = timezone.make_aware(datetime.combine(ayer, datetime.min.time()))
+            fecha_fin = timezone.make_aware(datetime.combine(ayer, datetime.max.time()))
+        elif filtro == 'semana':
             lunes = hoy - timedelta(days=hoy.weekday())
             fecha_inicio = timezone.make_aware(datetime.combine(lunes, datetime.min.time()))
         elif filtro == 'mes':
             primero = hoy.replace(day=1)
             fecha_inicio = timezone.make_aware(datetime.combine(primero, datetime.min.time()))
+        elif filtro == 'mes_anterior':
+            primer_dia_este_mes = hoy.replace(day=1)
+            ultimo_dia_mes_pasado = primer_dia_este_mes - timedelta(days=1)
+            primer_dia_mes_pasado = ultimo_dia_mes_pasado.replace(day=1)
+            fecha_inicio = timezone.make_aware(datetime.combine(primer_dia_mes_pasado, datetime.min.time()))
+            fecha_fin = timezone.make_aware(datetime.combine(ultimo_dia_mes_pasado, datetime.max.time()))
+
+        fi_param = request.query_params.get('fecha_inicio')
+        ff_param = request.query_params.get('fecha_fin')
+        if fi_param:
+            try:
+                dt = datetime.strptime(fi_param, '%Y-%m-%d')
+                fecha_inicio = timezone.make_aware(datetime.combine(dt.date(), datetime.min.time()))
+            except Exception: pass
+        if ff_param:
+            try:
+                dt = datetime.strptime(ff_param, '%Y-%m-%d')
+                fecha_fin = timezone.make_aware(datetime.combine(dt.date(), datetime.max.time()))
+            except Exception: pass
 
         mfiltro = {'fecha_hora__range': (fecha_inicio, fecha_fin)}
         if mercado_admin:
             mfiltro['mercado'] = mercado_admin
 
-        ventas = Venta.objects.filter(**mfiltro).order_by('-fecha_hora')
+        metodo_pago = request.query_params.get('metodo_pago')
+        if metodo_pago:
+            mfiltro['metodo_pago'] = metodo_pago
 
-        total_ventas = ventas.aggregate(total=Sum('total'))['total'] or 0
+        # Optimizado: select_related para evitar N+1 queries y max 1000 registros para evitar timeouts
+        ventas_qs = Venta.objects.filter(**mfiltro).select_related('cliente', 'usuario', 'mercado').order_by('-fecha_hora')
+        
+        # Calcular agregaciones KPI para la cabecera del PDF
+        total_completadas = ventas_qs.filter(estado='COMPLETADA').aggregate(t=Sum('total'))['t'] or Decimal('0.00')
+        cant_completadas = ventas_qs.filter(estado='COMPLETADA').count()
+        total_anuladas = ventas_qs.filter(estado='ANULADA').aggregate(t=Sum('total'))['t'] or Decimal('0.00')
+        cant_anuladas = ventas_qs.filter(estado='ANULADA').count()
+        ticket_promedio = float(total_completadas / cant_completadas) if cant_completadas > 0 else 0.0
+
+        ventas_list = list(ventas_qs[:1000])
+
+        rows = []
+        for idx, v in enumerate(ventas_list):
+            cli_nombre = v.cliente.nombre if v.cliente else 'Público General'
+            usr_name = v.usuario.username if v.usuario else 'Sistema'
+            comprobante = f"{v.serie}-{v.numero:06d}"
+            fecha_str = v.fecha_hora.strftime('%d/%m/%Y %H:%M')
+            bg_style = 'background-color: #f8fafc;' if idx % 2 == 1 else 'background-color: #ffffff;'
+            
+            estado_html = '<span style="color:#166534;background-color:#dcfce7;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:bold;">COMPLETADA</span>' if v.estado == 'COMPLETADA' else '<span style="color:#991b1b;background-color:#fee2e2;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:bold;">ANULADA</span>'
+
+            rows.append(f"""
+                <tr style="{bg_style}">
+                    <td style="font-weight:bold;color:#4f46e5;">{comprobante}</td>
+                    <td style="color:#475569;">{fecha_str}</td>
+                    <td>{cli_nombre}</td>
+                    <td style="color:#475569;">{usr_name}</td>
+                    <td>{v.metodo_pago}</td>
+                    <td style="text-align:center;">{estado_html}</td>
+                    <td style="text-align:right;font-weight:bold;">S/ {float(v.total):.2f}</td>
+                </tr>
+            """)
+
+        html_table_body = "".join(rows)
+        sucursal_nombre = mercado_admin.nombre if mercado_admin else 'Todas las Sucursales'
 
         html = f"""
         <html>
         <head>
             <meta charset="UTF-8">
             <style>
-                body {{ font-family: Arial, sans-serif; font-size: 12px; }}
-                h1 {{ text-align: center; font-size: 18px; }}
-                table {{ width: 100%; border-collapse: collapse; margin-top: 20px; }}
-                th, td {{ border: 1px solid #333; padding: 6px; text-align: left; }}
-                th {{ background-color: #f0f0f0; }}
-                .total {{ text-align: right; font-weight: bold; margin-top: 10px; }}
+                @page {{
+                    size: A4 portrait;
+                    margin: 1.2cm;
+                }}
+                body {{
+                    font-family: 'Helvetica', 'Arial', sans-serif;
+                    font-size: 10px;
+                    color: #1e293b;
+                    line-height: 1.4;
+                }}
+                .header-table {{
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-bottom: 15px;
+                    border-bottom: 2px solid #6366f1;
+                    padding-bottom: 10px;
+                }}
+                .header-title {{
+                    font-size: 20px;
+                    font-weight: bold;
+                    color: #0f172a;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                }}
+                .header-sub {{
+                    font-size: 11px;
+                    color: #6366f1;
+                    font-weight: bold;
+                }}
+                .meta-table {{
+                    width: 100%;
+                    margin-bottom: 15px;
+                    background-color: #f8fafc;
+                    border: 1px solid #e2e8f0;
+                    border-radius: 6px;
+                    padding: 8px 12px;
+                }}
+                .meta-label {{
+                    font-weight: bold;
+                    color: #64748b;
+                }}
+                .kpi-table {{
+                    width: 100%;
+                    border-collapse: separate;
+                    border-spacing: 8px;
+                    margin-bottom: 15px;
+                }}
+                .kpi-box {{
+                    background-color: #f1f5f9;
+                    border: 1px solid #cbd5e1;
+                    border-radius: 6px;
+                    padding: 8px;
+                    text-align: center;
+                }}
+                .kpi-title {{
+                    font-size: 9px;
+                    color: #475569;
+                    text-transform: uppercase;
+                    font-weight: bold;
+                }}
+                .kpi-val {{
+                    font-size: 13px;
+                    font-weight: bold;
+                    color: #0f172a;
+                    margin-top: 3px;
+                }}
+                .data-table {{
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-top: 10px;
+                }}
+                .data-table th {{
+                    background-color: #1e293b;
+                    color: #ffffff;
+                    font-weight: bold;
+                    text-align: left;
+                    padding: 7px 8px;
+                    font-size: 9px;
+                    text-transform: uppercase;
+                }}
+                .data-table td {{
+                    border-bottom: 1px solid #e2e8f0;
+                    padding: 6px 8px;
+                    font-size: 9.5px;
+                }}
+                .footer-summary {{
+                    margin-top: 15px;
+                    float: right;
+                    width: 250px;
+                    background-color: #f8fafc;
+                    border: 1px solid #cbd5e1;
+                    border-radius: 6px;
+                    padding: 8px 12px;
+                }}
             </style>
         </head>
         <body>
-            <h1>Reporte de Ventas - {hoy}</h1>
-            <p>Mercado: {mercado_admin.nombre if mercado_admin else 'General'}</p>
-            <p>Período: {fecha_inicio.strftime('%d/%m/%Y %H:%M')} - {fecha_fin.strftime('%d/%m/%Y %H:%M')}</p>
-            <table>
+            <!-- Banner Cabecera -->
+            <table class="header-table">
                 <tr>
-                    <th>#</th><th>Fecha</th><th>Cliente</th><th>Vendedor</th><th>Método</th><th>Total</th>
+                    <td style="vertical-align:middle;">
+                        <div class="header-title">Reporte Ejecutivo de Ventas</div>
+                        <div class="header-sub">{sucursal_nombre}</div>
+                    </td>
+                    <td style="text-align:right;vertical-align:middle;color:#64748b;font-size:9px;">
+                        Emisión: {ahora.strftime('%d/%m/%Y %H:%M')}<br>
+                        Generado por: {request.user.username}
+                    </td>
                 </tr>
-        """
-
-        for idx, v in enumerate(ventas, 1):
-            html += f"""
-                <tr>
-                    <td>{v.serie}-{v.numero:06d}</td>
-                    <td>{v.fecha_hora.strftime('%d/%m/%Y %H:%M')}</td>
-                    <td>{v.cliente.nombre if v.cliente else 'Público General'}</td>
-                    <td>{v.usuario.username if v.usuario else ''}</td>
-                    <td>{v.metodo_pago}</td>
-                    <td>S/ {float(v.total):.2f}</td>
-                </tr>
-            """
-
-        html += f"""
             </table>
-            <p class="total">Total General: S/ {float(total_ventas):.2f}</p>
-            <p class="total">Cantidad de Ventas: {ventas.count()}</p>
+
+            <!-- Meta Filtros -->
+            <table class="meta-table">
+                <tr>
+                    <td style="width:50%;"><span class="meta-label">Rango de Fechas:</span> {fecha_inicio.strftime('%d/%m/%Y %H:%M')} — {fecha_fin.strftime('%d/%m/%Y %H:%M')}</td>
+                    <td style="width:50%;text-align:right;"><span class="meta-label">Filtro Aplicado:</span> {filtro.upper()} {f'| {metodo_pago}' if metodo_pago else ''}</td>
+                </tr>
+            </table>
+
+            <!-- Resumen KPI -->
+            <table class="kpi-table">
+                <tr>
+                    <td class="kpi-box" style="width:25%;border-left: 3px solid #10b981;">
+                        <div class="kpi-title">Ventas Totales</div>
+                        <div class="kpi-val" style="color:#059669;">S/ {float(total_completadas):,.2f}</div>
+                    </td>
+                    <td class="kpi-box" style="width:25%;border-left: 3px solid #6366f1;">
+                        <div class="kpi-title">Transacciones</div>
+                        <div class="kpi-val">{cant_completadas} completadas</div>
+                    </td>
+                    <td class="kpi-box" style="width:25%;border-left: 3px solid #06b6d4;">
+                        <div class="kpi-title">Ticket Promedio</div>
+                        <div class="kpi-val">S/ {ticket_promedio:,.2f}</div>
+                    </td>
+                    <td class="kpi-box" style="width:25%;border-left: 3px solid #ef4444;">
+                        <div class="kpi-title">Anulaciones</div>
+                        <div class="kpi-val" style="color:#dc2626;">{cant_anuladas} ({f'S/ {float(total_anuladas):,.2f}'})</div>
+                    </td>
+                </tr>
+            </table>
+
+            <!-- Tabla de Datos -->
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th style="width:15%;">Comprobante</th>
+                        <th style="width:18%;">Fecha / Hora</th>
+                        <th>Cliente</th>
+                        <th style="width:14%;">Vendedor</th>
+                        <th style="width:12%;">Método</th>
+                        <th style="width:13%;text-align:center;">Estado</th>
+                        <th style="width:14%;text-align:right;">Monto Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {html_table_body}
+                </tbody>
+            </table>
+
+            <!-- Resumen Pie -->
+            <div class="footer-summary">
+                <table style="width:100%;">
+                    <tr>
+                        <td style="color:#64748b;font-weight:bold;">Total Neto Cobrado:</td>
+                        <td style="text-align:right;font-size:12px;font-weight:bold;color:#059669;">S/ {float(total_completadas):,.2f}</td>
+                    </tr>
+                </table>
+            </div>
         </body>
         </html>
         """
@@ -356,4 +581,7 @@ class ExportarReportePDFView(APIView):
                 {'error': 'xhtml2pdf no está instalado'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
+
+
+
 

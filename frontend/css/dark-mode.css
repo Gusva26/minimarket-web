@@ -169,3 +169,34 @@
 [data-theme="dark"] ::-webkit-scrollbar-track { background: var(--bg); }
 [data-theme="dark"] ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 [data-theme="dark"] ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* Topbar & Hero Banner Dark Mode Overrides */
+[data-theme="dark"] .topbar-header {
+  background: var(--surface) !important;
+  border-color: var(--border) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+[data-theme="dark"] .topbar-branch-wrapper {
+  background: var(--bg) !important;
+  border-color: var(--border) !important;
+}
+
+[data-theme="dark"] .topbar-branch-select {
+  color: #f1f5f9 !important;
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+[data-theme="dark"] .topbar-branch-select option {
+  background-color: #1e293b !important;
+  color: #f1f5f9 !important;
+}
+
+[data-theme="dark"] .dashboard-hero-banner {
+  background: linear-gradient(135deg, #1e1b4b 0%, #311042 100%) !important;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5) !important;
+  border: 1px solid rgba(124, 58, 237, 0.3) !important;
+}
+
+

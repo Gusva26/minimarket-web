@@ -213,15 +213,38 @@ class VentaViewSet(viewsets.ModelViewSet):
 
         qs = qs.order_by('-fecha_hora')
 
+        # Calcular KPIs globales agregados sobre todo el queryset filtrado (sin limitar a 1 pagina)
+        from django.db.models import Sum
+        total_completado = qs.filter(estado='COMPLETADA').aggregate(total=Sum('total'))['total'] or Decimal('0.00')
+        cant_completada = qs.filter(estado='COMPLETADA').count()
+        total_anulado = qs.filter(estado='ANULADA').aggregate(total=Sum('total'))['total'] or Decimal('0.00')
+        cant_anulada = qs.filter(estado='ANULADA').count()
+        ticket_promedio = (total_completado / cant_completada) if cant_completada > 0 else Decimal('0.00')
+
+        summary_data = {
+            'total_completado': float(total_completado),
+            'cant_completada': cant_completada,
+            'ticket_promedio': float(round(ticket_promedio, 2)),
+            'total_anulado': float(total_anulado),
+            'cant_anulada': cant_anulada,
+        }
+
         page = self.paginate_queryset(qs)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
             res_obj = self.get_paginated_response(serializer.data).data
+            res_obj['summary'] = summary_data
             cache.set(cache_key, res_obj, 600)
             return Response(res_obj)
+
         serializer = self.get_serializer(qs, many=True)
-        cache.set(cache_key, serializer.data, 600)
-        return Response(serializer.data)
+        res_data = {
+            'results': serializer.data,
+            'summary': summary_data
+        }
+        cache.set(cache_key, res_data, 600)
+        return Response(res_data)
+
 
 
     def create(self, request, *args, **kwargs):
