@@ -95,7 +95,7 @@ class ProductoViewSet(viewsets.ModelViewSet):
 
         logger.info(f'GET {request.path} (DB QUERY)')
         response = super().list(request, *args, **kwargs)
-        cache.set(cache_key, response.data, 600) # 10 min
+        cache.set(cache_key, response.data, 2)
         return response
 
     def perform_create(self, serializer):
@@ -320,14 +320,16 @@ class CategoriaViewSet(viewsets.ModelViewSet):
             logger.info(f'GET {request.path} (DB QUERY)')
             response = super().list(request, *args, **kwargs)
             data = response.data
-            cache.set(cache_key, data, 3600)
+            cache.set(cache_key, data, 30) # 30s cache TTL
         return Response(data)
 
     def perform_create(self, serializer):
         serializer.save(mercado=self.request.user.mercado)
+        invalidate_mercado_cache(self.request.user.mercado_id)
 
     def perform_update(self, serializer):
         serializer.save(mercado=self.request.user.mercado)
+        invalidate_mercado_cache(self.request.user.mercado_id)
 
     def destroy(self, request, *args, **kwargs):
         categoria = self.get_object()
@@ -336,7 +338,9 @@ class CategoriaViewSet(viewsets.ModelViewSet):
                 {'error': 'No se puede eliminar una categoría que tiene productos.'},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        return super().destroy(request, *args, **kwargs)
+        res = super().destroy(request, *args, **kwargs)
+        invalidate_mercado_cache(request.user.mercado_id)
+        return res
 
 
 class KardexListView(generics.ListAPIView):

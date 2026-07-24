@@ -217,7 +217,7 @@ class ReporteVentasView(APIView):
             ]
         }
 
-        cache.set(cache_key, result, 600)
+        cache.set(cache_key, result, 2)
         return Response(result)
 
 

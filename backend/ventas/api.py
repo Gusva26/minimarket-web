@@ -234,7 +234,7 @@ class VentaViewSet(viewsets.ModelViewSet):
             serializer = self.get_serializer(page, many=True)
             res_obj = self.get_paginated_response(serializer.data).data
             res_obj['summary'] = summary_data
-            cache.set(cache_key, res_obj, 600)
+            cache.set(cache_key, res_obj, 2)
             return Response(res_obj)
 
         serializer = self.get_serializer(qs, many=True)
@@ -242,7 +242,7 @@ class VentaViewSet(viewsets.ModelViewSet):
             'results': serializer.data,
             'summary': summary_data
         }
-        cache.set(cache_key, res_data, 600)
+        cache.set(cache_key, res_data, 2)
         return Response(res_data)
 
 
@@ -450,6 +450,7 @@ class VentaViewSet(viewsets.ModelViewSet):
                 venta.estado = 'ANULADA'
                 venta.save()
 
+            invalidate_mercado_cache(venta.mercado_id)
             return Response({'status': 'success', 'message': f'Venta {venta.serie}-{venta.numero} anulada.', 'venta': VentaSerializer(venta).data})
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

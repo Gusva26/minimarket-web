@@ -54,11 +54,11 @@ const HistorialPage = {
         <div class="filter-group w-100 mb-1">
           <label class="d-block mb-1" style="font-weight:600;font-size:0.75rem;text-transform:uppercase;color:var(--text-muted)">Período Rápido</label>
           <div class="btn-group" role="group" id="historialFiltrosRapidos">
-            <button class="btn btn-primary btn-sm active" data-range="hoy">Hoy</button>
+            <button class="btn btn-primary btn-sm active" data-range="todos">Todos</button>
+            <button class="btn btn-ghost btn-sm" data-range="hoy">Hoy</button>
             <button class="btn btn-ghost btn-sm" data-range="ayer">Ayer</button>
             <button class="btn btn-ghost btn-sm" data-range="semana">Últimos 7 Días</button>
             <button class="btn btn-ghost btn-sm" data-range="mes">Este Mes</button>
-            <button class="btn btn-ghost btn-sm" data-range="todos">Todos</button>
           </div>
         </div>
 
@@ -149,10 +149,13 @@ const HistorialPage = {
       </div>
     `;
 
-    // Establecer fecha de HOY por defecto
-    const hoy = new Date().toISOString().split('T')[0];
-    document.getElementById('filtro_fecha_inicio').value = hoy;
-    document.getElementById('filtro_fecha_fin').value = hoy;
+    if (typeof API !== 'undefined' && API.clearCache) {
+      API.clearCache();
+    }
+
+    // Por defecto mostrar Todos los comprobantes del historial
+    document.getElementById('filtro_fecha_inicio').value = '';
+    document.getElementById('filtro_fecha_fin').value = '';
 
     this.bindEvents();
     await this.cargarVentas();

@@ -142,9 +142,9 @@ const ProductosPage = {
                       <option value="KG">Kilogramo (KG) — peso</option>
                       <option value="LT">Litro (LT) — líquidos</option>
                       <option value="CAJ">Caja (CAJ) — por empaque</option>
-                      <option value="BOL">Bolsa (BOL) — por empaque</option>
                       <option value="PAQ">Paquete (PAQ) — por empaque</option>
                     </select>
+
                   </div>
                 </div>
                 <div class="col-md-4">
@@ -497,7 +497,8 @@ const ProductosPage = {
       return;
     }
 
-    const umLabels = { UND: 'Und', KG: 'Kg', LT: 'Lt', CAJ: 'Cja', BOL: 'Bsa', PAQ: 'Pqte' };
+    const umLabels = { UND: 'Und', KG: 'Kg', LT: 'Lt', CAJ: 'Cja', PAQ: 'Pqte' };
+
 
     tbody.innerHTML = productos.map(p => {
       const stock = parseFloat(p.stock) || 0;

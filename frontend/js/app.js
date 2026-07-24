@@ -36,10 +36,12 @@ const App = {
   async init() {
     this.navbar = new Navbar();
     await Auth.init();
+    Utils.initGlobalValidations();
     this.initSidebar();
     this.initTheme();
     this.initLogout();
     this.keepAlive();
+
     window.addEventListener('hashchange', () => this.handleRoute());
     if (!window.location.hash) {
       window.location.hash = '#/dashboard';

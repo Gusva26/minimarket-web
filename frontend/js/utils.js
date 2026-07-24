@@ -164,7 +164,75 @@ const Utils = {
     });
   },
 
+  initGlobalValidations() {
+    if (this._validationsInitialized) return;
+    this._validationsInitialized = true;
+
+    const getRestrictionType = (input) => {
+      if (!input || input.tagName !== 'INPUT') return null;
+      const type = input.type ? input.type.toLowerCase() : '';
+      if (['password', 'file', 'checkbox', 'radio', 'date', 'time', 'color'].includes(type)) return null;
+
+      const dType = (input.dataset.type || '').toLowerCase();
+      const name = (input.name || '').toLowerCase();
+      const id = (input.id || '').toLowerCase();
+
+      if (dType === 'dni' || name === 'dni' || id.includes('dni')) return 'dni';
+      if (dType === 'ruc' || name === 'ruc' || id.includes('ruc')) return 'ruc';
+      if (dType === 'phone' || dType === 'celular' || name === 'telefono' || name === 'celular' || id.includes('telefono') || id.includes('celular')) return 'phone';
+
+      if (name === 'num_documento' || id.includes('documento')) {
+        const form = input.closest('form') || input.closest('.modal-card') || document;
+        const tipoDoc = form.querySelector('[name="tipo_documento"], #cliente_tipo_doc, select[name*="tipo_doc"]');
+        if (tipoDoc && (tipoDoc.value === 'RUC' || tipoDoc.value === '6')) return 'ruc';
+        if (input.maxLength === 11) return 'ruc';
+        return 'dni';
+      }
+      return null;
+    };
+
+    const applyRestriction = (input) => {
+      const rType = getRestrictionType(input);
+      if (!rType) return;
+
+      let maxLen = 8;
+      if (rType === 'dni') maxLen = 8;
+      else if (rType === 'ruc') maxLen = 11;
+      else if (rType === 'phone') maxLen = 9;
+
+      input.setAttribute('maxlength', maxLen);
+      input.setAttribute('inputmode', 'numeric');
+
+      const digits = input.value.replace(/\D/g, '').slice(0, maxLen);
+      if (input.value !== digits) {
+        input.value = digits;
+      }
+    };
+
+    document.addEventListener('input', (e) => applyRestriction(e.target));
+    document.addEventListener('focusin', (e) => applyRestriction(e.target));
+
+    document.addEventListener('paste', (e) => {
+      const input = e.target;
+      const rType = getRestrictionType(input);
+      if (!rType) return;
+
+      e.preventDefault();
+      const pastedText = (e.clipboardData || window.clipboardData).getData('text') || '';
+      let digits = pastedText.replace(/\D/g, '');
+      let maxLen = 8;
+      if (rType === 'dni') maxLen = 8;
+      else if (rType === 'ruc') maxLen = 11;
+      else if (rType === 'phone') maxLen = 9;
+
+      input.setAttribute('maxlength', maxLen);
+      input.value = digits.slice(0, maxLen);
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+  },
+
   debounce(func, wait) {
+
     let timeout;
     return function(...args) {
       clearTimeout(timeout);
