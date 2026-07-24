@@ -455,6 +455,194 @@ class VentaViewSet(viewsets.ModelViewSet):
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    @action(detail=True, methods=['get'])
+    def pdf(self, request, pk=None):
+        from django.http import HttpResponse
+        from xhtml2pdf import pisa
+
+        venta = self.get_object()
+        detalles = venta.detalles.select_related('producto').all()
+
+        mercado_nombre = venta.mercado.nombre if venta.mercado else 'MINIMARKET'
+        mercado_direccion = venta.mercado.direccion if (venta.mercado and venta.mercado.direccion) else 'Lima, Perú'
+        cajero_nombre = f"{venta.usuario.first_name} {venta.usuario.last_name}".strip() if venta.usuario else 'Cajero'
+        if not cajero_nombre and venta.usuario:
+            cajero_nombre = venta.usuario.username
+
+        cliente_nombre = venta.cliente.nombre if venta.cliente else 'Cliente Anónimo'
+        cliente_doc = f"{venta.cliente.tipo_documento}: {venta.cliente.num_documento}" if (venta.cliente and venta.cliente.num_documento) else 'S/N'
+        cliente_dir = venta.cliente.direccion if (venta.cliente and venta.cliente.direccion) else ''
+
+        serie_num = f"{venta.serie}-{str(venta.numero).zfill(8)}"
+        fecha_str = timezone.localtime(venta.fecha_hora).strftime('%d/%m/%Y %H:%M:%S')
+
+        items_rows = ""
+        for det in detalles:
+            p_name = det.producto.nombre if det.producto else "Producto"
+            cant = float(det.cantidad)
+            p_unit = float(det.precio_unitario)
+            subt = float(det.subtotal)
+            items_rows += f"""
+            <tr>
+                <td style="padding: 4px 2px; border-bottom: 1px dashed #cbd5e1;">{p_name}</td>
+                <td style="padding: 4px 2px; text-align: center; border-bottom: 1px dashed #cbd5e1;">{cant:g}</td>
+                <td style="padding: 4px 2px; text-align: right; border-bottom: 1px dashed #cbd5e1;">S/ {p_unit:.2f}</td>
+                <td style="padding: 4px 2px; text-align: right; border-bottom: 1px dashed #cbd5e1;">S/ {subt:.2f}</td>
+            </tr>
+            """
+
+        html = f"""
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <style>
+                @page {{
+                    size: 80mm 200mm;
+                    margin: 4mm;
+                }}
+                body {{
+                    font-family: 'Helvetica', 'Arial', sans-serif;
+                    font-size: 10px;
+                    color: #0f172a;
+                    line-height: 1.3;
+                }}
+                .header {{
+                    text-align: center;
+                    border-bottom: 1px solid #0f172a;
+                    padding-bottom: 6px;
+                    margin-bottom: 6px;
+                }}
+                .title {{
+                    font-size: 13px;
+                    font-weight: bold;
+                    text-transform: uppercase;
+                }}
+                .subtitle {{
+                    font-size: 8.5px;
+                    color: #475569;
+                }}
+                .doc-box {{
+                    text-align: center;
+                    background-color: #f1f5f9;
+                    border: 1px solid #cbd5e1;
+                    padding: 5px;
+                    margin: 6px 0;
+                    border-radius: 4px;
+                }}
+                .doc-type {{
+                    font-size: 11px;
+                    font-weight: bold;
+                }}
+                .doc-num {{
+                    font-size: 12px;
+                    font-weight: bold;
+                    color: #2563eb;
+                }}
+                .meta-table {{
+                    width: 100%;
+                    margin-bottom: 6px;
+                    font-size: 8.5px;
+                }}
+                .items-table {{
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin: 6px 0;
+                }}
+                .items-table th {{
+                    background-color: #0f172a;
+                    color: #ffffff;
+                    padding: 4px 2px;
+                    font-size: 8px;
+                    text-transform: uppercase;
+                }}
+                .totals-table {{
+                    width: 100%;
+                    margin-top: 6px;
+                    border-top: 1px solid #0f172a;
+                    padding-top: 4px;
+                    font-size: 9px;
+                }}
+                .footer {{
+                    text-align: center;
+                    margin-top: 10px;
+                    font-size: 8px;
+                    color: #64748b;
+                    border-top: 1px dashed #cbd5e1;
+                    padding-top: 6px;
+                }}
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <div class="title">{mercado_nombre}</div>
+                <div class="subtitle">{mercado_direccion}</div>
+                <div class="subtitle">RUC: 20601234567 | Tel: (01) 458-9000</div>
+            </div>
+
+            <div class="doc-box">
+                <div class="doc-type">{venta.tipo_comprobante} ELECTRÓNICA</div>
+                <div class="doc-num">{serie_num}</div>
+            </div>
+
+            <table class="meta-table">
+                <tr>
+                    <td><strong>Fecha:</strong> {fecha_str}</td>
+                    <td style="text-align:right;"><strong>Cajero:</strong> {cajero_nombre}</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><strong>Cliente:</strong> {cliente_nombre} ({cliente_doc})</td>
+                </tr>
+                {f'<tr><td colspan="2"><strong>Dirección:</strong> {cliente_dir}</td></tr>' if cliente_dir else ''}
+                <tr>
+                    <td><strong>Método Pago:</strong> {venta.metodo_pago}</td>
+                    <td style="text-align:right;"><strong>Estado:</strong> {venta.estado}</td>
+                </tr>
+            </table>
+
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th style="text-align:left;">Producto</th>
+                        <th style="text-align:center;">Cant.</th>
+                        <th style="text-align:right;">P.U.</th>
+                        <th style="text-align:right;">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {items_rows}
+                </tbody>
+            </table>
+
+            <table class="totals-table">
+                <tr>
+                    <td>Op. Gravada:</td>
+                    <td style="text-align:right;">S/ {float(venta.subtotal):.2f}</td>
+                </tr>
+                <tr>
+                    <td>IGV (18%):</td>
+                    <td style="text-align:right;">S/ {float(venta.igv):.2f}</td>
+                </tr>
+                <tr style="font-size: 10.5px; font-weight: bold;">
+                    <td>TOTAL A PAGAR:</td>
+                    <td style="text-align:right; color:#059669;">S/ {float(venta.total):.2f}</td>
+                </tr>
+            </table>
+
+            <div class="footer">
+                <div>¡Gracias por su compra en {mercado_nombre}!</div>
+                <div>Representación impresa del comprobante electrónico</div>
+            </div>
+        </body>
+        </html>
+        """
+
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = f'inline; filename="Comprobante_{serie_num}.pdf"'
+        pisa_status = pisa.CreatePDF(html, dest=response)
+        if pisa_status.err:
+            return Response({'error': 'Error al generar el PDF del comprobante'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return response
+
 
 class ObtenerSiguienteNumeroView(APIView):
     def get(self, request):
