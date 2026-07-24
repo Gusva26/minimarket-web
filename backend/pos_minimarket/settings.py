@@ -144,13 +144,24 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, '..', 'frontend', 'static')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME', default='vp7sxhj7'),
     'API_KEY': config('CLOUDINARY_API_KEY', default='763468916953124'),
     'API_SECRET': config('CLOUDINARY_API_SECRET', default='vGOhvukLTxE5IkgVHbLueoRIQ40'),
 }
 
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+cloudinary.config(
+    cloud_name=CLOUDINARY_STORAGE['CLOUD_NAME'],
+    api_key=CLOUDINARY_STORAGE['API_KEY'],
+    api_secret=CLOUDINARY_STORAGE['API_SECRET'],
+    secure=True
+)
+
+DEFAULT_FILE_STORAGE = 'inventario.storage.CustomMediaCloudinaryStorage'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, '..', 'media')
