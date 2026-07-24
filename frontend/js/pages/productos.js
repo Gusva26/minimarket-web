@@ -591,8 +591,16 @@ const ProductosPage = {
     if (!data.get('categoria') || data.get('categoria') === '') {
       data.delete('categoria');
     }
-    const imagen = data.get('imagen');
-    if (imagen && imagen.size === 0) {
+
+    let imagenFile = data.get('imagen');
+    if (imagenFile && imagenFile.size > 0) {
+      try {
+        const compressed = await Utils.compressImage(imagenFile, 800, 0.82);
+        data.set('imagen', compressed);
+      } catch (err) {
+        console.warn('No se pudo comprimir la imagen en cliente:', err);
+      }
+    } else {
       data.delete('imagen');
     }
 
