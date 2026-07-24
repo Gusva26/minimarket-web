@@ -99,10 +99,18 @@ class ProductoViewSet(viewsets.ModelViewSet):
         return response
 
     def perform_create(self, serializer):
-        serializer.save(mercado=self.request.user.mercado)
+        prod = serializer.save(mercado=self.request.user.mercado)
+        invalidate_mercado_cache(self.request.user.mercado_id)
 
     def perform_update(self, serializer):
-        serializer.save(mercado=self.request.user.mercado)
+        prod = serializer.save(mercado=self.request.user.mercado)
+        invalidate_mercado_cache(self.request.user.mercado_id)
+
+    def perform_destroy(self, instance):
+        mercado_id = instance.mercado_id
+        instance.delete()
+        invalidate_mercado_cache(mercado_id)
+
 
     @action(detail=True, methods=['get'])
     def detalle(self, request, pk=None):

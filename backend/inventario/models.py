@@ -63,13 +63,12 @@ class Producto(models.Model):
     def save(self, *args, **kwargs):
         if self.imagen:
             try:
-                # Comprobar si es un archivo recién subido (tiene atributo file)
-                if hasattr(self.imagen, 'file') and not isinstance(self.imagen.file, str):
+                # Comprobar si se está subiendo un archivo nuevo con stream de lectura
+                if hasattr(self.imagen, 'file') and hasattr(self.imagen.file, 'read'):
                     img = Image.open(self.imagen.file)
                     if img.mode != 'RGBA':
                         img = img.convert('RGBA')
                     
-                    # Redimensionar a máximo 400x400 para optimización Base64
                     max_size = (400, 400)
                     if img.width > 400 or img.height > 400:
                         img.thumbnail(max_size, Image.LANCZOS)
@@ -82,6 +81,24 @@ class Producto(models.Model):
                 logger.warning(f"No se pudo convertir la imagen a Base64: {e}")
 
         super().save(*args, **kwargs)
+
+
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
+
+@receiver([post_save, post_delete], sender=Producto)
+def producto_changed_signal(sender, instance, **kwargs):
+    from .utils import invalidate_mercado_cache
+    mercado_id = instance.mercado_id if instance.mercado else None
+    invalidate_mercado_cache(mercado_id)
+
+@receiver([post_save, post_delete], sender=Categoria)
+def categoria_changed_signal(sender, instance, **kwargs):
+    from .utils import invalidate_mercado_cache
+    mercado_id = instance.mercado_id if instance.mercado else None
+    invalidate_mercado_cache(mercado_id)
+
+
 
 
 class Kardex(models.Model):

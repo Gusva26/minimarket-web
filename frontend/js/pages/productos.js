@@ -601,14 +601,16 @@ const ProductosPage = {
       } else {
         await API.upload('productos/', data);
       }
+      API.clearCache();
       Utils.showToast(isEdit ? 'Producto actualizado' : 'Producto creado', 'success');
       Utils.hideModal('modalProducto');
-      this.loadProductos();
+      await this.loadProductos();
     } catch (e) {
       Utils.showToast('Error: ' + e.message, 'error');
     } finally {
       btn.disabled = false;
     }
+
   },
 
   confirmarEliminar: function (id, nombre) {
