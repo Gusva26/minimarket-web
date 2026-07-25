@@ -287,7 +287,7 @@ const App = {
           productos: ProductosPage, categorias: CategoriasPage, kardex: KardexPage,
           transferencias: TransferenciasPage, vencimientos: VencimientosPage,
           valoracion: ValoracionPage, ventas: VentasPage, 'ventas-historial': HistorialPage,
-          cajas: CajasPage, compras: ComprasPage, proveedores: ProveedoresPage,
+          clientes: ClientesPage, cajas: CajasPage, compras: ComprasPage, proveedores: ProveedoresPage,
           reportes: ReportesPage,
         };
         if (pageMap[hash]) {
