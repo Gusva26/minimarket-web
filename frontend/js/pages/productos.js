@@ -6,7 +6,6 @@ const ProductosPage = {
   currentProductoId: null,
 
   render: async function (container) {
-    if (typeof API !== 'undefined' && API.clearCache) API.clearCache();
     const isAdmin = Auth.isAdmin();
 
     container.innerHTML = `

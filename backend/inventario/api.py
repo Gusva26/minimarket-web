@@ -95,7 +95,7 @@ class ProductoViewSet(viewsets.ModelViewSet):
 
         logger.info(f'GET {request.path} (DB QUERY)')
         response = super().list(request, *args, **kwargs)
-        cache.set(cache_key, response.data, 2)
+        cache.set(cache_key, response.data, 300)
         return response
 
     def perform_create(self, serializer):

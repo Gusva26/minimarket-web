@@ -17,7 +17,13 @@ const API = {
       this.clearCache();
     }
 
-    // Direct live request to backend (Backend manages versioned caching)
+    // Check memory cache for GET requests (30 seconds client cache)
+    if (method.toUpperCase() === 'GET' && !rawResponse) {
+      const cached = this._cacheMap.get(endpoint);
+      if (cached && (Date.now() - cached.timestamp < 30000)) {
+        return cached.data;
+      }
+    }
 
 
     const isPublicAuthEndpoint = endpoint.includes('auth/login') || 
