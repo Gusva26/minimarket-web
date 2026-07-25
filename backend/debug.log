@@ -985,3 +985,5 @@ Traceback (most recent call last):
 django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'localhost:8000'. You may need to add 'localhost' to ALLOWED_HOSTS.
 WARNING 2026-07-25 08:26:28,789 log 16528 20820 Bad Request: /api/ping/
 WARNING 2026-07-25 08:26:28,789 basehttp 16528 20820 "GET /api/ping/ HTTP/1.1" 400 76198
+WARNING 2026-07-25 08:49:49,424 log 21248 20076 Bad Request: /api/auth/password-reset/validate/
+WARNING 2026-07-25 08:49:49,425 basehttp 21248 20076 "POST /api/auth/password-reset/validate/ HTTP/1.1" 400 53
