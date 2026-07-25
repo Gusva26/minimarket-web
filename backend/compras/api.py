@@ -68,7 +68,7 @@ class CompraViewSet(viewsets.ModelViewSet):
             return Response(cached_data)
 
         response = super().list(request, *args, **kwargs)
-        cache.set(cache_key, response.data, 300)
+        cache.set(cache_key, response.data, 86400)
         return response
 
     def create(self, request, *args, **kwargs):

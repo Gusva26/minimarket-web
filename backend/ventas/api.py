@@ -234,7 +234,7 @@ class VentaViewSet(viewsets.ModelViewSet):
             serializer = self.get_serializer(page, many=True)
             res_obj = self.get_paginated_response(serializer.data).data
             res_obj['summary'] = summary_data
-            cache.set(cache_key, res_obj, 300)
+            cache.set(cache_key, res_obj, 86400)
             return Response(res_obj)
 
         serializer = self.get_serializer(qs, many=True)
@@ -242,7 +242,7 @@ class VentaViewSet(viewsets.ModelViewSet):
             'results': serializer.data,
             'summary': summary_data
         }
-        cache.set(cache_key, res_data, 300)
+        cache.set(cache_key, res_data, 86400)
         return Response(res_data)
 
 

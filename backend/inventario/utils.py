@@ -11,7 +11,7 @@ def get_mercado_cache_version(mercado_id):
     return cache.get_or_set(key, 1)
 
 
-def cached_list(cache_key_prefix, mercado_id, params_str, timeout=300):
+def cached_list(cache_key_prefix, mercado_id, params_str, timeout=86400):
     """Cachea la respuesta de un listado, invalidado por versión de mercado."""
     version = get_mercado_cache_version(mercado_id)
     cache_key = f"{cache_key_prefix}_v{version}_{params_str}"
@@ -21,7 +21,7 @@ def cached_list(cache_key_prefix, mercado_id, params_str, timeout=300):
     return True, cache_key
 
 
-def set_cached_list(cache_key, data, timeout=300):
+def set_cached_list(cache_key, data, timeout=86400):
     """Guarda datos en caché si la key fue generada por cached_list."""
     cache.set(cache_key, data, timeout)
 

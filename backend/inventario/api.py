@@ -95,7 +95,7 @@ class ProductoViewSet(viewsets.ModelViewSet):
 
         logger.info(f'GET {request.path} (DB QUERY)')
         response = super().list(request, *args, **kwargs)
-        cache.set(cache_key, response.data, 300)
+        cache.set(cache_key, response.data, 86400)
         return response
 
     def perform_create(self, serializer):
@@ -320,7 +320,7 @@ class CategoriaViewSet(viewsets.ModelViewSet):
             logger.info(f'GET {request.path} (DB QUERY)')
             response = super().list(request, *args, **kwargs)
             data = response.data
-            cache.set(cache_key, data, 300)
+            cache.set(cache_key, data, 86400)
         return Response(data)
 
     def perform_create(self, serializer):
