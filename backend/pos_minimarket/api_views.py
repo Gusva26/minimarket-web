@@ -9,6 +9,8 @@ from django.core.exceptions import ValidationError
 from django.template.loader import render_to_string
 from django.conf import settings
 from django.core.cache import cache
+from decouple import config
+import requests
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -18,6 +20,79 @@ from inventario.models import Producto, UnidadProducto, Kardex
 from inventario.utils import get_mercado_cache_version, mercado_filter
 from ventas.models import Venta, Caja
 from usuarios.models import Usuario
+
+
+def send_email_http_or_smtp(subject, message_html, to_email):
+    resend_key = config('RESEND_API_KEY', default='').strip()
+    if resend_key:
+        from_email = config('DEFAULT_FROM_EMAIL', default='Minimarket POS <onboarding@resend.dev>')
+        res = requests.post(
+            'https://api.resend.com/emails',
+            headers={
+                'Authorization': f'Bearer {resend_key}',
+                'Content-Type': 'application/json',
+            },
+            json={
+                'from': from_email,
+                'to': [to_email],
+                'subject': subject,
+                'html': message_html,
+            },
+            timeout=10
+        )
+        if res.status_code in (200, 201):
+            return True
+        
+        # Fallback to onboarding@resend.dev if custom domain is unverified on Resend free plan
+        if res.status_code in (400, 403) or 'domain' in res.text.lower() or 'onboarding' in res.text.lower() or 'validation' in res.text.lower():
+            res_retry = requests.post(
+                'https://api.resend.com/emails',
+                headers={
+                    'Authorization': f'Bearer {resend_key}',
+                    'Content-Type': 'application/json',
+                },
+                json={
+                    'from': 'Minimarket POS <onboarding@resend.dev>',
+                    'to': [to_email],
+                    'subject': subject,
+                    'html': message_html,
+                },
+                timeout=10
+            )
+            if res_retry.status_code in (200, 201):
+                return True
+            raise Exception(f"Resend API ({res_retry.status_code}): {res_retry.text}")
+
+        raise Exception(f"Resend API ({res.status_code}): {res.text}")
+
+    brevo_key = config('BREVO_API_KEY', default='').strip()
+    if brevo_key:
+        sender_email = config('SMTP_USER', default='noreply@minimarket.com')
+        res = requests.post(
+            'https://api.brevo.com/v3/smtp/email',
+            headers={
+                'api-key': brevo_key,
+                'Content-Type': 'application/json',
+            },
+            json={
+                'sender': {'name': 'Minimarket POS', 'email': sender_email},
+                'to': [{'email': to_email}],
+                'subject': subject,
+                'htmlContent': message_html,
+            },
+            timeout=10
+        )
+        if res.status_code in (200, 201):
+            return True
+        else:
+            raise Exception(f"Brevo API ({res.status_code}): {res.text}")
+
+    # Fallback to SMTP
+    if not getattr(settings, 'EMAIL_HOST_USER', '') or not getattr(settings, 'EMAIL_HOST_PASSWORD', ''):
+        raise Exception('Faltan credenciales SMTP (SMTP_USER / SMTP_PASS) o RESEND_API_KEY en las variables de entorno.')
+
+    send_mail(subject, message_html, None, [to_email], html_message=message_html)
+    return True
 
 
 class DashboardView(APIView):
@@ -185,14 +260,19 @@ class PasswordResetView(APIView):
                     f"<p>Si no solicitaste este cambio, ignora este correo.</p>"
                 )
 
-            if not getattr(settings, 'EMAIL_HOST_USER', '') or not getattr(settings, 'EMAIL_HOST_PASSWORD', ''):
-                return Response(
-                    {'error': 'Servidor no configurado para envío de correos (Faltan SMTP_USER y SMTP_PASS en las variables de entorno de Render).'},
-                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                )
-
-            send_mail(subject, message, None, [email], html_message=message)
-            return Response({'mensaje': 'Se ha enviado un enlace de recuperación a tu correo electrónico.'})
+            try:
+                send_email_http_or_smtp(subject, message, email)
+                return Response({'mensaje': 'Se ha enviado un enlace de recuperación a tu correo electrónico.'})
+            except Exception as mail_err:
+                print(f"Error al enviar correo en PasswordResetView: {mail_err}")
+                err_msg = str(mail_err)
+                if 'timed out' in err_msg.lower() or 'timeout' in err_msg.lower():
+                    err_msg = (
+                        "Render en su plan gratuito bloquea las conexiones SMTP por puerto 587/465. "
+                        "Para solucionarlo en 1 minuto: regístrate gratis en Resend.com (3,000 envíos/mes gratis), "
+                        "copia tu API Key y agrégala en Render como RESEND_API_KEY."
+                    )
+                return Response({'error': f'No se pudo enviar el correo: {err_msg}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         except Exception as e:
             print(f"Error inesperado en PasswordResetView: {e}")
