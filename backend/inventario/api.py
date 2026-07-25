@@ -320,7 +320,7 @@ class CategoriaViewSet(viewsets.ModelViewSet):
             logger.info(f'GET {request.path} (DB QUERY)')
             response = super().list(request, *args, **kwargs)
             data = response.data
-            cache.set(cache_key, data, 30) # 30s cache TTL
+            cache.set(cache_key, data, 300)
         return Response(data)
 
     def perform_create(self, serializer):
