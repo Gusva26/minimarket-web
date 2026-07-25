@@ -235,9 +235,14 @@ SIMPLE_JWT = {
 # Email
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = config('SMTP_HOST', default='smtp.gmail.com')
-EMAIL_PORT = config('SMTP_PORT', default=587, cast=int)
-EMAIL_USE_TLS = config('SMTP_USE_TLS', default=True, cast=bool)
-EMAIL_USE_SSL = config('SMTP_USE_SSL', default=False, cast=bool)
+EMAIL_PORT = config('SMTP_PORT', default=465, cast=int)
+if EMAIL_PORT == 465:
+    EMAIL_USE_SSL = config('SMTP_USE_SSL', default=True, cast=bool)
+    EMAIL_USE_TLS = config('SMTP_USE_TLS', default=False, cast=bool)
+else:
+    EMAIL_USE_SSL = config('SMTP_USE_SSL', default=False, cast=bool)
+    EMAIL_USE_TLS = config('SMTP_USE_TLS', default=True, cast=bool)
+
 EMAIL_HOST_USER = config('SMTP_USER', default='')
 EMAIL_HOST_PASSWORD = config('SMTP_PASS', default='')
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='Minimarket POS <noreply@minimarket.local>')
