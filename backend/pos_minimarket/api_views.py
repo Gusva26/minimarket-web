@@ -177,13 +177,19 @@ class PasswordResetView(APIView):
                 })
             except Exception:
                 name = user.first_name or user.username
-                message = f"""
-                <h2>Recuperación de Contraseña</h2>
-                <p>Hola <strong>{name}</strong>,</p>
-                <p>Recibimos una solicitud para restablecer tu contraseña en Minimarket POS. Haz clic en el siguiente enlace para continuar:</p>
-                <p><a href="{link}" style="display:inline-block;background:#0ea5e9;color:#fff;padding:10px 20px;border-radius:5px;text-decoration:none;">Restablecer Contraseña</a></p>
-                <p>Si no solicitaste este cambio, ignora este correo.</p>
-                """
+                message = (
+                    f"<h2>Recuperación de Contraseña</h2>"
+                    f"<p>Hola <strong>{name}</strong>,</p>"
+                    f"<p>Recibimos una solicitud para restablecer tu contraseña en Minimarket POS. Haz clic en el siguiente enlace para continuar:</p>"
+                    f"<p><a href=\"{link}\" style=\"display:inline-block;background:#0ea5e9;color:#fff;padding:10px 20px;border-radius:5px;text-decoration:none;\">Restablecer Contraseña</a></p>"
+                    f"<p>Si no solicitaste este cambio, ignora este correo.</p>"
+                )
+
+            if not getattr(settings, 'EMAIL_HOST_USER', '') or not getattr(settings, 'EMAIL_HOST_PASSWORD', ''):
+                return Response(
+                    {'error': 'Servidor no configurado para envío de correos (Faltan SMTP_USER y SMTP_PASS en las variables de entorno de Render).'},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
 
             send_mail(subject, message, None, [email], html_message=message)
             return Response({'mensaje': 'Se ha enviado un enlace de recuperación a tu correo electrónico.'})

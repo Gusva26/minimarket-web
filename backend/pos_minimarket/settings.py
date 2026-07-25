@@ -240,27 +240,18 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = config('SMTP_USER', default='')
 EMAIL_HOST_PASSWORD = config('SMTP_PASS', default='')
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='Minimarket POS <noreply@minimarket.local>')
+EMAIL_TIMEOUT = 10
 
 # CORS
-CORS_ALLOWED_ORIGINS = [
-    'http://127.0.0.1:5500',
-    'http://localhost:5500',
-    'http://127.0.0.1:8000',
-    'http://localhost:8000',
-    'https://minimarket-frontend-ten.vercel.app',
-]
-frontend_url = config('FRONTEND_URL', default='')
-if frontend_url:
-    clean_url = frontend_url.rstrip('/')
-    if clean_url not in CORS_ALLOWED_ORIGINS:
-        CORS_ALLOWED_ORIGINS.append(clean_url)
-
+CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 
 CSRF_TRUSTED_ORIGINS = [
     'http://127.0.0.1:5500',
     'http://localhost:5500',
+    'http://localhost:8000',
     'https://minimarket-frontend-ten.vercel.app',
+    'https://minimarket-backend-t8ai.onrender.com',
 ]
 
 # Session & Cookie settings for Cross-Site HTTPS Production
