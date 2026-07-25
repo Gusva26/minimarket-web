@@ -20,9 +20,13 @@ const API = {
     // Direct live request to backend (Backend manages versioned caching)
 
 
+    const isPublicAuthEndpoint = endpoint.includes('auth/login') || 
+                                 endpoint.includes('auth/password-reset') || 
+                                 endpoint.includes('auth/refresh');
+
     const headers = (!isFormData && data) ? {'Content-Type': 'application/json'} : {};
     const token = localStorage.getItem('access_token');
-    if (token) {
+    if (token && !isPublicAuthEndpoint) {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
@@ -36,7 +40,7 @@ const API = {
 
     let response = await fetch(this.baseURL + endpoint, config);
 
-    if (response.status === 401 && !endpoint.includes('auth/login') && !endpoint.includes('auth/refresh')) {
+    if (response.status === 401 && !isPublicAuthEndpoint) {
       try {
         const refreshToken = localStorage.getItem('refresh_token');
         const refreshHeaders = { 'Content-Type': 'application/json' };

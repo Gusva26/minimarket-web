@@ -31,10 +31,10 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -174,7 +174,7 @@ LOGOUT_REDIRECT_URL = 'login'
 # Configuración de Facturación Electrónica / Consultas
 # Regístrate en apisperu.com para obtener tu token gratuito (2,000 consultas/mes)
 APISPERU_TOKEN = config('APISPERU_TOKEN', default='')
-FRONTEND_URL = config('FRONTEND_URL', default='')
+FRONTEND_URL = config('FRONTEND_URL', default='https://minimarket-frontend-ten.vercel.app')
 
 # Django REST Framework
 REST_FRAMEWORK = {
@@ -247,6 +247,7 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:5500',
     'http://127.0.0.1:8000',
     'http://localhost:8000',
+    'https://minimarket-frontend-ten.vercel.app',
 ]
 frontend_url = config('FRONTEND_URL', default='')
 if frontend_url:
@@ -255,6 +256,12 @@ if frontend_url:
         CORS_ALLOWED_ORIGINS.append(clean_url)
 
 CORS_ALLOW_CREDENTIALS = True
+
+CSRF_TRUSTED_ORIGINS = [
+    'http://127.0.0.1:5500',
+    'http://localhost:5500',
+    'https://minimarket-frontend-ten.vercel.app',
+]
 
 # Session & Cookie settings for Cross-Site HTTPS Production
 if not DEBUG:

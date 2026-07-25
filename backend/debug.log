@@ -907,3 +907,81 @@ WARNING 2026-07-23 16:29:43,621 log 24172 12408 Not Found: /media/productos/png-
 WARNING 2026-07-23 16:29:43,622 log 24172 1724 Not Found: /media/productos/images_2_shCaq0U.png
 WARNING 2026-07-23 16:29:43,622 basehttp 24172 12408 "GET /media/productos/png-clipart-lighter-bic-promotional-merchandise-color-lighter-blue-white-thumb_7axDhvC.png HTTP/1.1" 404 2937
 WARNING 2026-07-23 16:29:43,624 basehttp 24172 1724 "GET /media/productos/images_2_shCaq0U.png HTTP/1.1" 404 2657
+ERROR 2026-07-25 08:26:07,858 exception 16528 14472 Invalid HTTP_HOST header: 'localhost:8000'. You may need to add 'localhost' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "C:\Users\Gusva\OneDrive\Desktop\PRESENTACION\minimarket-web\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Gusva\OneDrive\Desktop\PRESENTACION\minimarket-web\venv\Lib\site-packages\django\utils\deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "C:\Users\Gusva\OneDrive\Desktop\PRESENTACION\minimarket-web\venv\Lib\site-packages\django\middleware\common.py", line 48, in process_request
+    host = request.get_host()
+  File "C:\Users\Gusva\OneDrive\Desktop\PRESENTACION\minimarket-web\venv\Lib\site-packages\django\http\request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'localhost:8000'. You may need to add 'localhost' to ALLOWED_HOSTS.
+WARNING 2026-07-25 08:26:07,993 log 16528 14472 Bad Request: /api/auth/me/
+WARNING 2026-07-25 08:26:07,994 basehttp 16528 14472 "GET /api/auth/me/ HTTP/1.1" 400 79986
+ERROR 2026-07-25 08:26:08,004 exception 16528 2208 Invalid HTTP_HOST header: 'localhost:8000'. You may need to add 'localhost' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "C:\Users\Gusva\OneDrive\Desktop\PRESENTACION\minimarket-web\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Gusva\OneDrive\Desktop\PRESENTACION\minimarket-web\venv\Lib\site-packages\django\utils\deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "C:\Users\Gusva\OneDrive\Desktop\PRESENTACION\minimarket-web\venv\Lib\site-packages\django\middleware\common.py", line 48, in process_request
+    host = request.get_host()
+  File "C:\Users\Gusva\OneDrive\Desktop\PRESENTACION\minimarket-web\venv\Lib\site-packages\django\http\request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'localhost:8000'. You may need to add 'localhost' to ALLOWED_HOSTS.
+WARNING 2026-07-25 08:26:08,031 log 16528 2208 Bad Request: /api/ping/
+WARNING 2026-07-25 08:26:08,031 basehttp 16528 2208 "GET /api/ping/ HTTP/1.1" 400 76198
+ERROR 2026-07-25 08:26:11,310 exception 16528 19864 Invalid HTTP_HOST header: 'localhost:8000'. You may need to add 'localhost' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "C:\Users\Gusva\OneDrive\Desktop\PRESENTACION\minimarket-web\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Gusva\OneDrive\Desktop\PRESENTACION\minimarket-web\venv\Lib\site-packages\django\utils\deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "C:\Users\Gusva\OneDrive\Desktop\PRESENTACION\minimarket-web\venv\Lib\site-packages\django\middleware\common.py", line 48, in process_request
+    host = request.get_host()
+  File "C:\Users\Gusva\OneDrive\Desktop\PRESENTACION\minimarket-web\venv\Lib\site-packages\django\http\request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'localhost:8000'. You may need to add 'localhost' to ALLOWED_HOSTS.
+WARNING 2026-07-25 08:26:11,330 log 16528 19864 Bad Request: /api/auth/password-reset/
+WARNING 2026-07-25 08:26:11,331 basehttp 16528 19864 "POST /api/auth/password-reset/ HTTP/1.1" 400 79759
+ERROR 2026-07-25 08:26:15,355 exception 16528 22404 Invalid HTTP_HOST header: 'localhost:8000'. You may need to add 'localhost' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "C:\Users\Gusva\OneDrive\Desktop\PRESENTACION\minimarket-web\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Gusva\OneDrive\Desktop\PRESENTACION\minimarket-web\venv\Lib\site-packages\django\utils\deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "C:\Users\Gusva\OneDrive\Desktop\PRESENTACION\minimarket-web\venv\Lib\site-packages\django\middleware\common.py", line 48, in process_request
+    host = request.get_host()
+  File "C:\Users\Gusva\OneDrive\Desktop\PRESENTACION\minimarket-web\venv\Lib\site-packages\django\http\request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'localhost:8000'. You may need to add 'localhost' to ALLOWED_HOSTS.
+WARNING 2026-07-25 08:26:15,381 log 16528 22404 Bad Request: /api/ping/
+WARNING 2026-07-25 08:26:15,381 basehttp 16528 22404 "GET /api/ping/ HTTP/1.1" 400 76198
+ERROR 2026-07-25 08:26:23,024 exception 16528 21772 Invalid HTTP_HOST header: 'localhost:8000'. You may need to add 'localhost' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "C:\Users\Gusva\OneDrive\Desktop\PRESENTACION\minimarket-web\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Gusva\OneDrive\Desktop\PRESENTACION\minimarket-web\venv\Lib\site-packages\django\utils\deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "C:\Users\Gusva\OneDrive\Desktop\PRESENTACION\minimarket-web\venv\Lib\site-packages\django\middleware\common.py", line 48, in process_request
+    host = request.get_host()
+  File "C:\Users\Gusva\OneDrive\Desktop\PRESENTACION\minimarket-web\venv\Lib\site-packages\django\http\request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'localhost:8000'. You may need to add 'localhost' to ALLOWED_HOSTS.
+WARNING 2026-07-25 08:26:23,044 log 16528 21772 Bad Request: /api/auth/login/
+WARNING 2026-07-25 08:26:23,045 basehttp 16528 21772 "POST /api/auth/login/ HTTP/1.1" 400 79668
+ERROR 2026-07-25 08:26:28,760 exception 16528 20820 Invalid HTTP_HOST header: 'localhost:8000'. You may need to add 'localhost' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "C:\Users\Gusva\OneDrive\Desktop\PRESENTACION\minimarket-web\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Gusva\OneDrive\Desktop\PRESENTACION\minimarket-web\venv\Lib\site-packages\django\utils\deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "C:\Users\Gusva\OneDrive\Desktop\PRESENTACION\minimarket-web\venv\Lib\site-packages\django\middleware\common.py", line 48, in process_request
+    host = request.get_host()
+  File "C:\Users\Gusva\OneDrive\Desktop\PRESENTACION\minimarket-web\venv\Lib\site-packages\django\http\request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'localhost:8000'. You may need to add 'localhost' to ALLOWED_HOSTS.
+WARNING 2026-07-25 08:26:28,789 log 16528 20820 Bad Request: /api/ping/
+WARNING 2026-07-25 08:26:28,789 basehttp 16528 20820 "GET /api/ping/ HTTP/1.1" 400 76198

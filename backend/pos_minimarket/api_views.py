@@ -151,7 +151,7 @@ class CambiarMercadoView(APIView):
 
 
 class PasswordResetView(APIView):
-
+    authentication_classes = []
     permission_classes = [AllowAny]
 
     def post(self, request):
@@ -166,19 +166,28 @@ class PasswordResetView(APIView):
 
         token = token_generator.make_token(user)
         uid = urlsafe_base64_encode(force_bytes(user.pk))
-        link = f"{settings.FRONTEND_URL}/#/reset-password/{uid}/{token}"
+        frontend = (settings.FRONTEND_URL or 'https://minimarket-frontend-ten.vercel.app').rstrip('/')
+        link = f"{frontend}/#/reset-password/{uid}/{token}"
 
         subject = 'Recuperación de contraseña — Minimarket POS'
         message = render_to_string('emails/password_reset_email.html', {
             'user': user,
             'link': link,
         })
-        send_mail(subject, message, None, [email], html_message=message)
+        try:
+            send_mail(subject, message, None, [email], html_message=message)
+        except Exception as e:
+            print(f"Error enviando correo de recuperación: {e}")
+            return Response(
+                {'error': 'No se pudo enviar el correo de recuperación. Por favor verifica la configuración del servidor de correo.'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
         return Response({'mensaje': 'Se ha enviado un enlace de recuperación a tu correo electrónico.'})
 
 
 class PasswordResetValidateView(APIView):
+    authentication_classes = []
     permission_classes = [AllowAny]
 
     def post(self, request):
@@ -201,6 +210,7 @@ class PasswordResetValidateView(APIView):
 
 
 class PasswordResetConfirmView(APIView):
+    authentication_classes = []
     permission_classes = [AllowAny]
 
     def post(self, request):
