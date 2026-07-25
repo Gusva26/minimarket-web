@@ -155,35 +155,47 @@ class PasswordResetView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        email = request.data.get('email', '').strip()
-        if not email:
-            return Response({'error': 'El correo es obligatorio.'}, status=status.HTTP_400_BAD_REQUEST)
-
         try:
-            user = Usuario.objects.get(email=email, is_active=True)
-        except Usuario.DoesNotExist:
-            return Response({'error': 'El correo no está registrado en el sistema.'}, status=status.HTTP_404_NOT_FOUND)
+            email = request.data.get('email', '').strip()
+            if not email:
+                return Response({'error': 'El correo es obligatorio.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        token = token_generator.make_token(user)
-        uid = urlsafe_base64_encode(force_bytes(user.pk))
-        frontend = (settings.FRONTEND_URL or 'https://minimarket-frontend-ten.vercel.app').rstrip('/')
-        link = f"{frontend}/#/reset-password/{uid}/{token}"
+            user = Usuario.objects.filter(email__iexact=email, is_active=True).first()
+            if not user:
+                return Response({'error': 'El correo no está registrado en el sistema.'}, status=status.HTTP_404_NOT_FOUND)
 
-        subject = 'Recuperación de contraseña — Minimarket POS'
-        message = render_to_string('emails/password_reset_email.html', {
-            'user': user,
-            'link': link,
-        })
-        try:
+            token = token_generator.make_token(user)
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            frontend = (settings.FRONTEND_URL or 'https://minimarket-frontend-ten.vercel.app').rstrip('/')
+            link = f"{frontend}/#/reset-password/{uid}/{token}"
+
+            subject = 'Recuperación de contraseña — Minimarket POS'
+            try:
+                message = render_to_string('emails/password_reset_email.html', {
+                    'user': user,
+                    'link': link,
+                })
+            except Exception:
+                name = user.first_name or user.username
+                message = f"""
+                <h2>Recuperación de Contraseña</h2>
+                <p>Hola <strong>{name}</strong>,</p>
+                <p>Recibimos una solicitud para restablecer tu contraseña en Minimarket POS. Haz clic en el siguiente enlace para continuar:</p>
+                <p><a href="{link}" style="display:inline-block;background:#0ea5e9;color:#fff;padding:10px 20px;border-radius:5px;text-decoration:none;">Restablecer Contraseña</a></p>
+                <p>Si no solicitaste este cambio, ignora este correo.</p>
+                """
+
             send_mail(subject, message, None, [email], html_message=message)
+            return Response({'mensaje': 'Se ha enviado un enlace de recuperación a tu correo electrónico.'})
+
         except Exception as e:
-            print(f"Error enviando correo de recuperación: {e}")
+            print(f"Error inesperado en PasswordResetView: {e}")
+            import traceback
+            traceback.print_exc()
             return Response(
-                {'error': 'No se pudo enviar el correo de recuperación. Por favor verifica la configuración del servidor de correo.'},
+                {'error': f'No se pudo procesar la solicitud: {str(e)}'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-
-        return Response({'mensaje': 'Se ha enviado un enlace de recuperación a tu correo electrónico.'})
 
 
 class PasswordResetValidateView(APIView):
