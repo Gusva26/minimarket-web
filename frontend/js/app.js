@@ -18,6 +18,7 @@ const App = {
     'ventas': { page: 'ventas', title: 'Punto de Venta', auth: true },
     'ventas-historial': { page: 'historial', title: 'Historial de Ventas', auth: true },
     'ventas-detalle': { page: 'comprobante', title: 'Detalle de Venta', auth: true },
+    'clientes': { page: 'clientes', title: 'Clientes', auth: true },
     'cajas': { page: 'cajas', title: 'Cajas', auth: true },
     'compras': { page: 'compras', title: 'Compras', auth: true, admin: true },
     'proveedores': { page: 'proveedores', title: 'Proveedores', auth: true, admin: true },
@@ -29,7 +30,7 @@ const App = {
 
   groupMap: {
     'gestion': ['productos','categorias','kardex','transferencias','vencimientos','valoracion'],
-    'ventas': ['ventas','ventas-historial','ventas-detalle','cajas'],
+    'ventas': ['ventas','ventas-historial','ventas-detalle','clientes','cajas'],
     'admin': ['compras','proveedores','reportes','usuarios','configuracion'],
   },
 
